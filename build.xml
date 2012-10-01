@@ -1,0 +1,149 @@
+<?xml version="0.1" encoding="UTF-8"?>
+<project name="cruxc" basedir="." default="compile">
+	<description>
+		Build script for the crux project by Erik Westrup.
+	</description>
+
+	<!-- *** Global Variables *** -->
+	<property name="project.name" value="cruxc" />
+	<property name="project.authors" value="Erik Westrup" />
+	<property name="path.source" value="src" />
+	<property name="path.destination" value="bin" />
+	<property name="path.library" value="lib" />
+	<property name="path.documentation" value="doc" />
+	<property name="path.release" value="release" />
+	<property name="path.test" value="test" />
+	<property name="path.mainClass" value="crux/prog" />
+
+
+	<!-- Library versions in use. Please update path externalLibs if you add/remove from here.-->
+	<property name="junit" value="junit-4.9b2.jar" />
+
+	<!-- *** Paths *** -->
+	<path id="externalLibs">
+		<fileset dir="${path.library}">
+			<include name="${junit}" />
+		</fileset>
+	</path>
+
+	<path id="classpath.tests">
+		<pathelement location="${path.destination}" />
+	</path>
+
+	
+	<!-- *** Targets *** -->
+	<!-- Here all targets exists. -->
+
+	<target name="compile" depends="clean" description="Compile the sources to the destination.">
+		<mkdir dir="bin" />
+		<javac destdir="${path.destination}" includeantruntime="false">
+			<src path="${path.source}" />
+			<classpath refid="externalLibs" />
+		</javac>
+	</target>
+
+	<target name="release" depends="distribute,test" description="Make a full release.">
+		<property name="jarName" value="${path.release}/${project.name}.jar" />
+		<echo message="A full release was successfully created!" />
+		<echo message="File: ${jarName}" />
+	</target>
+
+	<target name="distribute" depends="compile,doc" description="Make a releaseable JAR.">
+
+		<property name="jarName" value="${path.release}/${project.name}.jar" />
+		<delete file="${jarName}" />
+
+		<jar destfile="${jarName}" update="no">
+			<zipgroupfileset dir="${path.library}">
+				<include name="**/*.jar" />
+			</zipgroupfileset>
+			<fileset dir="${path.documentation}" includes="**/*" />
+			<fileset dir="${path.destination}" includes="**/*.class" />
+			<manifest>
+				<attribute name="Main-class" value="${path.mainClass}" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="clean" description="Delete old binaries and text files.">
+		<delete includeemptydirs="true" quiet="true"> 
+			<fileset dir="${path.destination}" includes="**/*" />
+			<fileset dir="${path.documentation}" includes="**/*" />
+		</delete>
+	</target>
+
+	<target name="test" description="Run JUnit tests and stop build if one fails.">
+		<junit printsummary="true" fork="yes" haltonfailure="true">
+			<formatter type="plain" usefile="no" />
+			<classpath refid="classpath.tests" />
+			<classpath refid="externalLibs" />
+
+			<batchtest>
+				<fileset dir="${path.destination}/" includes="${path.test}/**/**Test**.class" />
+			</batchtest>
+		</junit>
+	</target>
+
+	<target name="doc" description="Generate javadocs from sourcefiles">
+		<mkdir dir="${path.documentation}" />
+		<javadoc destdir="${path.documentation}" author="true" version="true" use="true" doctitle="${project.name} Documentation" windowtitle="${project.name} Documentation" bottom="Documentation produly presented by the authors ${project.authors}." encoding="UTF-8">
+			<fileset dir="${path.source}">
+				<include name="**/*.java" />
+				<exclude name="**/*Test*.java" />
+			</fileset>
+			<link href="http://download.oracle.com/javase/6/docs/api/" />
+			<link href="http://opencsv.sourceforge.net/api/" />
+		</javadoc>
+
+	</target>
+</project>
+
+<!--
+Old configurations:
+
+	<property name="path.report" value="report_junittest" />
+	<property name="mail.user" value="erik.westrup@gmail.com" />
+	<property name="mail.password" value="" />
+	<property name="uispec4j" value="uispec4j-2.4-jdk16.jar" />
+
+
+>>clean
+		<delete dir="${path.report}" />
+>>test
+		<mkdir dir="${path.report}"/>
+
+>>test>>junit
+			<formatter type="xml" usefile="yes"/>
+			<batchtest todir="${path.report}">
+			
+			
+			
+	<target name="mail"  description="Mail the current version to the customer.">
+		<property prefix="svn" file="svn.properties"/>
+		<property name="jarName" value="${path.release}/${project.name}-${svn.Revision}.jar" />
+		<mail
+			charset="UTF-8"
+			encoding="mime"
+			failonerror="true"
+			tolist="lennart.ohlsson@cs.lth.se"
+			bcclist="ie06ar3@student.lth.se"
+			from="ada09ewe@student.lu.se"
+			replyto="ada09ewe@student.lu.se"
+			subject="[Endueo ${project.group}] new release!"
+			mailhost="smtp.gmail.com"
+			mailport="465"
+			ssl="true"
+			user="${mail.user}"
+			password="${mail.password}">
+		<message>
+Hello,
+
+a new release of ${project.name} is available. It is built from revision ${svn.Revision} and an executable JAR is attached in this email. Please enjoy the software.
+
+Greetings from the members of group ${project.group}:
+${project.authors}.
+		</message>
+		<fileset dir="." includes="${jarName}"/>
+		</mail>
+	</target>
+-->
