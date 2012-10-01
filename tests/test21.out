@@ -1,0 +1,4 @@
+FLOAT(1.8)(lineNum:1, charPos:1)
+ERROR(Unexpected character: .)(lineNum:1, charPos:4)
+FLOAT(7.9)(lineNum:1, charPos:5)
+EOF(lineNum:2, charPos:1)

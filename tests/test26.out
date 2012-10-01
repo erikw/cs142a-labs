@@ -1,0 +1,5 @@
+IDENTIFIER(_gorn)(lineNum:1, charPos:1)
+IDENTIFIER(__)(lineNum:2, charPos:1)
+IDENTIFIER(GoRn)(lineNum:3, charPos:1)
+IDENTIFIER(_0234_3)(lineNum:4, charPos:1)
+EOF(lineNum:5, charPos:1)

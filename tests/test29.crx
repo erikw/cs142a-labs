@@ -1,0 +1,100 @@
+<html>
+  <head>
+    <title>CS 142A: Interpreters and Compilers</title>
+    <link href="style.css" rel="StyleSheet" type="text/css"></link>
+  </head>
+
+  <body><div id="container">
+    <div id="header">
+      <p><a href="index.html">CS 142A: Interpreters and Compilers</a></p>
+    </div>
+
+    <div id="leftnav">
+      <!-- should provide a noscript hard link to a navigation page -->
+      <script type="text/javascript" src="code/menu.js"></script>
+      <script type="text/javascript">document.write(generateMenu(document.URL));</script>
+    </div>
+
+    <div id="content">
+      <h1>Instructor Information</h1>
+      <p>Eric Hennigan<br>
+        cs142a@gmail.com<br>
+      </p>
+      <p><b>Office Hours:</b> Wed 2-5pm ICS 444<br>My office is in a corner suite. Enter the suite, turn right, go through and past the coffee mess, to find the middle door on the left. Everyone in my lab is quite friendly, ask directions within the suite if you get lost.</p>
+      
+      <h1>Announcements</h1>
+      <p>
+      <table>
+        <tr>
+            <th>Date</th>
+            <th>Topic</th>
+        </tr>
+        <tr>
+          <td>Thu 9/27</td>
+          <td>Updated the <a href="labs/">grading rubric</a>. It now sums the points correctly, and includes a category which specifies how much private test cases are weighted. Very good that we have both issues clear before beginning.</td>
+      </table>
+
+      <h1>Materials:</h1>
+      <h2>Textbook</h2>
+      <p>I don't believe that there is any singularly excellent book on compiler design.
+      However, the course will be making use of the following texts.
+      Use your own discretion when purchasing.
+      <table>
+        <tr><th>Text</th><th>Availablitiy</th></tr>
+        <tr>
+          <td>Compilers: Principles, Techniques, and Tools<br>
+            by Aho, Lam, Seth, and Ullman<br>
+            known as "The Dragon Book" (Second Edition)</td>
+          <td>Primary text for the class.<br>
+            On reserve at Ayala Science Library</td>
+        <tr>
+        </tr>
+          <td>Engineering a Compiler<br>
+            by Cooper and Torczon</td>
+          <td>Secondary text for the class.<br>
+            On reserve at Ayala Science Library</td>
+        </tr>
+        <tr>
+          <td>Head First Design Patterns<br>
+            by Freeman, Freeman, Sierra, and Bates.</td>
+          <td>Available at <a href="http://proquest.safaribooksonline.com/0596007124">Safari books online</a> when on the campus network.</td>
+        </tr>
+        <tr>
+          <td>Compiler Construction<br>
+            by Niklaus Wirth</td>
+          <td>Available <a href="http://www.ethoberon.ethz.ch/WirthPubl/CBEAll.pdf">online</a>.</td>
+        </tr>
+      </table>
+
+      <h1>Course Goals</h1>
+      <p>This course is programming heavy (some projects about ~1k lines).
+      You will implement a compiler for a simple LL(1) language designed specifically for the course.
+      Lectures emphasize data structures and design patterns that support the task of parsing, representing, transforming, and evaluating input code.
+      Projects put that emphasis into practice.
+      By the end of the course you will be able to:
+      </p>
+      <ol>
+        <li>Associate computer language features with the data structures used to implement them.</li>
+        <!--<li>Identify the computation model needed for different languages in the Chomsky Hierarchy.</li>-->
+        <li>Apply object oriented design patterns and refactorings appropriately in the construction of a software project with strongly interconnected components (i.e. a compiler).</li>
+        <li>Design and implement a language transformer (i.e., a compiler).</li>
+      </ol>
+
+      <h1>Grades</h1>
+      <p>Projects (6 of them): 40% (6.66% each)<br>
+      Midterm: 25%<br>
+      Final: 35%<br>
+      According to our <a href="labs/index.html">late work policy</a>, you have a one-time-use no-questions-asked 48 hr grace period for lab projects. Try to reserve it for real emergencies.
+      </p>
+
+    </div>
+
+    <div id="aknowledgements">
+      <ul class="nomarker">
+      </ul>
+    </div>
+
+    <div id="footer"></div>
+
+  </div></body>
+</html>
