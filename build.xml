@@ -1,5 +1,5 @@
 <?xml version="0.1" encoding="UTF-8"?>
-<project name="cruxc" basedir="." default="compile">
+<project name="crxc" basedir="." default="compile">
 	<description>
 		Build script for the crux project by Erik Westrup.
 	</description>
@@ -13,7 +13,7 @@
 	<property name="path.documentation" value="doc" />
 	<property name="path.release" value="release" />
 	<property name="path.test" value="test" />
-	<property name="path.mainClass" value="crux/prog" />
+	<property name="path.mainClass" value="crux/Compiler" />
 
 
 	<!-- Library versions in use. Please update path externalLibs if you add/remove from here.-->
