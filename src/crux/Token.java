@@ -8,24 +8,56 @@ public class Token {
 	 * Enumeration of all possible token types in the crux language.
 	 */
 	public static enum Kind {
+		// TODO add attribte Category.CAT?
 		// Logical.
 		AND("and"),
 		OR("or"),
 		NOT("not"),
-		
+
+		// Control structures.
+		IF("if"),
+		ELSE("else"),
+		WHILE("while"),
+		RETURN("return"),
+
+		// Relational.
+		GREATER_EQUAL(">="),
+		LESSER_EQUAL("<="),
+		NOT_EQUAL("!="),
+		EQUAL("=="),
+		GREATER_THAN(">"),
+		LESS_THAN("<"),
+
 		// Arithmetical.
 		ADD("+"),
 		SUB("-"),
 		MUL("*"),
 		DIV("/"),
-		
-		IDENTIFIER(),
 
 		// Types.
 		INTEGER(),
 		FLOAT(),
+		TRUE("true"),
+		FALSE("false"),
+		LET("let"),
+		VAR("var"),
+		ARRAY("array"),
+		FUNC("func"),
+
+		IDENTIFIER(),
 
 		// Misc.
+		ASSIGN("="),
+		COMMA(","),
+		SEMICOLON(";"),
+		COLON(":"),
+		CALL("::"),
+		OPEN_PAREN("("),
+		CLOSE_PAREN(")"),
+		OPEN_BRACE("{"),
+		CLOSE_BRACE("}"),
+		OPEN_BRACKET("["),
+		CLOSE_BRACKET("]"),
 		ERROR(),
 		EOF();
 		

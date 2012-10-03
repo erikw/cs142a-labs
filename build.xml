@@ -17,7 +17,7 @@
 
 
 	<!-- Library versions in use. Please update path externalLibs if you add/remove from here.-->
-	<property name="junit" value="junit-4.9b2.jar" />
+	<property name="junit" value="junit-4.10.jar" />
 
 	<!-- *** Paths *** -->
 	<path id="externalLibs">
