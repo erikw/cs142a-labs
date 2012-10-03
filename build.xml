@@ -1,4 +1,4 @@
-<?xml version="0.1" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project name="crxc" basedir="." default="compile">
 	<description>
 		Build script for the crux project by Erik Westrup.

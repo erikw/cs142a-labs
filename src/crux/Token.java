@@ -56,7 +56,7 @@ public class Token {
 		 */
 		public boolean hasStaticLexeme()
 		{
-			return default_lexeme != null;
+			return default_lexeme.length() > 0;
 		}
 		
 		// TODO OPTIONAL: if you wish to also make convenience functions, feel free
@@ -102,7 +102,7 @@ public class Token {
 		this.lexeme = "No Lexeme Given";
 	}
 	
-	 * Instantiate a token with line number and char position.
+	 /* Instantiate a token with line number and char position.
 	 * @param lexeme The found lexeme string.
 	 * @param lineNum The line number the lexeme was found at.
 	 * @param charPos The character position on the line the lexeme was found on.
@@ -141,7 +141,7 @@ public class Token {
 	 * Return the lexeme representing or held by this token.
 	 * @return The lexeme string.
 	 */
-	public String lexeme()
+	public String getLexeme()
 	{
 		// TODO implement
 		return null;
@@ -155,7 +155,7 @@ public class Token {
 	{
 		// TODO implement this
 		throw new UnsupportedOperationException();
-		return "Not Yet Implemented";
+		//return "Not Yet Implemented";
 	}
 
 	// TODO OPTIONAL: function to query a token about its kind

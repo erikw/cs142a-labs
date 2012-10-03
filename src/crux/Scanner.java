@@ -1,6 +1,6 @@
 package crux;
 
-import java.io.IOException;
+//import java.io.IOException;
 import java.io.Reader;
 import java.util.Iterator;
 
@@ -51,6 +51,16 @@ public class Scanner implements Iterable<Token> {
 	public Token next()
 	{
 		// TODO implement this
+		return null;
+	}
+
+	/**
+	 * Get an iterator for Tokens.
+	 * @return An token Iterator.
+	 */
+	public Iterator<Token> iterator()
+	{
+		// TODO construct iterato that just uses Scanner.next?
 		return null;
 	}
 

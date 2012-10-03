@@ -36,8 +36,9 @@ public class Compiler {
             System.exit(-2);
         }
 
+        // TODO use iterable interface?
         Token t = scanner.next();
-        while (false) { /* TODO t is not the EOF token */
+        while (t != null ) { /* TODO t is not the EOF token */
             System.out.println(t);
             t = scanner.next();
         }
