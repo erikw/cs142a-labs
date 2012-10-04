@@ -79,7 +79,8 @@
 			<classpath refid="externalLibs" />
 
 			<batchtest>
-				<fileset dir="${path.destination}/" includes="${path.test}/**/**Test**.class" />
+				<!-- The $* excludes inner classes. -->
+				<fileset dir="${path.destination}/" includes="${path.test}/**/**Test**.class" excludes="**/*$*.class" />
 			</batchtest>
 		</junit>
 	</target>
