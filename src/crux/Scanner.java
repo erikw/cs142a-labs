@@ -7,7 +7,8 @@ import java.util.Iterator;
 /**
  * A scanner that reads crux source text and produces as stream of tokens.
  */
-public class Scanner implements Iterable<Token> {
+public class Scanner implements Iterable<Token>
+{
     /* Author details. */
     public static String studentName = "Erik Westrup";
     public static String studentID = "50471668";
@@ -36,7 +37,8 @@ public class Scanner implements Iterable<Token> {
 	//           can be used to catch and handle any IOExceptions,
 	//           advance the charPos or lineNum, etc.
 	/*
-	private int readChar() {
+	private int readChar()
+	{
 	
 	}
 	*/

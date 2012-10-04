@@ -13,7 +13,8 @@ import static org.junit.Assert.*;
 
 import crux.*;
 
-public class TestFiles {
+public class TestFiles
+{
 
 	/* Path to test files root dir. */
 	private static final String fileRoot = "tests";
@@ -40,7 +41,8 @@ public class TestFiles {
 	private PrintStream errStream;
 
 	@Before
-	public void setUp() {
+	public void setUp()
+	{
 		compiler = new crux.Compiler();	
 		outOrg = System.out;
 		errOrg = System.err;
@@ -51,7 +53,8 @@ public class TestFiles {
 	}
 
 	@After
-	public void tearDown() {
+	public void tearDown()
+	{
 		compiler = null;
 		useOutBuffer(false);
 	}
@@ -71,8 +74,10 @@ public class TestFiles {
 	private void testFilesIn(String subdir)
 	{
 		File dir = new File(fileRoot + "/" + subdir);
-		String[] cruxFiles = dir.list(new FilenameFilter() {
- 	 	 	public boolean accept(File dir, String name) {
+		String[] cruxFiles = dir.list(new FilenameFilter()
+		{
+ 	 	 	public boolean accept(File dir, String name)
+ 	 		{
  	 	 		return name.matches(".*\\.crx$");
  	 	 	}
 		});
@@ -114,7 +119,8 @@ public class TestFiles {
 		String actual = outBuffer.toString();
 		String errStr = errBuffer.toString();
 		useOutBuffer(false);
-		if (!errStr.isEmpty())  {
+		if (!errStr.isEmpty())
+		{
 			System.err.printf("Compiler gave this error output: {\\n%s\\n}\\n", errStr);
 		}
 

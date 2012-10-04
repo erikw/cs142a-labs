@@ -10,7 +10,7 @@
 	<property name="path.source" value="src" />
 	<property name="path.destination" value="bin" />
 	<property name="path.library" value="lib" />
-	<property name="path.documentation" value="doc" />
+	<property name="path.documentation" value="doc/gen/" />
 	<property name="path.release" value="release" />
 	<property name="path.test" value="test" />
 	<property name="path.mainClass" value="crux/Compiler" />

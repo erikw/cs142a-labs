@@ -3,11 +3,13 @@ package crux;
 /**
  * Representation of a crux token.
  */
-public class Token {
+public class Token
+{
 	/**
 	 * Enumeration of all possible token types in the crux language.
 	 */
-	public static enum Kind {
+	public static enum Kind
+	{
 		// TODO add attribte Category.CAT?
 		// Logical.
 		AND("and"),
@@ -94,6 +96,7 @@ public class Token {
 		// TODO OPTIONAL: if you wish to also make convenience functions, feel free
 		//           for example, boolean matches(String lexeme)
 		//           can report whether a Token.Kind has the given lexeme
+
 	}
 	
 	/* The line number of the lexeme. */
@@ -188,6 +191,15 @@ public class Token {
 		// TODO implement this
 		throw new UnsupportedOperationException();
 		//return "Not Yet Implemented";
+	}
+
+	/**
+	 * Query this token if it's of a given kind.
+	 */
+	public boolean isKind(Kind rhs)
+	{
+		//return kind == rhs;
+		return kind.equals(rhs);
 	}
 
 	// TODO OPTIONAL: function to query a token about its kind

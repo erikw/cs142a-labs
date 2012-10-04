@@ -10,7 +10,8 @@ import java.util.ArrayList;
 /**
  * Main class for the crux compiler.
  */
-public class Compiler {
+public class Compiler
+{
     /* Author details. */
     public static String studentName = "Erik Westrup";
     public static String studentID = "50471668";
@@ -25,22 +26,24 @@ public class Compiler {
 	{
         Scanner scanner = null;
 
-        try {
+        try
+        {
             scanner = new Scanner(new FileReader(cruxFile));
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException e)
+        {
+            //e.printStackTrace();
             System.err.println("Error accessing the source file: \"" + cruxFile + "\".");
             System.exit(-2);
         }
 
         // TODO use iterable interface?
         Token t = scanner.next();
-        while (t != null)
-        { /* TODO t is not the EOF token */
+        while (!t.isKind(Token.Kind.EOF))
+        {
             System.out.println(t);
             t = scanner.next();
         }
-        System.out.println(t);
+        System.out.println(t); // TODO purpuse of printing EOF?
 
 	}
 
@@ -50,8 +53,9 @@ public class Compiler {
 	 */
 	public static void main(String[] args)
 	{
-        if (args.length != 1) {
-			System.err.println("One argument expected. Usage:\n $ java Compiler <source_file>");
+        if (args.length != 1)
+        {
+			System.err.println("One argument expected. Usage:\n $ crxc <source_file>");
         }
         String sourceFile = args[0];
         new Compiler().compile(sourceFile);
