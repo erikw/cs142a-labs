@@ -1,86 +1,95 @@
 package crux;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
 /**
  * Representation of a crux token.
  */
-public class Token
-{
+public class Token {
+	/**
+	 * The token categories we're interested in distinguish.
+	 */
+	public static enum Category {
+		KEYWORD, OPERATOR, MISC;
+	}
+
 	/**
 	 * Enumeration of all possible token types in the crux language.
 	 */
-	public static enum Kind
-	{
+	public static enum Kind {
 		// TODO add attribte Category.CAT?
 		// Logical.
-		AND("and"),
-		OR("or"),
-		NOT("not"),
+		AND("and", Token.Category.KEYWORD),
+		OR("or", Token.Category.KEYWORD),
+		NOT("not", Token.Category.KEYWORD),
 
 		// Control structures.
-		IF("if"),
-		ELSE("else"),
-		WHILE("while"),
-		RETURN("return"),
+		IF("if", Token.Category.KEYWORD),
+		ELSE("else", Token.Category.KEYWORD),
+		WHILE("while", Token.Category.KEYWORD),
+		RETURN("return", Token.Category.KEYWORD),
 
 		// Relational.
-		GREATER_EQUAL(">="),
-		LESSER_EQUAL("<="),
-		NOT_EQUAL("!="),
-		EQUAL("=="),
-		GREATER_THAN(">"),
-		LESS_THAN("<"),
+		GREATER_EQUAL(">=", Token.Category.OPERATOR),
+		LESSER_EQUAL("<=", Token.Category.OPERATOR),
+		NOT_EQUAL("!=", Token.Category.OPERATOR),
+		EQUAL("==", Token.Category.OPERATOR),
+		GREATER_THAN(">", Token.Category.OPERATOR),
+		LESS_THAN("<", Token.Category.OPERATOR),
 
 		// Arithmetical.
-		ADD("+"),
-		SUB("-"),
-		MUL("*"),
-		DIV("/"),
+		ADD("+", Token.Category.OPERATOR),
+		SUB("-", Token.Category.OPERATOR),
+		MUL("*", Token.Category.OPERATOR),
+		DIV("/", Token.Category.OPERATOR),
 
 		// Types.
-		INTEGER(),
-		FLOAT(),
-		TRUE("true"),
-		FALSE("false"),
-		LET("let"),
-		VAR("var"),
-		ARRAY("array"),
-		FUNC("func"),
+		INTEGER(Token.Category.MISC),
+		FLOAT(Token.Category.MISC),
+		TRUE("true", Token.Category.KEYWORD),
+		FALSE("false", Token.Category.KEYWORD),
+		LET("let", Token.Category.KEYWORD),
+		VAR("var", Token.Category.KEYWORD),
+		ARRAY("array", Token.Category.KEYWORD),
+		FUNC("func", Token.Category.KEYWORD),
 
-		IDENTIFIER(),
+		IDENTIFIER(Token.Category.MISC),
 		// TODO categorize into keywords to distinguish from identifier?
 		// Misc.
-		ASSIGN("="),
-		COMMA(","),
-		SEMICOLON(";"),
-		COLON(":"),
-		CALL("::"),
-		OPEN_PAREN("("),
-		CLOSE_PAREN(")"),
-		OPEN_BRACE("{"),
-		CLOSE_BRACE("}"),
-		OPEN_BRACKET("["),
-		CLOSE_BRACKET("]"),
-		ERROR(),
-		EOF();
+		ASSIGN("=", Token.Category.OPERATOR),
+		COMMA(",", Token.Category.OPERATOR),
+		SEMICOLON(";", Token.Category.OPERATOR),
+		COLON(":", Token.Category.OPERATOR),
+		CALL("::", Token.Category.OPERATOR),
+		OPEN_PAREN("(", Token.Category.OPERATOR),
+		CLOSE_PAREN(")", Token.Category.OPERATOR),
+		OPEN_BRACE("{", Token.Category.OPERATOR),
+		CLOSE_BRACE("}", Token.Category.OPERATOR),
+		OPEN_BRACKET("[", Token.Category.OPERATOR),
+		CLOSE_BRACKET("]", Token.Category.OPERATOR),
+		ERROR(Token.Category.MISC),
+		EOF(Token.Category.MISC);
 		
 		// TODO complete the list of possible tokens
 		
 		/* Default lexeme for this Kind. */
 		private String default_lexeme;
+
+		/* The category the kind belongs to. */
+		private Token.Category category;
 		
 		/**
 		 * Construct a token type enum with a default lexemes.
 		 */
-		Kind()
-		{
-			default_lexeme = "";
+		Kind(Token.Category category) {
+			this("", category);
 		}
 		
 		/**
 		 * Construct a token type enum with a given lexeme.
 		 */
-		Kind(String lexeme)
-		{
+		Kind(String lexeme, Token.Category category) {
 			default_lexeme = lexeme;
 		}
 		
@@ -89,15 +98,31 @@ public class Token
 		 * @return true if it has a static lexeme
 		 * @return false otherwise.
 		 */
-		public boolean hasStaticLexeme()
-		{
+		public boolean hasStaticLexeme() {
 			return default_lexeme.length() > 0;
 		}
 		
-		// TODO OPTIONAL: if you wish to also make convenience functions, feel free
-		//           for example, boolean matches(String lexeme)
-		//           can report whether a Token.Kind has the given lexeme
+		/**
+		 * Report if the given test string matches the lexeme of this type.
+		 */
+		public boolean matches(String test) {
+			return test.equals(default_lexeme);
+		}
 
+		/**
+		 * Get all tokes in the give category.
+		 * @param category The category to get.
+		 * @return A collection of kinds in this category.
+		 */
+		public static Collection<Token.Kind> getCategory(Token.Category category) {
+			LinkedList<Token.Kind> kinds = new LinkedList<Token.Kind>();
+			for (Token.Kind kind: Token.Kind.values()) {
+				if (kind.category.equals(category)) {
+					kinds.add(kind);
+				}
+			}
+			return kinds;
+		}
 	}
 	
 	/* The line number of the lexeme. */
@@ -114,14 +139,27 @@ public class Token
 	
 	
 	// TODO OPTIONAL: implement factory functions for some tokens, as you see fit.
-	/*
-	public static Token EOF(int linePos, int charPos)
-	{
-		Token tok = new Token(linePos, charPos);
+	
+	public static Token makeEOF(int lineNum, int charPos) {
+		Token tok = new Token(lineNum, charPos);
 		tok.kind = Kind.EOF;
 		return tok;
 	}
-	*/
+
+	/**
+	 * Make an operator of kind.
+	 * @param kind The kind to make.
+	 * @param lineNum The line number.
+	 * @param charPos The character positionl
+	 * @return A token of the requested type.
+	 *
+	 */
+	public static Token makeOperator(Token.Kind kind, int lineNum, int charPos) {
+		Token token = new Token(lineNum, charPos);
+		token.kind. = kindk;
+		return token;
+	}
+
 	//public static Token Identifier(String name, int lineNum, int charPos);
 	//public static Token Float(String num, int lineNum, int charPos);
 
@@ -130,8 +168,7 @@ public class Token
 	 * @param lineNum The line number the lexeme was found at.
 	 * @param charPos The character position on the line the lexeme was found on.
 	 */
-	private Token(int lineNum, int charPos)
-	{
+	private Token(int lineNum, int charPos) {
 		this.lineNum = lineNum;
 		this.charPos = charPos;
 		
@@ -146,8 +183,7 @@ public class Token
 	 * @param lineNum The line number the lexeme was found at.
 	 * @param charPos The character position on the line the lexeme was found on.
 	 */
-	public Token(String lexeme, int lineNum, int charPos)
-	{
+	public Token(String lexeme, int lineNum, int charPos) {
 		this.lineNum = lineNum;
 		this.charPos = charPos;
 		
@@ -162,8 +198,7 @@ public class Token
 	 * Get the line number of the lexeme.
 	 * @return The line number.
 	 */
-	public int getLineNumber()
-	{
+	public int getLineNumber() {
 		return lineNum;
 	}
 	
@@ -171,8 +206,7 @@ public class Token
 	 * Get the character position of the lexeme.
 	 * @return The character position.
 	 */
-	public int getCharPosition()
-	{
+	public int getCharPosition() {
 		return charPos;
 	}
 
@@ -180,8 +214,7 @@ public class Token
 	 * Return the lexeme representing or held by this token.
 	 * @return The lexeme string.
 	 */
-	public String getLexeme()
-	{
+	public String getLexeme() {
 		// TODO implement
 		return null;
 	}
@@ -190,18 +223,20 @@ public class Token
 	 * Get a string represenation of this token instance.
 	 * @return A formatted string describing the token.
 	 */
-	public String toString()
-	{
-		// TODO implement this
-		throw new UnsupportedOperationException();
-		//return "Not Yet Implemented";
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(kind.name());
+		builderappend("(");
+		builder.append("lineNum:").append(lineNum);
+		builder.append("charPos:").append(charPos);
+		builder.append(")");
+		return builder.toString();
 	}
 
 	/**
 	 * Query this token if it's of a given kind.
 	 */
-	public boolean isKind(Kind rhs)
-	{
+	public boolean isKind(Kind rhs) {
 		//return kind == rhs;
 		return kind.equals(rhs);
 	}

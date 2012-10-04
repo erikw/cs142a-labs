@@ -10,8 +10,7 @@ import java.util.ArrayList;
 /**
  * Main class for the crux compiler.
  */
-public class Compiler
-{
+public class Compiler {
     /* Author details. */
     public static String studentName = "Erik Westrup";
     public static String studentID = "50471668";
@@ -22,15 +21,12 @@ public class Compiler
 	 * Compile the file give.
 	 * @param cruxFile The file to compile.
 	 */
-	public void compile(String cruxFile)
-	{
+	public void compile(String cruxFile) {
         Scanner scanner = null;
 
-        try
-        {
+        try {
             scanner = new Scanner(new FileReader(cruxFile));
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             //e.printStackTrace();
             System.err.println("Error accessing the source file: \"" + cruxFile + "\".");
             System.exit(-2);
@@ -38,8 +34,7 @@ public class Compiler
 
         // TODO use iterable interface?
         Token t = scanner.next();
-        while (!t.isKind(Token.Kind.EOF))
-        {
+        while (!t.isKind(Token.Kind.EOF)) {
             System.out.println(t);
             t = scanner.next();
         }
@@ -51,10 +46,8 @@ public class Compiler
 	 * Main method that starts the compilation.
 	 *
 	 */
-	public static void main(String[] args)
-	{
-        if (args.length != 1)
-        {
+	public static void main(String[] args) {
+        if (args.length != 1) {
 			System.err.println("One argument expected. Usage:\n $ crxc <source_file>");
         }
         String sourceFile = args[0];
