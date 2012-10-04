@@ -47,7 +47,7 @@ public class Token
 		FUNC("func"),
 
 		IDENTIFIER(),
-
+		// TODO categorize into keywords to distinguish from identifier?
 		// Misc.
 		ASSIGN("="),
 		COMMA(","),
@@ -65,6 +65,7 @@ public class Token
 		
 		// TODO complete the list of possible tokens
 		
+		/* Default lexeme for this Kind. */
 		private String default_lexeme;
 		
 		/**
@@ -121,6 +122,8 @@ public class Token
 		return tok;
 	}
 	*/
+	//public static Token Identifier(String name, int lineNum, int charPos);
+	//public static Token Float(String num, int lineNum, int charPos);
 
 	/**
 	 * Instantiate a token with line number and char position.
@@ -137,7 +140,8 @@ public class Token
 		this.lexeme = "No Lexeme Given";
 	}
 	
-	 /* Instantiate a token with line number and char position.
+	/**
+	 * Instantiate a token with a lexeme, line number and char position.
 	 * @param lexeme The found lexeme string.
 	 * @param lineNum The line number the lexeme was found at.
 	 * @param charPos The character position on the line the lexeme was found on.

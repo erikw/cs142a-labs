@@ -1,2 +1,6 @@
-* Gerenarte javadoc
+* A symbol table some where. -- not until lab2?
 * Is my brace style correct?
+* remove ws and comments
+* input buffering as of p.115?
+* use failure function to find keywords? p.136
+* evaluator for e.g. int and float that find its value? http://en.wikipedia.org/wiki/Lexical_analysis

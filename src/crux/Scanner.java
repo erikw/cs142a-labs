@@ -9,40 +9,49 @@ import java.util.Iterator;
  */
 public class Scanner implements Iterable<Token>
 {
+    /* Represents Begnning of File. */
+    private static final short BOF = -1;
+
+    /* Represents End of File. */
+    private static final short EOF = -1;
+
     /* Author details. */
     public static String studentName = "Erik Westrup";
     public static String studentID = "50471668";
     public static String uciNetID = "ewestrup";
-	
+
 	/* Current line count. */
 	private int lineNum;
-	
+
 	/* Character offset for current line. */
 	private int charPos;
 
 	/* Contains the next char (-1 == EOF). */
-	// TODO constant for EOF?
 	private int nextChar;
 
-	/* TODO Input reader. */
+	/* Input source. */
 	private Reader input;
-	
-	/* Construct a scanner from a reader. */
+
+	/**
+	 * Construct a scanner from a reader.
+	 * @param reader The reader to use a input source.
+	 */
 	Scanner(Reader reader)
 	{
-		// TODO initialize the Scanner
-	}	
-	
+		input = reader;
+		lineNum = 0;
+		charPos = 0;
+		nextChar = BOF;
+	}
+
 	// OPTIONAL: helper function for reading a single char from input
 	//           can be used to catch and handle any IOExceptions,
 	//           advance the charPos or lineNum, etc.
-	/*
 	private int readChar()
 	{
-	
+		return 0;
 	}
-	*/
-		
+
 
 	/**
 	 * Get the next available Token.
@@ -52,7 +61,11 @@ public class Scanner implements Iterable<Token>
 	 */
 	public Token next()
 	{
-		// TODO implement this
+		int curChar = readChar();
+
+		// TODO skip ws
+		// TODO mkToken or set state based on first char
+		// TODO switch or state try to match more.
 		return null;
 	}
 

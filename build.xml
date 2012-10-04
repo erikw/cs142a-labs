@@ -34,12 +34,19 @@
 	<!-- *** Targets *** -->
 	<!-- Here all targets exists. -->
 
-	<target name="compile" depends="clean" description="Compile the sources to the destination.">
+	<target name="compile" depends="clean,tags" description="Compile the sources to the destination.">
 		<mkdir dir="bin" />
 		<javac destdir="${path.destination}" includeantruntime="false">
 			<src path="${path.source}" />
 			<classpath refid="externalLibs" />
 		</javac>
+	</target>
+
+	<target name="tags"  description="Generate a tags file.">
+  		<exec executable="ctags">
+    		<arg value="-R"/>
+    		<arg value="."/>
+  		</exec>
 	</target>
 
 	<target name="release" depends="distribute,test" description="Make a full release.">
