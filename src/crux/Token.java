@@ -271,8 +271,11 @@ public class Token {
 	 * @return The lexeme string.
 	 */
 	public String getLexeme() {
-		// TODO implement
-		return null;
+		if (kind.hasStaticLexeme()) {
+			return kind.default_lexeme;
+		} else {
+			return lexeme;
+		}
 	}
 
 	/**

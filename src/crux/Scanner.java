@@ -125,7 +125,7 @@ public class Scanner implements Iterable<Token> {
 				continue;
 			}
 			switch (state) {
-				case BEGINNING: // TODO break out this to priv method?
+				case BEGINNING:
 				 	if (Character.isWhitespace((char) nextChar)) {
 						//System.out.println("skipping ws");
 						continue;
