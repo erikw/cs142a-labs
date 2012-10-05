@@ -75,7 +75,6 @@ public class TestFiles {
  	 	 	}
 		});
 
-		int nbrSucess = 0;
 		for (String cruxFile: cruxFiles) {
 			String[] nameParts = cruxFile.split("\\.");
 			if (nameParts.length != 2) {
@@ -83,15 +82,10 @@ public class TestFiles {
 				System.exit(1);
 			}
 			String outFile = nameParts[0] + ".out";
-			if (testFile(fileRoot + "/" + subdir + "/" + cruxFile, fileRoot + "/" + subdir + "/" + outFile)) {
-				++nbrSucess;
-			}
+			testFile(fileRoot + "/" + subdir + "/" + cruxFile, fileRoot + "/" + subdir + "/" + outFile);
 		}
-		if (nbrSucess == cruxFiles.length) {
-			System.out.println("All tests passed!");
-		} else {
-			System.err.printf("%d/%d tests passed.\n", nbrSucess, cruxFiles.length);
-		}
+		System.out.printf("In %s: ", subdir);
+		System.out.printf("All tests files passed!\n");
 	}
 
 	/**
@@ -99,7 +93,7 @@ public class TestFiles {
 	 * @param cruxFileName The input crux file.
 	 * @param outFileName The reference expected output.
 	 */
-	private boolean testFile(String cruxFileName, String outFileName) {
+	private void testFile(String cruxFileName, String outFileName) {
 		System.out.printf("Testing input file \"%s\", with the expected output in \"%s\"\n", cruxFileName, outFileName);
 		useOutBuffer(true);
 		compiler.compile(cruxFileName);
@@ -116,7 +110,7 @@ public class TestFiles {
 			outScanner = new java.util.Scanner(outFile);
 		} catch (FileNotFoundException fnfe) {
 			System.err.printf("Bad filename \"%s\"!\n", outFileName);
-			return false;
+			return;
 		}
 		String expected = outScanner.useDelimiter("\\Z").next();
 		expected += '\n'; // Needed apparently.
@@ -127,8 +121,6 @@ public class TestFiles {
 			fail();
 		}
 		//assertEquals("Wrong compiler output.", expected+'\n', actual);
-
-		return true;
 	}
 
 	/**

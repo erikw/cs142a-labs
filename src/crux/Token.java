@@ -19,16 +19,8 @@ public class Token {
 	 */
 	public static enum Kind {
 		// TODO add attribte Category.CAT?
-		// Logical.
-		AND("and", Token.Category.KEYWORD),
-		OR("or", Token.Category.KEYWORD),
-		NOT("not", Token.Category.KEYWORD),
 
 		// Control structures.
-		IF("if", Token.Category.KEYWORD),
-		ELSE("else", Token.Category.KEYWORD),
-		WHILE("while", Token.Category.KEYWORD),
-		RETURN("return", Token.Category.KEYWORD),
 
 		// Relational.
 		GREATER_EQUAL(">=", Token.Category.OPERATOR),
@@ -47,12 +39,29 @@ public class Token {
 		// Types.
 		INTEGER(Token.Category.MISC),
 		FLOAT(Token.Category.MISC),
+		
+		// Keywords.
 		TRUE("true", Token.Category.KEYWORD),
 		FALSE("false", Token.Category.KEYWORD),
 		LET("let", Token.Category.KEYWORD),
 		VAR("var", Token.Category.KEYWORD),
 		ARRAY("array", Token.Category.KEYWORD),
 		FUNC("func", Token.Category.KEYWORD),
+		IF("if", Token.Category.KEYWORD),
+		ELSE("else", Token.Category.KEYWORD),
+		WHILE("while", Token.Category.KEYWORD),
+		RETURN("return", Token.Category.KEYWORD),
+
+		// Logical.
+		AND("and", Token.Category.KEYWORD),
+		OR("or", Token.Category.KEYWORD),
+		NOT("not", Token.Category.KEYWORD),
+
+		// These should not exists as they are to be recognized as IDENTIFIERs.
+		//VOID("void", Token.Category.KEYWORD),
+		//BOOL("bool", Token.Category.KEYWORD),
+		//INT("int", Token.Category.KEYWORD),
+		//FLOAT("float", Token.Category.KEYWORD),
 
 		IDENTIFIER(Token.Category.MISC),
 		// TODO categorize into keywords to distinguish from identifier?

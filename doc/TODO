@@ -8,4 +8,3 @@
 * make test cases from real programs (look at last lab?)
 * can identifiers or string(have those?) stretch over linefeed?
 * multiline test cases
-* privtest with file that does not end with \n
