@@ -18,10 +18,6 @@ public class Token {
 	 * Enumeration of all possible token types in the crux language.
 	 */
 	public static enum Kind {
-		// TODO add attribte Category.CAT?
-
-		// Control structures.
-
 		// Relational.
 		GREATER_EQUAL(">=", Token.Category.OPERATOR),
 		LESSER_EQUAL("<=", Token.Category.OPERATOR),
@@ -64,7 +60,6 @@ public class Token {
 		//FLOAT("float", Token.Category.KEYWORD),
 
 		IDENTIFIER(Token.Category.MISC),
-		// TODO categorize into keywords to distinguish from identifier?
 		// Misc.
 		ASSIGN("=", Token.Category.OPERATOR),
 		COMMA(",", Token.Category.OPERATOR),
@@ -79,8 +74,6 @@ public class Token {
 		CLOSE_BRACKET("]", Token.Category.OPERATOR),
 		ERROR(Token.Category.MISC),
 		EOF(Token.Category.MISC);
-		
-		// TODO complete the list of possible tokens
 		
 		/* Default lexeme for this Kind. */
 		private String default_lexeme;
@@ -151,14 +144,6 @@ public class Token {
 	private String lexeme = "";
 	
 	
-	// TODO OPTIONAL: implement factory functions for some tokens, as you see fit.
-	
-	//public static Token makeEOF(int lineNum, int charPos) {
-		//Token tok = new Token(lineNum, charPos);
-		//tok.kind = Kind.EOF;
-		//return tok;
-	//}
-
 	/**
 	 * Make an operator of kind.
 	 * @param lineNum The line number.
@@ -312,13 +297,6 @@ public class Token {
 	 * Query this token if it's of a given kind.
 	 */
 	public boolean isKind(Kind rhs) {
-		//return kind == rhs;
 		return kind.equals(rhs);
 	}
-
-	// TODO OPTIONAL: function to query a token about its kind
-	//           boolean is(Token.Kind kind)
-
-	// TODO OPTIONAL: add any additional helper or convenience methods
-	//           that you find make for a clean design
 }
