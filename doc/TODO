@@ -3,8 +3,3 @@
 * remove ws and comments
 * input buffering as of p.115?
 * use failure function to find keywords? p.136
-* evaluator for e.g. int and float that find its value? http://en.wikipedia.org/wiki/Lexical_analysis
-* Use char type when we have determined that it's not an EOF or other negative constant?
-* make test cases from real programs (look at last lab?)
-* can identifiers or string(have those?) stretch over linefeed?
-* multiline test cases

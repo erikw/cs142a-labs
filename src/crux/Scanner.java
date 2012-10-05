@@ -98,7 +98,6 @@ public class Scanner implements Iterable<Token> {
 	 *  pre: call assumes that nextChar is already holding an unread character (if this is not the first call)
 	 *  post: return leaves nextChar containing an untokenized character.
 	 */
-	// TODO mnake sure pre: and post: holds.
 	public Token next() {
 		Token token = null;
 		StringBuilder lexemeBuilder = new StringBuilder();
@@ -118,7 +117,7 @@ public class Scanner implements Iterable<Token> {
 			}
 			if (nextChar == EOF) { // EOF can come anywhere in the stream.
 				if (state != State.BEGINNING) {
-					token = Token.makeTokenFromKind(lineNum, charPos, Token.Kind.ERROR); // TODO test this much
+					token = Token.makeTokenFromKind(lineNum, charPos, Token.Kind.ERROR);
 				} else {
 					//token = Token.makeEOF(lineNum, charPos);
 					token = Token.makeTokenFromKind(lineNum, charPos, Token.Kind.EOF);

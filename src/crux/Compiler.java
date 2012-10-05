@@ -38,7 +38,7 @@ public class Compiler {
             System.out.println(t);
             t = scanner.next();
         }
-        System.out.println(t); // TODO purpuse of printing EOF?
+        System.out.println(t);
 	}
 
 	/**
