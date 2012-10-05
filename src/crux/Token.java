@@ -169,6 +169,7 @@ public class Token {
 	 * @param lineNum The line number.
 	 * @param charPos The character positionl
 	 * @param identifier The identifier.
+	 * @return A new token.
 	 */
 	public static Token makeIdentifier(int lineNum, int charPos, String identifier) {
 		Token token = new Token(lineNum, charPos);
@@ -176,6 +177,21 @@ public class Token {
 		token.lexeme = identifier;
 		return token;
 	}
+
+	/**
+	 * Construct and error token.
+	 * @param lineNum The line number.
+	 * @param charPos The character positionl
+	 * @param offendingChar The unexpected char.
+	 * @return A new token.
+	 */
+	public static Token makeError(int lineNum, int charPos, char offendingChar) {
+		Token token = new Token(lineNum, charPos);
+		token.kind = Token.Kind.ERROR;
+		token.lexeme = Character.toString(offendingChar);
+		return token;
+	}
+
 
 	//public static Token Identifier(String name, int lineNum, int charPos);
 	//public static Token Float(String num, int lineNum, int charPos);
@@ -243,6 +259,12 @@ public class Token {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(kind.name());
+		if (kind.equals(Kind.ERROR)) {
+			builder.append("(");
+			builder.append("Unexpected character: ");
+			builder.append(lexeme);
+			builder.append(")");
+		}
 		builder.append("(");
 		builder.append("lineNum:").append(lineNum);
 		builder.append(", ");

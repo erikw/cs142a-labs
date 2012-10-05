@@ -180,8 +180,20 @@ public class Scanner implements Iterable<Token> {
 				case DIGIT:
 					break;
 				case LESS_THAN:
+					if (nextChar == '=') {
+						token = Token.makeTokenFromKind(tokBegLineNum, tokBegCharPos, Token.Kind.LESSER_EQUAL);
+					} else {
+						unreadChar();
+						token = Token.makeTokenFromKind(tokBegLineNum, tokBegCharPos, Token.Kind.LESS_THAN);
+					}
 					break;
 				case GREATER_THAN:
+					if (nextChar == '=') {
+						token = Token.makeTokenFromKind(tokBegLineNum, tokBegCharPos, Token.Kind.GREATER_EQUAL);
+					} else {
+						unreadChar();
+						token = Token.makeTokenFromKind(tokBegLineNum, tokBegCharPos, Token.Kind.GREATER_THAN);
+					}
 					break;
 				case ASSIGN:
 					if (nextChar == '=') {
@@ -192,6 +204,12 @@ public class Scanner implements Iterable<Token> {
 					}
 					break;
 				case BANG:
+					if (nextChar == '=') {
+						token = Token.makeTokenFromKind(tokBegLineNum, tokBegCharPos, Token.Kind.NOT_EQUAL);
+					} else {
+						unreadChar();
+						token = Token.makeError(tokBegLineNum, tokBegCharPos, (char) nextChar);
+					}
 					break;
 				default:
 					System.err.println("defalt label in next switch. Should not be here!");

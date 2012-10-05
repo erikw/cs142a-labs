@@ -122,8 +122,8 @@ public class TestFiles {
 		expected += '\n'; // Needed apparently.
 
 		if (!expected.equals(actual)) {
-			System.err.println("Wrong compiler output.");
-			System.err.printf("exp={\n%s\n}\nact={\n%s\n}\n", expected, actual);
+			System.out.println("Wrong compiler output.");
+			System.out.printf("exp={\n%s\n}\nact={\n%s\n}\n", expected, actual);
 			fail();
 		}
 		//assertEquals("Wrong compiler output.", expected+'\n', actual);
