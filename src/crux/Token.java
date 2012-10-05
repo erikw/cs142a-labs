@@ -91,6 +91,7 @@ public class Token {
 		 */
 		Kind(String lexeme, Token.Category category) {
 			default_lexeme = lexeme;
+			this.category = category;
 		}
 		
 		/**
@@ -117,6 +118,9 @@ public class Token {
 		public static Collection<Token.Kind> getCategory(Token.Category category) {
 			LinkedList<Token.Kind> kinds = new LinkedList<Token.Kind>();
 			for (Token.Kind kind: Token.Kind.values()) {
+				if (kind.category == null) {
+					System.out.println(kind.name());
+				}
 				if (kind.category.equals(category)) {
 					kinds.add(kind);
 				}
@@ -140,23 +144,36 @@ public class Token {
 	
 	// TODO OPTIONAL: implement factory functions for some tokens, as you see fit.
 	
-	public static Token makeEOF(int lineNum, int charPos) {
-		Token tok = new Token(lineNum, charPos);
-		tok.kind = Kind.EOF;
-		return tok;
-	}
+	//public static Token makeEOF(int lineNum, int charPos) {
+		//Token tok = new Token(lineNum, charPos);
+		//tok.kind = Kind.EOF;
+		//return tok;
+	//}
 
 	/**
 	 * Make an operator of kind.
-	 * @param kind The kind to make.
 	 * @param lineNum The line number.
 	 * @param charPos The character positionl
+	 * @param kind The kind to make.
 	 * @return A token of the requested type.
 	 *
 	 */
-	public static Token makeOperator(Token.Kind kind, int lineNum, int charPos) {
+	public static Token makeTokenFromKind(int lineNum, int charPos, Token.Kind kind) {
 		Token token = new Token(lineNum, charPos);
-		token.kind. = kindk;
+		token.kind = kind;
+		return token;
+	}
+
+	/**
+	 * Construct and identifier token.
+	 * @param lineNum The line number.
+	 * @param charPos The character positionl
+	 * @param identifier The identifier.
+	 */
+	public static Token makeIdentifier(int lineNum, int charPos, String identifier) {
+		Token token = new Token(lineNum, charPos);
+		token.kind = Token.Kind.IDENTIFIER;
+		token.lexeme = identifier;
 		return token;
 	}
 
@@ -226,8 +243,9 @@ public class Token {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(kind.name());
-		builderappend("(");
+		builder.append("(");
 		builder.append("lineNum:").append(lineNum);
+		builder.append(", ");
 		builder.append("charPos:").append(charPos);
 		builder.append(")");
 		return builder.toString();

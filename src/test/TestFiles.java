@@ -119,9 +119,14 @@ public class TestFiles {
 			return false;
 		}
 		String expected = outScanner.useDelimiter("\\Z").next();
+		expected += '\n'; // Needed apparently.
 
-		System.out.printf("exp={%s}\\nact={%s}", expected, actual);
-		assertEquals("Wrong compiler output.", expected, actual);
+		if (!expected.equals(actual)) {
+			System.err.println("Wrong compiler output.");
+			System.err.printf("exp={\n%s\n}\nact={\n%s\n}\n", expected, actual);
+			fail();
+		}
+		//assertEquals("Wrong compiler output.", expected+'\n', actual);
 
 		return true;
 	}

@@ -26,19 +26,19 @@ public class Scanner implements Iterable<Token> {
     public static String uciNetID = "ewestrup";
 
 	/* Current line count. */
-	private int lineNum;
+	private int lineNum = 1;
 
 	/* Character offset for current line. */
-	private int charPos;
+	private int charPos = 0;
 
 	/* Contains the next char (-1 == EOF). */
-	private int nextChar;
+	private int nextChar = BOF;
+
+	/* Keep the current nextChar one time. Implements a puschback/unread feature. */
+	private boolean holdNextChar = false;
 
 	/* Input source. */
 	private Reader input;
-
-	/* Pushed backed character to the stream. */
-	private int pushbackChar = NO_UNREAD_CHAR;
 
 	/**
 	 * Construct a scanner from a reader.
@@ -46,29 +46,24 @@ public class Scanner implements Iterable<Token> {
 	 */
 	Scanner(Reader reader) {
 		input = reader;
-		lineNum = 0;
-		charPos = 0;
-		nextChar = BOF;
 	}
 
-	private void unreadChar(int unchar) {
-		pushbackChar = unchar;
+	/**
+	 * Unread current nextChar.
+	 * post: lineNum and charPos still corresponds to the unread char. Why? 
+	 * Because if we push back an \n it becomes messy to reverse these 
+	 * variables as we have to record more information.
+	 */
+	private void unreadChar() {
+		holdNextChar = true;
 	}
 
-	/* Re-read a previously pushed back charachter. */
-	private int reunreadChar() {
-		int chr = pushbackChar;
-		pushbackChar = NO_UNREAD_CHAR;
-		return chr;
-	}
-
-	// OPTIONAL: helper function for reading a single char from input
-	//           can be used to catch and handle any IOExceptions,
-	//           advance the charPos or lineNum, etc.
-	private int readChar() {	
-		int nextChar = 0;
-		if (pushbackChar != NO_UNREAD_CHAR) {
-			nextChar = reunreadChar();
+	/**
+	 * Read the next charcter and maintain stuff.
+	 */
+	private void readChar() {
+		if (holdNextChar) {
+			holdNextChar = false;
 		} else {
 			try {
 				nextChar = input.read();
@@ -78,65 +73,151 @@ public class Scanner implements Iterable<Token> {
 			}
 			if (nextChar == -1) {
 				nextChar = EOF;
-			}
-			else if (nextChar == '\n') {
+			} else if (nextChar == '\n') {
 				++lineNum;
-				charPos = 0;
+				charPos = 1; // TODO where are we now?
 			} else if (nextChar != EOF) {
 				++charPos;
 			}
 		}
-		return nextChar;
+		//System.out.println("next char is \"" + (char) nextChar  + "\"");
 	}
 
 
 	/**
+	 * The states we can be in when parsing.
+	 */
+	private static enum State {
+		BEGINNING, IDENTIFIER, DIGIT, LESS_THAN, GREATER_THAN, ASSIGN, BANG;
+	}
+
+	/**
 	 * Get the next available Token.
-	 * @return Token The next Token or EOF-token if input stream contains to nore tokens.
-	 *  pre: call assumes that nextChar is already holding an unread character
+	 * @return Token The next Token or EOF-token if input stream contains to more tokens.
+	 *  pre: call assumes that nextChar is already holding an unread character (if this is not the first call)
 	 *  post: return leaves nextChar containing an untokenized character.
 	 */
+	// TODO make sure pre: and post: holds.
 	public Token next() {
 		Token token = null;
 		StringBuilder lexemeBuilder = new StringBuilder();
+		State state = State.BEGINNING;
+		if (nextChar == BOF) {
+			// Don't want to block in constructor.
+			readChar();
+		}
+		int tokBegLineNum = 0;
+		int tokBegCharPos = 0;
+		boolean firstLoop = true;
 		while (token == null) {
-			int curChar = readChar();
-			if (curChar == EOF) {
-				token = Token.EOF(lineNum, charPos);
-				continue;
-			} else if (curChar == ' ' || curChar == '\t' || curChar == '\n' || curChar == '\f') {
-				continue;
-			} 
-			
-			lexemeBuilder.append(curChar);
-			if (Token.Kind.LESS_THAN.matches(lexemeBuilder.toString())) {
-
+			//System.out.println("loop");
+			if (firstLoop) {
+				firstLoop = false;
 			} else {
-				System.out.println("Non-ws: \"" + (char) curChar + "\"");
-				boolean found = false;
-				Collection<Token.Kind> operatorKinds = Token.Kind.getCategory(Token.Category.OPERATOR);
-				Iterator<Token.Kind> iterator = operatorKinds.iterator();
-				Token.Kind curKind;
-				while (!found && iterator.hasNext()){
-					curKind = iterator.next();
-					if (curKind.matches(lexemeBuilder.toString())){
-						found = true;
+				readChar();
+			}
+			if (nextChar == EOF) { // EOF can come anywhere in the stream.
+				if (state != State.BEGINNING) {
+					token = Token.makeTokenFromKind(lineNum, charPos, Token.Kind.ERROR);
+				} else {
+					//token = Token.makeEOF(lineNum, charPos);
+					token = Token.makeTokenFromKind(lineNum, charPos, Token.Kind.EOF);
+				}
+				continue;
+			}
+			switch (state) {
+				case BEGINNING: // TODO break out this to priv method
+				 	if (Character.isWhitespace(nextChar)) {
+						 //System.out.println("skipping ws");
+						continue;
 					}
-				}
-				if (found) {
-					return Token.makeOperator(curKind, lineNum, charPos);
-				}
 
+					tokBegLineNum = lineNum;
+					tokBegCharPos = charPos;
+					lexemeBuilder.append(nextChar);
+					if (Token.Kind.LESS_THAN.matches(String.valueOf((char) nextChar))) {
+						state = State.LESS_THAN;
+					} else if (Token.Kind.GREATER_THAN.matches(String.valueOf((char) nextChar))) {
+						state = State.GREATER_THAN;
+					} else if (Token.Kind.ASSIGN.matches(String.valueOf((char) nextChar))) {
+						//System.out.println("in assign and charpos=" +charPos);
+						state = State.ASSIGN;
+					} else if (nextChar == '!') {
+						state = State.BANG;
+					} else {
+						//System.out.println("Non-ws: \"" + (char) nextChar + "\"");
+						boolean found = false;
+						Collection<Token.Kind> operatorKinds = Token.Kind.getCategory(Token.Category.OPERATOR);
+						Iterator<Token.Kind> iterator = operatorKinds.iterator();
+						Token.Kind curKind = Token.Kind.EOF;
+						while (!found && iterator.hasNext()) {
+							curKind = iterator.next();
+							if (curKind.matches(lexemeBuilder.toString())) {
+								found = true;
+							}
+						}
+						if (found) {
+							token = Token.makeTokenFromKind(tokBegLineNum, tokBegCharPos, curKind);
+							// Character.isLetter(nextChar) // Will allow non ASCII chars.
+						} else if (matchesIdentifier(true, nextChar)) {
+							state = State.IDENTIFIER;
+						} else if (nextChar >= '0' && nextChar <= '9') {
+							state = State.DIGIT;
+						} else {
+							token = Token.makeTokenFromKind(tokBegLineNum, tokBegCharPos, Token.Kind.ERROR);
+						}
+					}
+					break;
+				case IDENTIFIER:
+					if (matchesIdentifier(false, nextChar)) {
+						lexemeBuilder.append(nextChar);
+					} else {
+						unreadChar();
+						String identifier = lexemeBuilder.toString();
+						token = Token.makeIdentifier(tokBegLineNum, tokBegCharPos, identifier);
+					}
+					break;
+				case DIGIT:
+					break;
+				case LESS_THAN:
+					break;
+				case GREATER_THAN:
+					break;
+				case ASSIGN:
+					if (nextChar == '=') {
+						token = Token.makeTokenFromKind(tokBegLineNum, tokBegCharPos, Token.Kind.EQUAL);
+					} else {
+						unreadChar();
+						token = Token.makeTokenFromKind(tokBegLineNum, tokBegCharPos, Token.Kind.ASSIGN);
+					}
+					break;
+				case BANG:
+					break;
+				default:
+					System.err.println("defalt label in next switch. Should not be here!");
+					System.exit(1);
 			}
 		}
-
+		//System.out.println("anropslut");
+		readChar(); // Make sure nextChar contains the next input to use.
 		return token;
 	}
 
 	/**
-	 * Get an iterator for Tokens.
-	 * @return An token Iterator.
-	 */
+ 	 * Short hand for testing if the supplied character matces the caracters in an identifier.
+ 	 * @param firstChar If we're testing the first char in a string we think is an identifier.
+ 	 * @param testChar The character to test.
+ 	 * @return Boolean answer for the question.
+ 	 */
+	private boolean matchesIdentifier(boolean firstChar, int testChar) {
+		return ((testChar >= 'a' && testChar <= 'z') || (testChar >= 'A' && testChar <= 'Z') || testChar == '_') ?
+			true : (!firstChar && (testChar >= '0' && testChar <= '9'));
+	}
+
+	/**
+ 	 * Get an iterator for Tokens.
+ 	 * @return An token Iterator.
+ 	 */
 	public Iterator<Token> iterator() {
 		// TODO construct iterato that just uses Scanner.next?
 		return null;
