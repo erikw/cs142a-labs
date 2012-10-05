@@ -1,0 +1,5 @@
+FLOAT(123.445)(lineNum:1, charPos:1)
+IDENTIFIER(aaa)(lineNum:1, charPos:8)
+INTEGER(123)(lineNum:2, charPos:1)
+IDENTIFIER(bbb)(lineNum:2, charPos:4)
+EOF(lineNum:3, charPos:1)

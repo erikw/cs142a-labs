@@ -73,10 +73,11 @@ public class Scanner implements Iterable<Token> {
 			}
 			if (nextChar == -1) {
 				nextChar = EOF;
+				++charPos;
 			} else if (nextChar == '\n') {
 				++lineNum;
-				charPos = 1; // TODO where are we now?
-			} else if (nextChar != EOF) {
+				charPos = 0;
+			} else {
 				++charPos;
 			}
 		}
@@ -88,7 +89,7 @@ public class Scanner implements Iterable<Token> {
 	 * The states we can be in when parsing.
 	 */
 	private static enum State {
-		BEGINNING, IDENTIFIER, DIGIT, LESS_THAN, GREATER_THAN, ASSIGN, BANG, COLON;
+		BEGINNING, IDENTIFIER, DIGIT, LESS_THAN, GREATER_THAN, ASSIGN, BANG, COLON, FLOAT, SLASH, COMMENT;
 	}
 
 	/**
@@ -97,7 +98,7 @@ public class Scanner implements Iterable<Token> {
 	 *  pre: call assumes that nextChar is already holding an unread character (if this is not the first call)
 	 *  post: return leaves nextChar containing an untokenized character.
 	 */
-	// TODO make sure pre: and post: holds.
+	// TODO mnake sure pre: and post: holds.
 	public Token next() {
 		Token token = null;
 		StringBuilder lexemeBuilder = new StringBuilder();
@@ -106,11 +107,10 @@ public class Scanner implements Iterable<Token> {
 			// Don't want to block in constructor.
 			readChar();
 		}
-		int tokBegLineNum = 0;
-		int tokBegCharPos = 0;
+		int lexBegLineNum = 0;
+		int lexBegCharPos = 0;
 		boolean firstLoop = true;
 		while (token == null) {
-			//System.out.println("loop");
 			if (firstLoop) {
 				firstLoop = false;
 			} else {
@@ -118,7 +118,7 @@ public class Scanner implements Iterable<Token> {
 			}
 			if (nextChar == EOF) { // EOF can come anywhere in the stream.
 				if (state != State.BEGINNING) {
-					token = Token.makeTokenFromKind(lineNum, charPos, Token.Kind.ERROR);
+					token = Token.makeTokenFromKind(lineNum, charPos, Token.Kind.ERROR); // TODO test this much
 				} else {
 					//token = Token.makeEOF(lineNum, charPos);
 					token = Token.makeTokenFromKind(lineNum, charPos, Token.Kind.EOF);
@@ -126,15 +126,15 @@ public class Scanner implements Iterable<Token> {
 				continue;
 			}
 			switch (state) {
-				case BEGINNING: // TODO break out this to priv method
-				 	if (Character.isWhitespace(nextChar)) {
-						 //System.out.println("skipping ws");
+				case BEGINNING: // TODO break out this to priv method?
+				 	if (Character.isWhitespace((char) nextChar)) {
+						//System.out.println("skipping ws");
 						continue;
 					}
 
-					tokBegLineNum = lineNum;
-					tokBegCharPos = charPos;
-					lexemeBuilder.append(nextChar);
+					lexBegLineNum = lineNum;
+					lexBegCharPos = charPos;
+					lexemeBuilder.append((char) nextChar);
 					if (Token.Kind.LESS_THAN.matches(String.valueOf((char) nextChar))) {
 						state = State.LESS_THAN;
 					} else if (Token.Kind.GREATER_THAN.matches(String.valueOf((char) nextChar))) {
@@ -146,12 +146,14 @@ public class Scanner implements Iterable<Token> {
 						state = State.BANG;
 					} else if (nextChar == ':') {
 						state = State.COLON;
+					} else if (nextChar == '/') {
+						state = State.SLASH;
 					} else {
 						//System.out.println("Non-ws: \"" + (char) nextChar + "\"");
 						boolean found = false;
 						Collection<Token.Kind> operatorKinds = Token.Kind.getCategory(Token.Category.OPERATOR);
 						Iterator<Token.Kind> iterator = operatorKinds.iterator();
-						Token.Kind curKind = Token.Kind.EOF;
+						Token.Kind curKind = null;
 						while (!found && iterator.hasNext()) {
 							curKind = iterator.next();
 							if (curKind.matches(lexemeBuilder.toString())) {
@@ -159,66 +161,109 @@ public class Scanner implements Iterable<Token> {
 							}
 						}
 						if (found) {
-							token = Token.makeTokenFromKind(tokBegLineNum, tokBegCharPos, curKind);
-							// Character.isLetter(nextChar) // Will allow non ASCII chars.
+							token = Token.makeTokenFromKind(lexBegLineNum, lexBegCharPos, curKind);
+							// Character.isLetter((char) nextChar) // Will allow non ASCII chars.
 						} else if (matchesIdentifier(true, nextChar)) {
 							state = State.IDENTIFIER;
 						} else if (nextChar >= '0' && nextChar <= '9') {
 							state = State.DIGIT;
 						} else {
-							token = Token.makeTokenFromKind(tokBegLineNum, tokBegCharPos, Token.Kind.ERROR);
+							token = Token.makeTokenFromKindWLexeme(lexBegLineNum, lexBegCharPos, Token.Kind.ERROR, Character.toString((char) nextChar));
 						}
 					}
 					break;
 				case IDENTIFIER:
 					if (matchesIdentifier(false, nextChar)) {
-						lexemeBuilder.append(nextChar);
+						lexemeBuilder.append((char) nextChar);
 					} else {
 						unreadChar();
 						String identifier = lexemeBuilder.toString();
-						token = Token.makeIdentifier(tokBegLineNum, tokBegCharPos, identifier);
+						Token.Kind matchKind = matchingKind(Token.Category.KEYWORD, lexemeBuilder.toString());
+						Token.Kind kindToUse = null;
+						if (matchKind == null) {
+							kindToUse = Token.Kind.IDENTIFIER;
+						} else {
+							kindToUse = matchKind;
+						}
+						//token = Token.makeIdentifier(lexBegLineNum, lexBegCharPos, identifier);
+						token = Token.makeTokenFromKindWLexeme(lexBegLineNum, lexBegCharPos, kindToUse, identifier);
 					}
 					break;
 				case DIGIT:
+					if (nextChar == '.') {
+						lexemeBuilder.append((char) nextChar);
+						state = State.FLOAT;
+					} else if (nextChar >= '0' && nextChar <= '9') {
+						lexemeBuilder.append((char) nextChar);
+					} else {
+						unreadChar();
+						String integer = lexemeBuilder.toString();
+						token = Token.makeTokenFromKindWLexeme(lexBegLineNum, lexBegCharPos, Token.Kind.INTEGER, integer);
+					}
+					break;
+				case FLOAT:
+					if (nextChar >= '0' && nextChar <= '9') {
+						lexemeBuilder.append((char) nextChar);
+					} else {
+						unreadChar();
+						String floating = lexemeBuilder.toString();
+						token = Token.makeTokenFromKindWLexeme(lexBegLineNum, lexBegCharPos, Token.Kind.FLOAT, floating);
+					}
 					break;
 				case LESS_THAN:
 					if (nextChar == '=') {
-						token = Token.makeTokenFromKind(tokBegLineNum, tokBegCharPos, Token.Kind.LESSER_EQUAL);
+						token = Token.makeTokenFromKind(lexBegLineNum, lexBegCharPos, Token.Kind.LESSER_EQUAL);
 					} else {
 						unreadChar();
-						token = Token.makeTokenFromKind(tokBegLineNum, tokBegCharPos, Token.Kind.LESS_THAN);
+						token = Token.makeTokenFromKind(lexBegLineNum, lexBegCharPos, Token.Kind.LESS_THAN);
 					}
 					break;
 				case GREATER_THAN:
 					if (nextChar == '=') {
-						token = Token.makeTokenFromKind(tokBegLineNum, tokBegCharPos, Token.Kind.GREATER_EQUAL);
+						token = Token.makeTokenFromKind(lexBegLineNum, lexBegCharPos, Token.Kind.GREATER_EQUAL);
 					} else {
 						unreadChar();
-						token = Token.makeTokenFromKind(tokBegLineNum, tokBegCharPos, Token.Kind.GREATER_THAN);
+						token = Token.makeTokenFromKind(lexBegLineNum, lexBegCharPos, Token.Kind.GREATER_THAN);
 					}
 					break;
 				case ASSIGN:
 					if (nextChar == '=') {
-						token = Token.makeTokenFromKind(tokBegLineNum, tokBegCharPos, Token.Kind.EQUAL);
+						token = Token.makeTokenFromKind(lexBegLineNum, lexBegCharPos, Token.Kind.EQUAL);
 					} else {
 						unreadChar();
-						token = Token.makeTokenFromKind(tokBegLineNum, tokBegCharPos, Token.Kind.ASSIGN);
+						token = Token.makeTokenFromKind(lexBegLineNum, lexBegCharPos, Token.Kind.ASSIGN);
 					}
 					break;
 				case BANG:
 					if (nextChar == '=') {
-						token = Token.makeTokenFromKind(tokBegLineNum, tokBegCharPos, Token.Kind.NOT_EQUAL);
+						token = Token.makeTokenFromKind(lexBegLineNum, lexBegCharPos, Token.Kind.NOT_EQUAL);
 					} else {
 						unreadChar();
-						token = Token.makeError(tokBegLineNum, tokBegCharPos, (char) nextChar);
+						//token = Token.makeError(lexBegLineNum, lexBegCharPos, (char) nextChar);
+						token = Token.makeTokenFromKindWLexeme(lexBegLineNum, lexBegCharPos, Token.Kind.ERROR,Character.toString('!'));
 					}
 					break;
 				case COLON:
 					if (nextChar == ':') {
-						token = Token.makeTokenFromKind(tokBegLineNum, tokBegCharPos, Token.Kind.CALL);
+						token = Token.makeTokenFromKind(lexBegLineNum, lexBegCharPos, Token.Kind.CALL);
 					} else {
 						unreadChar();
-						token = Token.makeTokenFromKind(tokBegLineNum, tokBegCharPos, Token.Kind.COLON);
+						token = Token.makeTokenFromKind(lexBegLineNum, lexBegCharPos, Token.Kind.COLON);
+					}
+					break;
+				case SLASH:
+					if (nextChar == '/') {
+						state = State.COMMENT;
+					} else {
+						unreadChar();
+						token = Token.makeTokenFromKind(lexBegLineNum, lexBegCharPos, Token.Kind.DIV);
+					}
+					break;
+				case COMMENT:
+					if (nextChar == '\n') {
+						state = State.BEGINNING;
+						lexemeBuilder.delete(0, (lexemeBuilder.length()));
+						unreadChar();
 					}
 					break;
 				default:
@@ -229,6 +274,26 @@ public class Scanner implements Iterable<Token> {
 		//System.out.println("anropslut");
 		readChar(); // Make sure nextChar contains the next input to use.
 		return token;
+	}
+
+	/**
+ 	 * Try to find a token that matches the lexeme in a give category.
+ 	 * @param category The category of tokens to consider.
+ 	 * @param lexeme The lexeme to look for for.
+ 	 * @return A matching Kind or null.
+ 	 */
+	private Token.Kind matchingKind(Token.Category category, String lexeme) {
+		boolean found = false;
+		Collection<Token.Kind> catKinds = Token.Kind.getCategory(category);
+		Iterator<Token.Kind> iterator = catKinds.iterator();
+		Token.Kind curKind = null;
+		while (!found && iterator.hasNext()) {
+			curKind = iterator.next();
+			if (curKind.matches(lexeme)) {
+				found = true;
+			}
+		}
+		return found ? curKind : null;
 	}
 
 	/**

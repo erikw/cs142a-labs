@@ -159,8 +159,22 @@ public class Token {
 	 *
 	 */
 	public static Token makeTokenFromKind(int lineNum, int charPos, Token.Kind kind) {
+		return makeTokenFromKindWLexeme(lineNum, charPos, kind, "");
+	}
+
+	/**=
+	 * Make an operator of kind.
+	 * @param lineNum The line number.
+	 * @param charPos The character positionl
+	 * @param kind The kind to make.
+	 * @param lexeme The lexeme found. Can be empty if non is found.
+	 * @return A token of the requested type.
+	 *
+	 */
+	public static Token makeTokenFromKindWLexeme(int lineNum, int charPos, Token.Kind kind, String lexeme) {
 		Token token = new Token(lineNum, charPos);
 		token.kind = kind;
+		token.lexeme = lexeme;
 		return token;
 	}
 
@@ -171,12 +185,12 @@ public class Token {
 	 * @param identifier The identifier.
 	 * @return A new token.
 	 */
-	public static Token makeIdentifier(int lineNum, int charPos, String identifier) {
-		Token token = new Token(lineNum, charPos);
-		token.kind = Token.Kind.IDENTIFIER;
-		token.lexeme = identifier;
-		return token;
-	}
+	//public static Token makeIdentifier(int lineNum, int charPos, String identifier) {
+		//Token token = new Token(lineNum, charPos);
+		//token.kind = Token.Kind.IDENTIFIER;
+		//token.lexeme = identifier;
+		//return token;
+	//}
 
 	/**
 	 * Construct and error token.
@@ -185,12 +199,12 @@ public class Token {
 	 * @param offendingChar The unexpected char.
 	 * @return A new token.
 	 */
-	public static Token makeError(int lineNum, int charPos, char offendingChar) {
-		Token token = new Token(lineNum, charPos);
-		token.kind = Token.Kind.ERROR;
-		token.lexeme = Character.toString(offendingChar);
-		return token;
-	}
+	//public static Token makeError(int lineNum, int charPos, char offendingChar) {
+		//Token token = new Token(lineNum, charPos);
+		//token.kind = Token.Kind.ERROR;
+		//token.lexeme = Character.toString(offendingChar);
+		//return token;
+	//}
 
 
 	//public static Token Identifier(String name, int lineNum, int charPos);
@@ -259,11 +273,20 @@ public class Token {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(kind.name());
-		if (kind.equals(Kind.ERROR)) {
-			builder.append("(");
-			builder.append("Unexpected character: ");
-			builder.append(lexeme);
-			builder.append(")");
+		switch (kind) {
+			case ERROR: 
+				builder.append("(");
+				builder.append("Unexpected character: ");
+				builder.append(lexeme);
+				builder.append(")");
+			break;
+			case INTEGER:
+			case FLOAT:
+			case IDENTIFIER:
+				builder.append("(");
+				builder.append(lexeme);
+				builder.append(")");
+			break;
 		}
 		builder.append("(");
 		builder.append("lineNum:").append(lineNum);

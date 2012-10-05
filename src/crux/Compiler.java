@@ -29,7 +29,7 @@ public class Compiler {
         } catch (IOException e) {
             //e.printStackTrace();
             System.err.println("Error accessing the source file: \"" + cruxFile + "\".");
-            System.exit(-2);
+			System.exit(-2);
         }
 
         // TODO use iterable interface?
@@ -39,7 +39,6 @@ public class Compiler {
             t = scanner.next();
         }
         System.out.println(t); // TODO purpuse of printing EOF?
-
 	}
 
 	/**
