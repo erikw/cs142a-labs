@@ -88,7 +88,7 @@ public class Scanner implements Iterable<Token> {
 	 * The states we can be in when parsing.
 	 */
 	private static enum State {
-		BEGINNING, IDENTIFIER, DIGIT, LESS_THAN, GREATER_THAN, ASSIGN, BANG;
+		BEGINNING, IDENTIFIER, DIGIT, LESS_THAN, GREATER_THAN, ASSIGN, BANG, COLON;
 	}
 
 	/**
@@ -144,6 +144,8 @@ public class Scanner implements Iterable<Token> {
 						state = State.ASSIGN;
 					} else if (nextChar == '!') {
 						state = State.BANG;
+					} else if (nextChar == ':') {
+						state = State.COLON;
 					} else {
 						//System.out.println("Non-ws: \"" + (char) nextChar + "\"");
 						boolean found = false;
@@ -209,6 +211,14 @@ public class Scanner implements Iterable<Token> {
 					} else {
 						unreadChar();
 						token = Token.makeError(tokBegLineNum, tokBegCharPos, (char) nextChar);
+					}
+					break;
+				case COLON:
+					if (nextChar == ':') {
+						token = Token.makeTokenFromKind(tokBegLineNum, tokBegCharPos, Token.Kind.CALL);
+					} else {
+						unreadChar();
+						token = Token.makeTokenFromKind(tokBegLineNum, tokBegCharPos, Token.Kind.COLON);
 					}
 					break;
 				default:
