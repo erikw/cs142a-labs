@@ -173,38 +173,6 @@ public class Token {
 	}
 
 	/**
-	 * Construct and identifier token.
-	 * @param lineNum The line number.
-	 * @param charPos The character positionl
-	 * @param identifier The identifier.
-	 * @return A new token.
-	 */
-	//public static Token makeIdentifier(int lineNum, int charPos, String identifier) {
-		//Token token = new Token(lineNum, charPos);
-		//token.kind = Token.Kind.IDENTIFIER;
-		//token.lexeme = identifier;
-		//return token;
-	//}
-
-	/**
-	 * Construct and error token.
-	 * @param lineNum The line number.
-	 * @param charPos The character positionl
-	 * @param offendingChar The unexpected char.
-	 * @return A new token.
-	 */
-	//public static Token makeError(int lineNum, int charPos, char offendingChar) {
-		//Token token = new Token(lineNum, charPos);
-		//token.kind = Token.Kind.ERROR;
-		//token.lexeme = Character.toString(offendingChar);
-		//return token;
-	//}
-
-
-	//public static Token Identifier(String name, int lineNum, int charPos);
-	//public static Token Float(String num, int lineNum, int charPos);
-
-	/**
 	 * Instantiate a token with line number and char position.
 	 * @param lineNum The line number the lexeme was found at.
 	 * @param charPos The character position on the line the lexeme was found on.
@@ -213,6 +181,7 @@ public class Token {
 		this.lineNum = lineNum;
 		this.charPos = charPos;
 		
+		// TODO Based on the given lexeme determine and set the actual kind.
 		// If we don't match anything, signal error.
 		this.kind = Kind.ERROR;
 		this.lexeme = "No Lexeme Given";

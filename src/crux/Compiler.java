@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Main class for the crux compiler.
@@ -32,13 +33,19 @@ public class Compiler {
 			System.exit(-2);
         }
 
-        // TODO use iterable interface?
-        Token t = scanner.next();
-        while (!t.isKind(Token.Kind.EOF)) {
-            System.out.println(t);
-            t = scanner.next();
-        }
-        System.out.println(t);
+		Token token;
+		do {
+			token = scanner.next();
+			System.out.println(token);
+		} while (!token.isKind(Token.Kind.EOF));
+        //Token token = null;
+        //Iterator<Token> iterator = scanner.iterator();
+        //for (; iterator.hasNext(); ) {
+            //token = iterator.next();
+            //System.out.println(token);
+        //}
+        //token = iterator.next();
+        //System.out.println(token);
 	}
 
 	/**

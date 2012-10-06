@@ -5,6 +5,8 @@ import java.io.Reader;
 import java.util.Collection;
 import java.util.Iterator;
 
+import javax.naming.OperationNotSupportedException;
+
 //import java.io.IOException;
 
 /**
@@ -148,21 +150,10 @@ public class Scanner implements Iterable<Token> {
 					} else if (nextChar == '/') {
 						state = State.SLASH;
 					} else {
-						//System.out.println("Non-ws: \"" + (char) nextChar + "\"");
-						boolean found = false;
-						Collection<Token.Kind> operatorKinds = Token.Kind.getCategory(Token.Category.OPERATOR);
-						Iterator<Token.Kind> iterator = operatorKinds.iterator();
-						Token.Kind curKind = null;
-						while (!found && iterator.hasNext()) {
-							curKind = iterator.next();
-							if (curKind.matches(lexemeBuilder.toString())) {
-								found = true;
-							}
-						}
-						if (found) {
-							token = Token.makeTokenFromKind(lexBegLineNum, lexBegCharPos, curKind);
-							// Character.isLetter((char) nextChar) // Will allow non ASCII chars.
-						} else if (matchesIdentifier(true, nextChar)) {
+						Token.Kind matchKind = matchingKind(Token.Category.OPERATOR, lexemeBuilder.toString());
+						if (matchKind != null) {
+							token = Token.makeTokenFromKind(lexBegLineNum, lexBegCharPos, matchKind);
+						} else if (matchesIdentifier(true, nextChar)) { // Character.isLetter((char) nextChar) // Will allow non ASCII chars.
 							state = State.IDENTIFIER;
 						} else if (nextChar >= '0' && nextChar <= '9') {
 							state = State.DIGIT;
@@ -311,8 +302,57 @@ public class Scanner implements Iterable<Token> {
  	 * @return An token Iterator.
  	 */
 	public Iterator<Token> iterator() {
-		// TODO construct iterato that just uses Scanner.next?
-		return null;
+		return new TokenIterator(this);
+	}
+
+	private static class TokenIterator implements Iterator<Token> {
+		/* Scanner to use. */
+		private Scanner scanner;
+
+		/* Look ahead token. */
+		private Token cache;
+
+		/**
+		 * Construct iterator with scanner.
+		 * @param scanner The scanner to use.
+		 */
+		public TokenIterator(Scanner scanner) {
+			this.scanner = scanner;
+		}
+
+		/**
+		 * Are there more tokens?
+		 */
+		public boolean hasNext() {
+			if (cache == null) {
+				cache = scanner.next();
+			}
+			return !cache.isKind(Token.Kind.EOF);
+		}
+
+		/**
+		 * Get the next token.
+		 */
+		public Token next() {
+			Token token = null;
+			if (cache != null) {
+				token = cache;
+				cache = null;
+			} else {
+				token = scanner.next();
+			}
+			return token;	
+		}
+
+		/**
+		 * We don't support removing.
+		 */
+		public void remove() {
+			//throw new OperationNotSupportedException();
+			;
+		}
+
+
 	}
 
 	// OPTIONAL: any other methods that you find convenient for implementation or testing
