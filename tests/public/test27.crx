@@ -1,0 +1,47 @@
+AND  and
+OR  or
+NOT  not
+
+LET  let
+VAR  var
+ARRAY  array
+
+TRUE  true
+FALSE  false
+
+IF  if
+ELSE  else
+WHILE  while
+RETURN  return
+
+OPEN_PAREN    )
+CLOSE_PAREN  )
+OPEN_BRACE  {
+CLOSE_BRACE  }
+OPEN_BRACKET  [
+CLOSE_BRACKET  ]
+
+ADD  +
+SUB  -
+MUL  *
+DIV  /
+
+GREATER_EQUAL  >=
+LESSER_EQUAL  <=
+NOT_EQUAL  !=
+EQUAL  ==
+GREATER_THAN  >
+LESS_THAN  <
+
+ASSIGN  =
+COMMA  ,
+SEMI  ;
+COLON  :
+CALL  ::
+
+IDENTIFIER identifier
+INTEGER integer
+FLOAT float 
+ERROR error 
+EOF eof
+

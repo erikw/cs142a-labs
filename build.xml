@@ -1,5 +1,5 @@
-<?xml version="0.1" encoding="UTF-8"?>
-<project name="cruxc" basedir="." default="compile">
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="crxc" basedir="." default="compile">
 	<description>
 		Build script for the crux project by Erik Westrup.
 	</description>
@@ -10,14 +10,14 @@
 	<property name="path.source" value="src" />
 	<property name="path.destination" value="bin" />
 	<property name="path.library" value="lib" />
-	<property name="path.documentation" value="doc" />
+	<property name="path.documentation" value="doc/gen/" />
 	<property name="path.release" value="release" />
 	<property name="path.test" value="test" />
-	<property name="path.mainClass" value="crux/prog" />
+	<property name="path.mainClass" value="crux/Compiler" />
 
 
 	<!-- Library versions in use. Please update path externalLibs if you add/remove from here.-->
-	<property name="junit" value="junit-4.9b2.jar" />
+	<property name="junit" value="junit-4.10.jar" />
 
 	<!-- *** Paths *** -->
 	<path id="externalLibs">
@@ -34,12 +34,19 @@
 	<!-- *** Targets *** -->
 	<!-- Here all targets exists. -->
 
-	<target name="compile" depends="clean" description="Compile the sources to the destination.">
+	<target name="compile" depends="clean,tags" description="Compile the sources to the destination.">
 		<mkdir dir="bin" />
-		<javac destdir="${path.destination}" includeantruntime="false">
+		<javac destdir="${path.destination}" includeantruntime="false" debug="true" debuglevel="lines,vars,source">
 			<src path="${path.source}" />
 			<classpath refid="externalLibs" />
 		</javac>
+	</target>
+
+	<target name="tags"  description="Generate a tags file.">
+  		<exec executable="ctags">
+    		<arg value="-R"/>
+    		<arg value="."/>
+  		</exec>
 	</target>
 
 	<target name="release" depends="distribute,test" description="Make a full release.">
@@ -72,14 +79,15 @@
 		</delete>
 	</target>
 
-	<target name="test" description="Run JUnit tests and stop build if one fails.">
+	<target name="test" depends="compile" description="Run JUnit tests and stop build if one fails.">
 		<junit printsummary="true" fork="yes" haltonfailure="true">
 			<formatter type="plain" usefile="no" />
 			<classpath refid="classpath.tests" />
 			<classpath refid="externalLibs" />
 
 			<batchtest>
-				<fileset dir="${path.destination}/" includes="${path.test}/**/**Test**.class" />
+				<!-- The $* excludes inner classes. -->
+				<fileset dir="${path.destination}/" includes="${path.test}/**/**Test**.class" excludes="**/*$*.class" />
 			</batchtest>
 		</junit>
 	</target>

@@ -1,0 +1,6 @@
+
+// test printBool
+
+func main() : void {
+  ::printBool(true);
+  ::printB

@@ -1,0 +1,4 @@
+ERROR(Unexpected character: !)(lineNum:1, charPos:1)
+NOT_EQUAL(lineNum:1, charPos:2)
+ASSIGN(lineNum:1, charPos:4)
+EOF(lineNum:2, charPos:1)
