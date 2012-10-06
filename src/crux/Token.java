@@ -1,6 +1,7 @@
 package crux;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
@@ -181,8 +182,7 @@ public class Token {
 		this.lineNum = lineNum;
 		this.charPos = charPos;
 		
-		// TODO Based on the given lexeme determine and set the actual kind.
-		// If we don't match anything, signal error.
+		// Let factory method change these.
 		this.kind = Kind.ERROR;
 		this.lexeme = "No Lexeme Given";
 	}
@@ -193,13 +193,11 @@ public class Token {
 	 * @param lineNum The line number the lexeme was found at.
 	 * @param charPos The character position on the line the lexeme was found on.
 	 */
-	public Token(String lexeme, int lineNum, int charPos) {
+	private Token(String lexeme, int lineNum, int charPos) {
 		this.lineNum = lineNum;
 		this.charPos = charPos;
 		
-		// TODO Based on the given lexeme determine and set the actual kind.
-		
-		// If we don't match anything, signal error.
+		// Let factory method change these.
 		this.kind = Kind.ERROR;
 		this.lexeme = "Unrecognized lexeme: " + lexeme;
 	}
@@ -267,5 +265,25 @@ public class Token {
 	 */
 	public boolean isKind(Kind rhs) {
 		return kind.equals(rhs);
+	}
+
+	/**
+ 	 * Try to find a token that matches the lexeme in a give category.
+ 	 * @param category The category of tokens to consider.
+ 	 * @param lexeme The lexeme to look for for.
+ 	 * @return A matching Kind or null.
+ 	 */
+	public static Token.Kind matchingKind(Token.Category category, String lexeme) {
+		boolean found = false;
+		Collection<Token.Kind> catKinds = Token.Kind.getCategory(category);
+		Iterator<Token.Kind> iterator = catKinds.iterator();
+		Token.Kind curKind = null;
+		while (!found && iterator.hasNext()) {
+			curKind = iterator.next();
+			if (curKind.matches(lexeme)) {
+				found = true;
+			}
+		}
+		return found ? curKind : null;
 	}
 }

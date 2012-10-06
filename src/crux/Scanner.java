@@ -150,7 +150,7 @@ public class Scanner implements Iterable<Token> {
 					} else if (nextChar == '/') {
 						state = State.SLASH;
 					} else {
-						Token.Kind matchKind = matchingKind(Token.Category.OPERATOR, lexemeBuilder.toString());
+						Token.Kind matchKind = Token.matchingKind(Token.Category.OPERATOR, lexemeBuilder.toString());
 						if (matchKind != null) {
 							token = Token.makeTokenFromKind(lexBegLineNum, lexBegCharPos, matchKind);
 						} else if (matchesIdentifier(true, nextChar)) { // Character.isLetter((char) nextChar) // Will allow non ASCII chars.
@@ -168,7 +168,7 @@ public class Scanner implements Iterable<Token> {
 					} else {
 						unreadChar();
 						String identifier = lexemeBuilder.toString();
-						Token.Kind matchKind = matchingKind(Token.Category.KEYWORD, lexemeBuilder.toString());
+						Token.Kind matchKind = Token.matchingKind(Token.Category.KEYWORD, lexemeBuilder.toString());
 						Token.Kind kindToUse = null;
 						if (matchKind == null) {
 							kindToUse = Token.Kind.IDENTIFIER;
@@ -264,26 +264,6 @@ public class Scanner implements Iterable<Token> {
 		//System.out.println("anropslut");
 		readChar(); // Make sure nextChar contains the next input to use.
 		return token;
-	}
-
-	/**
- 	 * Try to find a token that matches the lexeme in a give category.
- 	 * @param category The category of tokens to consider.
- 	 * @param lexeme The lexeme to look for for.
- 	 * @return A matching Kind or null.
- 	 */
-	private Token.Kind matchingKind(Token.Category category, String lexeme) {
-		boolean found = false;
-		Collection<Token.Kind> catKinds = Token.Kind.getCategory(category);
-		Iterator<Token.Kind> iterator = catKinds.iterator();
-		Token.Kind curKind = null;
-		while (!found && iterator.hasNext()) {
-			curKind = iterator.next();
-			if (curKind.matches(lexeme)) {
-				found = true;
-			}
-		}
-		return found ? curKind : null;
 	}
 
 	/**
