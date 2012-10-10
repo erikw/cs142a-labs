@@ -61,16 +61,21 @@ public class TestFiles {
 	// Lab 1 tests.
 	@Test
 	public void testLab1Public() {
+		compiler.setLab(crux.Compiler.Lab.LAB1);
 		testFilesIn("lab1/public");
 	}
 
 	@Test
 	public void testLab1Private() {
+		compiler.setLab(crux.Compiler.Lab.LAB1);
+		testFilesIn("lab1/public");
 		testFilesIn("lab1/private");
 	}
 
 	@Test
 	public void testLab1PrivateSecret() {
+		compiler.setLab(crux.Compiler.Lab.LAB1);
+		testFilesIn("lab1/public");
 		testFilesIn("lab1/private_secret");
 	}
 
@@ -78,11 +83,13 @@ public class TestFiles {
 	// Lab 2 tests.
 	@Test
 	public void testLab2Public() {
+		compiler.setLab(crux.Compiler.Lab.LAB2);
 		testFilesIn("lab2/public");
 	}
 
 	@Test
 	public void testLab2Private() {
+		compiler.setLab(crux.Compiler.Lab.LAB2);
 		testFilesIn("lab2/private");
 	}
 
