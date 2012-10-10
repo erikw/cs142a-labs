@@ -1,0 +1,201 @@
+<html>
+  <head>
+    <title>CS 142A: Interpreters and Compilers</title>
+    <link href="../style.css" rel="StyleSheet" type="text/css"></link>
+  </head>
+
+  <body><div id="container">
+    <div id="header">
+      <p><a href="../index.html">CS 142A: Interpreters and Compilers</a></p>
+    </div>
+
+    <div id="leftnav">
+      <!-- should provide a noscript hard link to a navigation page -->
+      <script type="text/javascript" src="../code/menu.js"></script>
+      <script type="text/javascript">document.write(generateMenu(document.URL));</script>
+    </div>
+
+    <div id="content">
+
+      <h1>Lexical Semantics</h1>
+      <p>A program written in Crux consists of a sequence of lexemes, each of which can be classified as a kind of token.
+      The kinds of tokens, and the rules that govern their appearance are as follows:
+      <ul>
+        <!--<li>Identifiers must begin with an uppercase or lowercase letter, optionally followed by any number of uppercase letters, lowercase letters, digits, or underscores.</li>-->
+        <!--<li>An integer literal is a sequence of digits. It may be preceded by a '-' character to indicate a negative number.</li>-->
+        <!--<li>A float literal is a sequence of digits followed by a single '.' character to indicate the decimal place and at least one more digit. It may be preceded by a '-' character to indicate a negative value.</li>-->
+        <!--<li>A string literal is a sequence of characters within single quotes. String literals recognize backslash, newline, and single quote using the same escaping convention as Java. No other special escape sequences need to be recognized. An end-of-line character may not occur within a string literal.</li>-->
+        <li>As in Java, comments begin with a double forwardslash and continue until the end of the line on which they appear. Comments should be ignored by the scanner, because they do not constitute a lexeme.</li>
+        <li>Whitespace should be ignored, as it does not constitute a lexeme.
+        <li>The following words are reserved types, but are recognized as IDENTIFIER tokens: void, bool, int, float<!--, string-->.</li>
+        <li>The following words are reserved keywords:
+        <table>
+          <tr><th>Name</th><th>Lexeme</th></tr>
+          <tr><td>AND</td><td>and</td></tr>
+          <tr><td>OR</td><td>or</td></tr>
+          <tr><td>NOT</td><td>not</td></tr>
+          <tr><td>LET</td><td>let</td></tr>
+          <tr><td>VAR</td><td>var</td></tr>
+          <tr><td>ARRAY</td><td>array</td></tr>
+          <tr><td>FUNC</td><td>func</td></tr>
+          <tr><td>IF</td><td>if</td></tr>
+          <tr><td>ELSE</td><td>else</td></tr>
+          <tr><td>WHILE</td><td>while</td></tr>
+          <tr><td>TRUE</td><td>true</td></tr>
+          <tr><td>FALSE</td><td>false</td></tr>
+          <tr><td>RETURN</td><td>return</td></tr>
+        </table>
+        </li>
+        <li>The following character sequences have special meaning:
+        <table>
+          <tr><th>Name</th><th>Lexeme</th></tr>
+          <tr><td>OPEN_PAREN</td><td>(</td></tr>
+          <tr><td>CLOSE_PAREN</td><td>)</td></tr>
+          <tr><td>OPEN_BRACE</td><td>{</td></tr>
+          <tr><td>CLOSE_BRACE</td><td>}</td></tr>
+          <tr><td>OPEN_BRACKET</td><td>[</td></tr>
+          <tr><td>CLOSE_BRACKET</td><td>]</td></tr>
+          <tr><td>ADD</td><td>+</td></tr>
+          <tr><td>SUB</td><td>-</td></tr>
+          <tr><td>MUL</td><td>*</td></tr>
+          <tr><td>DIV</td><td>/</td></tr>
+          <tr><td>GREATER_EQUAL</td><td>&gt;=</td></tr>
+          <tr><td>LESSER_EQUAL</td><td>&lt;=</td></tr>
+          <tr><td>NOT_EQUAL</td><td>!=</td></tr>
+          <tr><td>EQUAL</td><td>==</td></tr>
+          <tr><td>GREATER_THAN</td><td>&gt;</td></tr>
+          <tr><td>LESS_THAN</td><td>&lt;</td></tr>
+          <tr><td>ASSIGN</td><td>=</td></tr>
+          <tr><td>COMMA</td><td>,</td></tr>
+          <tr><td>SEMICOLON</td><td>;</td></tr>
+          <tr><td>COLON</td><td>:</td></tr>
+          <tr><td>CALL</td><td>::</td></tr>
+        </table>
+        </li>
+        <li>The following patterns are reserved value literals:
+        <table>
+          <tr><th>Name</th><th>Lexeme Pattern</th></tr>
+          <tr><td>INTEGER</td><td>digit {digit}</td></tr>
+          <tr><td>FLOAT</td><td>digit {digit} "." {digit}</td></tr>
+          <tr><td>IDENTIFIER</td><td>("_" | letter) { "_" | letter | digit }</td></tr>
+        </table>
+           where <pre>
+digit := "0" | "1" | ... | "9" .
+lowercase-letter := "a" | "b" | ... | "z" .
+uppercase-letter := "A" | "B" | ... | "Z" .
+letter := lowercase-letter | uppercase-letter .
+</pre>
+        </li>
+        <li>The following special circumstances generate special tokens:
+        <table>
+          <tr><th>Name</th><th>Circumstance</th></tr>
+          <tr><td>ERROR</td><td>Any character sequence not otherwise reserved. For example, a "!" not followed by an "=".</td></tr>
+          <tr><td>EOF</td><td>The end-of-file marker.</td></tr>
+        </table>
+        </li>
+      </ul>
+
+      <h1>Crux Grammar</h1>
+      <p>The crux grammar is given in <a href="http://en.wikipedia.org/wiki/Wirth_syntax_notation">Wirth Syntax Notation</a>.
+
+<!--string-literal := "'" {letter | escape-char} "'" .-->
+<!--escape-char := "\\" | "\n" | "\'" .-->
+      <pre>
+literal := INTEGER | FLOAT | TRUE | FALSE .
+
+designator := IDENTIFIER { "[" expression0 "]" } .
+type := IDENTIFIER .
+
+op0 := "&gt;=" | "&lt;=" | "!=" | "==" | "&gt;" | "&lt;" .
+op1 := "+" | "-" | "or" .
+op2 := "*" | "/" | "and" .
+
+expression0 := expression1 [ op0 expression1 ] .
+expression1 := expression2 { op1  expression2 } .
+expression2 := expression3 { op2 expression3 } .
+expression3 := "not" expression3
+       | "(" expression0 ")"
+       | designator
+       | call-expression
+       | literal .
+call-expression := "::" IDENTIFIER "(" expression-list ")" .
+expression-list := [ expression0 { "," expression0 } ] .
+
+parameter := IDENTIFIER ":" type .
+parameter-list := [ parameter { "," parameter } ] .
+
+variable-declaration := "var" IDENTIFIER ":" type ";"
+array-declaration := "array" IDENTIFIER ":" type "[" INTEGER "]" { "[" INTEGER "]" } ";"
+function-definition := "func" IDENTIFIER "(" parameter-list ")" ":" type statement-block .
+declaration := variable-declaration | array-declaration | function-definition .
+declaration-list := { declaration } .
+
+assignment-statement := "let" designator "=" expression0 ";"
+call-statement := call-expression ";"
+if-statement := "if" expression0 statement-block [ "else" statement-block ] .
+while-statement := "while" expression0 statement-block .
+return-statement := "return" expression0 ";" .
+statement := variable-declaration
+           | call-statement
+           | assignment-statement
+           | if-statement
+           | while-statement
+           | return-statement .
+statement-list := { statement } .
+statement-block := "{" statement-list "}" .
+
+program := declaration-list EOF .
+    </pre>
+
+    <h1>Predefined Functions</h1>
+    <ul>
+      <li><code>printInt(arg:int) : void</code>, Prints an integer value to the screen.</li>
+      <li><code>printFloat(arg:float) : void</code>, Prints a float value to the screen.</li>
+      <li><code>printBool(arg:bool) : void</code>, Prints a bool value to the screen.</li>
+      <li><code>println() : void</code>, Prints newline character to the screen.</li>
+      <li><code>readInt() : int</code>, Prompts the user for an integer.</li>
+      <li><code>readFloat() : float</code>, Prompts the user for an integer.</li>
+    </ul>
+
+    <h1>Runtime Constraints</h1>
+    <ul>
+      <li>All valid crux programs have one function with the signature: <code>main() : void</code>.
+      This function represents the starting point of the crux program.</li>
+    </ul>
+
+    <h1>Symbol Semantics</h1>
+    <ul>
+      <li>An identifier must be declared before use. Note that this rule means Crux does not support mutual recursion, but it does support direct recursion.</li>
+      <li>Identifier lookup is based on name only (not name and type).</li>
+      <li>Only unique names may exist within any one scope.</li>
+      <li>Symbols in an inner scope shadow symbols in outer scopes with the same name. Crux offers no syntax for accessing names in an outer scope.</li>
+      <li>Each scope (roughly) corresponds to a set of matching curly braces.</li>
+      <li>Function parameters are scoped with the function body.</li>
+    </ul>
+
+    <h1>Type Semantics</h1>
+    <ul>
+      <li>Crux has the following predefined types: void, bool, int, float<!--, string-->.</li>
+      <li>The relation operators (GreaterThan, LesserThan, GreaterEqual, LesserEqual, NotEqual, Equal) result in a boolean value.</li>
+      <li>The boolean logic operations (and, or, not) can only operate on booleans.</li>
+      <li>Mathematical operators (Add, Sub, Mul, Div) shall operate only on 'like' type. That is, ints with ints, and floats with floats.</li>
+      <!-- <li><span class="todo">String concat?</span></li> -->
+      <!-- <li><span class="todo">Mod operator?</span></li> -->
+      <li>A function with the void return type does not necessarily have to have a return statement.</li>
+      <li>A function with any return type other than void must have all possible code paths return a value.</li>
+      <li>The return value of a function must have the same type as that specified by the function declaration.</li>
+      <li>A function is not allowed to have a void (or other erroneous) type for an argument.</li>
+    </ul>
+
+    </div> 
+
+    <div id="aknowledgements"> 
+      <ul class="nomarker">
+        <li>Language derived from Alex Thornton's ICS 142 by Eric Hennigan, Fall 2012.</li>
+      </ul>
+    </div>
+
+    <div id="footer"></div>
+
+  </div></body>
+</html>
