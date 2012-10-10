@@ -67,6 +67,11 @@ public class TestFiles {
 		testFilesIn("private");
 	}
 
+	@Test
+	public void testPrivateSecret() {
+		testFilesIn("private_secret");
+	}
+
 	private void testFilesIn(String subdir) {
 		File dir = new File(fileRoot + "/" + subdir);
 		String[] cruxFiles = dir.list(new FilenameFilter() {

@@ -1,0 +1,12 @@
+AND("and"),
+OR("or"),
+NOT("not"),
+
+IDENTIFIER(),
+INTEGER(),
+FLOAT(),
+ERROR(),
+EOF();
+
+LET("let"),
+VAR("var"),

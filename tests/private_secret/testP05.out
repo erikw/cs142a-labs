@@ -1,0 +1,4 @@
+INTEGER(5)(lineNum:1, charPos:1)
+GREATER_THAN(lineNum:1, charPos:2)
+INTEGER(4)(lineNum:1, charPos:3)
+EOF(lineNum:2, charPos:1)
