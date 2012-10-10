@@ -120,6 +120,7 @@ public class TestFiles {
 		String expected = outScanner.useDelimiter("\\Z").next();
 		expected += '\n'; // Needed apparently.
 
+		actual = actual.replaceAll("\\r", ""); // So tests can be run under Windoze.
 		if (!expected.equals(actual)) {
 			System.out.println("Wrong compiler output.");
 			System.out.printf("exp={\n%s\n}\nact={\n%s\n}\n", expected, actual);
