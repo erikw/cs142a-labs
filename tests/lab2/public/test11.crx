@@ -1,0 +1,5 @@
+// test func invalid type
+
+func foo() : type {
+  ::printInt(9);
+}

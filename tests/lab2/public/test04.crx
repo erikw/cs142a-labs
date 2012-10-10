@@ -1,0 +1,8 @@
+// test expression
+
+func main() : void {
+  let a = 5;
+  let b = (4>=4);
+  let c = 4 + 3;
+  let d = 4 + 4 + 2 - 8 - 9;
+}

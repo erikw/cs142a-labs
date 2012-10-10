@@ -1,0 +1,8 @@
+// test designator
+
+func main() : void {
+  let a = 0;
+  let a[0] = 0;
+  let a[0][0][0][0][0][0] = 7;
+}
+  

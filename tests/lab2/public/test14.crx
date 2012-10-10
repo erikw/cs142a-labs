@@ -1,0 +1,5 @@
+// return
+
+func main() : void {
+  return 7;
+}

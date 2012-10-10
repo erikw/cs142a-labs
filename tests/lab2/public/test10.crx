@@ -1,0 +1,6 @@
+// test funcs with args
+
+func foo(a:int, b:float, c:bool) : void {
+  ::gorn();
+}
+

@@ -58,18 +58,18 @@ public class TestFiles {
 	}
 
 	@Test
-	public void testPublic() {
-		testFilesIn("public");
+	public void testLab1Public() {
+		testFilesIn("lab1/public");
 	}
 
 	@Test
-	public void testPrivate() {
-		testFilesIn("private");
+	public void testLab1Private() {
+		testFilesIn("lab1/private");
 	}
 
 	@Test
-	public void testPrivateSecret() {
-		testFilesIn("private_secret");
+	public void testLab1PrivateSecret() {
+		testFilesIn("lab1/private_secret");
 	}
 
 	private void testFilesIn(String subdir) {
