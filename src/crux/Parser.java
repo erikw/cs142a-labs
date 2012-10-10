@@ -249,9 +249,15 @@ public class Parser {
 		exitRule(NonTerminal.DESIGNATOR);
 	}
 
+	public void expression0()
+	{
+		throw new RuntimeException("implement all the grammar rules");
+	}
+
 	// program := declaration-list EOF .
 	public void program()
 	{
 		throw new RuntimeException("implement all the grammar rules");
 	}
+
 }

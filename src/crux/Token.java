@@ -139,7 +139,7 @@ public class Token {
 	private int charPos;
 	
 	/* The kind of token the lexeme is of. */
-	Kind kind;
+	private Kind kind;
 
 	/* The actual instance of the token. */
 	private String lexeme = "";
@@ -206,7 +206,7 @@ public class Token {
 	 * Get the line number of the lexeme.
 	 * @return The line number.
 	 */
-	public int getLineNumber() {
+	public int lineNumber() {
 		return lineNum;
 	}
 	
@@ -214,7 +214,7 @@ public class Token {
 	 * Get the character position of the lexeme.
 	 * @return The character position.
 	 */
-	public int getCharPosition() {
+	public int charPosition() {
 		return charPos;
 	}
 
@@ -222,12 +222,20 @@ public class Token {
 	 * Return the lexeme representing or held by this token.
 	 * @return The lexeme string.
 	 */
-	public String getLexeme() {
+	public String lexeme() {
 		if (kind.hasStaticLexeme()) {
 			return kind.default_lexeme;
 		} else {
 			return lexeme;
 		}
+	}
+
+	/**
+	 * Return the kind of this lexeme.
+	 * @return The kind.
+	 */
+	public Token.Kind kind() {
+		return kind;
 	}
 
 	/**
@@ -263,7 +271,7 @@ public class Token {
 	/**
 	 * Query this token if it's of a given kind.
 	 */
-	public boolean isKind(Kind rhs) {
+	public boolean is(Kind rhs) {
 		return kind.equals(rhs);
 	}
 

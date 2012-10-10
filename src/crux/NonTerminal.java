@@ -11,124 +11,213 @@ public enum NonTerminal {
 	//		 some lines have already been handled by the CruxScanner
 
 	DESIGNATOR(new HashSet<Token.Kind>() {
-		private static final long serialVersionUID = 1L; {
+		private static final long serialVersionUID = 1L;
+		{
 			add(Token.Kind.IDENTIFIER);
-		}}),
-		TYPE(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		LITERAL(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		CALL_EXPRESSION(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		OP0(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		OP1(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		OP2(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		EXPRESSION3(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		EXPRESSION2(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		EXPRESSION1(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		EXPRESSION0(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		EXPRESSION_LIST(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		PARAMETER(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		PARAMETER_LIST(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		VARIABLE_DECLARATION(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		ARRAY_DECLARATION(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		FUNCTION_DEFINITION(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		DECLARATION(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		DECLARATION_LIST(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),	
-		ASSIGNMENT_STATEMENT(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		CALL_STATEMENT(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		IF_STATEMENT(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		WHILE_STATEMENT(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		RETURN_STATEMENT(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		STATEMENT_BLOCK(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		STATEMENT(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		STATEMENT_LIST(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}}),
-		PROGRAM(new HashSet<Token.Kind>() {
-			private static final long serialVersionUID = 1L; {
-				throw new RuntimeException("implement this");
-			}});
+		}
+	}),
+	TYPE(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			add(Token.Kind.IDENTIFIER);
+		}
+	}),
+	LITERAL(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			add(Token.Kind.INTEGER);
+			add(Token.Kind.FLOAT);
+			add(Token.Kind.TRUE);
+			add(Token.Kind.FALSE);
+		}
+	}),
+	CALL_EXPRESSION(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			add(Token.Kind.CALL);
+		}
+	}),
+	OP0(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			add(Token.Kind.GREATER_EQUAL);
+			add(Token.Kind.LESSER_EQUAL);
+			add(Token.Kind.NOT_EQUAL);
+			add(Token.Kind.EQUAL);
+			add(Token.Kind.GREATER_THAN);
+			add(Token.Kind.LESS_THAN);
+		}
+	}),
+	OP1(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			add(Token.Kind.ADD);
+			add(Token.Kind.SUB);
+			add(Token.Kind.OR);
+		}
+	}),
+	OP2(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			add(Token.Kind.MUL);
+			add(Token.Kind.DIV);
+			add(Token.Kind.AND);
+		}
+	}),
+	EXPRESSION3(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			add(Token.Kind.NOT);
+			add(Token.Kind.OPEN_PAREN);
+			addAll(NonTerminal.DESIGNATOR.firstSet);
+			addAll(NonTerminal.CALL_EXPRESSION.firstSet);
+			addAll(NonTerminal.LITERAL.firstSet);
+		}
+	}),
+	EXPRESSION2(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			addAll(NonTerminal.EXPRESSION3.firstSet);
+		}
+	}),
+	EXPRESSION1(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			addAll(NonTerminal.EXPRESSION2.firstSet);
+		}
+	}),
+	EXPRESSION0(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			addAll(NonTerminal.EXPRESSION1.firstSet);
+		}
+	}),
+	EXPRESSION_LIST(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			addAll(NonTerminal.EXPRESSION0.firstSet);
+		}
+	}),
+	PARAMETER(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			add(Token.Kind.IDENTIFIER);
+		}
+	}),
+	PARAMETER_LIST(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			addAll(NonTerminal.PARAMETER.firstSet);
+		}
+	}),
+	VARIABLE_DECLARATION(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			add(Token.Kind.VAR);
+		}
+	}),
+	ARRAY_DECLARATION(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			add(Token.Kind.ARRAY);
+		}
+	}),
+	FUNCTION_DEFINITION(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			add(Token.Kind.FUNC);
+		}
+	}),
+	DECLARATION(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			addAll(NonTerminal.VARIABLE_DECLARATION.firstSet);
+			addAll(NonTerminal.ARRAY_DECLARATION.firstSet);
+			addAll(NonTerminal.FUNCTION_DEFINITION.firstSet);
+		}
+	}),
+	DECLARATION_LIST(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			addAll(NonTerminal.DECLARATION.firstSet);
+		}
+	}),	
+	ASSIGNMENT_STATEMENT(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			add(Token.Kind.LET);
+		}
+	}),
+	CALL_STATEMENT(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			// TODO what is the needed for this rule? the semicolon could have been added to call-expression?
+			addAll(NonTerminal.CALL_EXPRESSION.firstSet);
+		}
+	}),
+	IF_STATEMENT(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			add(Token.Kind.IF);
+		}
+	}),
+	WHILE_STATEMENT(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			add(Token.Kind.WHILE);
+		}
+	}),
+	RETURN_STATEMENT(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			add(Token.Kind.RETURN);
+		}
+	}),
+	STATEMENT_BLOCK(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			add(Token.Kind.OPEN_BRACE);
+		}
+	}),
+	STATEMENT(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			addAll(NonTerminal.VARIABLE_DECLARATION.firstSet);
+			addAll(NonTerminal.CALL_STATEMENT.firstSet);
+			addAll(NonTerminal.ASSIGNMENT_STATEMENT.firstSet);
+			addAll(NonTerminal.IF_STATEMENT.firstSet);
+			addAll(NonTerminal.WHILE_STATEMENT.firstSet);
+			addAll(NonTerminal.RETURN_STATEMENT.firstSet);
+		}
+	}),
+	STATEMENT_LIST(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			addAll(NonTerminal.STATEMENT.firstSet);
+		}
+	}),
+	PROGRAM(new HashSet<Token.Kind>() {
+		private static final long serialVersionUID = 1L;
+		{
+			addAll(NonTerminal.DECLARATION_LIST.firstSet);
+		}
+	});
+	// TODO does this cover all possible nonterminals?
 
+	/* Set for tokens that is in first(nonTerminal. */
 	public final HashSet<Token.Kind> firstSet = new HashSet<Token.Kind>();
 
-	NonTerminal(HashSet<Token.Kind> t) {
-		firstSet.addAll(t);
+	/**
+	 * Construct an enum of this type with a first set.
+	 */
+	NonTerminal(HashSet<Token.Kind> first) {
+		firstSet.addAll(first);
 	}
 
+	/**
+	 * Get the first set of this non terminal.
+	 * @return The first est.
+	 */
 	public final Set<Token.Kind> firstSet() {
 		return firstSet;
 	}

@@ -310,7 +310,7 @@ public class Scanner implements Iterable<Token> {
 			if (cache == null) {
 				cache = scanner.next();
 			}
-			return !cache.isKind(Token.Kind.EOF);
+			return !cache.is(Token.Kind.EOF);
 		}
 
 		/**
