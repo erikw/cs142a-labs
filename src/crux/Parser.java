@@ -356,6 +356,32 @@ public class Parser {
 
 	/**
 	 * Production for rule:
+	 * parameter := IDENTIFIER ":" type .
+	 */
+	public void paramter() {
+		enterRule(NonTerminal.PARAMETER);
+		expect(Token.Kind.IDENTIFIER);
+		expect(Token.Kind.COLON);
+		type();
+		exitRule(NonTerminal.PARAMETER);
+	}
+
+	/**
+	 * Production for rule:
+	 * parameter-list := [ parameter { "," parameter } ] .
+	 */
+	public void parameter_list() {
+		enterRule(NonTerminal.PARAMETER_LIST);
+		if (have(NonTerminal.PARAMETER)) {
+			do {
+				paramter();
+			} while (accept(Token.Kind.COMMA));
+		}
+		exitRule(NonTerminal.PARAMETER_LIST);
+	}
+
+	/**
+	 * Production for rule:
 	 * variable-declaration := "var" IDENTIFIER ":" type ";" .
 	 * 
 	 */
@@ -410,7 +436,7 @@ public class Parser {
 	 * Production for rule:
 	 * declaration := variable-declaration | array-declaration | function-definition .
 	 */
-	public void declaraion() {
+	public void declaration() {
 		enterRule(NonTerminal.DECLARATION);
 		if (have(NonTerminal.VARIABLE_DECLARATION)) {
 			variable_declaration();
@@ -459,10 +485,49 @@ public class Parser {
 
 	/**
 	 * Production for rule:
+	 * if-statement := "if" expression0 statement-block [ "else" statement-block ] .
+	 */
+	public void if_statement() {
+		enterRule(NonTerminal.IF_STATEMENT);
+		expect(Token.Kind.IF);
+		expression0();
+		statement_block();
+		if (accept(Token.Kind.ELSE)) {
+			statement_block();
+		}
+		exitRule(NonTerminal.IF_STATEMENT);
+	}
+
+	/**
+	 * Production for rule:
+	 * while-statement := "while" expression0 statement-block .
+	 */
+	public void while_statement() {
+		enterRule(NonTerminal.WHILE_STATEMENT);
+		expect(Token.Kind.WHILE);
+		expression0();
+		statement_block();
+		exitRule(NonTerminal.WHILE_STATEMENT);
+	}
+
+	/**
+	 * Production for rule:
+	 * return-statement := "return" expression0 ";" .
+	 */
+	public void return_statement() {
+		enterRule(NonTerminal.RETURN_STATEMENT);
+		expect(Token.Kind.RETURN);
+		expression0();
+		expect(Token.Kind.SEMICOLON);
+		exitRule(NonTerminal.RETURN_STATEMENT);
+	}
+
+	/**
+	 * Production for rule:
 	 * statement := variable-declaration | call-statement | assignment-statement 
 	 * | if-statement | while-statement | return-statement .
 	 */
-	public void statemet() {
+	public void statement() {
 		enterRule(NonTerminal.STATEMENT);
 		if (have(NonTerminal.VARIABLE_DECLARATION)) {
 			variable_declaration();
@@ -519,8 +584,8 @@ public class Parser {
 	 * Production for rule:
 	 * 
 	 */
-	public void () {
-		enterRule(NonTerminal.);
-		exitRule(NonTerminal.);
-	}
+	//public void () {
+		//enterRule(NonTerminal.);
+		//exitRule(NonTerminal.);
+	//}
 }
