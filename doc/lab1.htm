@@ -1,0 +1,159 @@
+<html>
+  <head>
+    <title>CS 142A: Interpreters and Compilers</title>
+    <link href="../../style.css" rel="StyleSheet" type="text/css"></link>
+    <script type="text/javascript" src="../../code/jQuery.js"></script>
+
+  </head>
+
+  <body><div id="container">
+    <div id="header">
+      <p><a href="index.html">CS 142A: Interpreters and Compilers</a></p>
+    </div>
+
+    <div id="leftnav">
+      <!-- should provide a noscript hard link to a navigation page -->
+      <script type="text/javascript" src="../../code/menu.js"></script>
+      <script type="text/javascript">document.write(generateMenu(document.URL));</script>
+    </div>
+
+    <div id="content">
+    
+    <h1>Lab #1: <i>Scanner</i></h1>
+    <p><b>Due date and time:</b> <i>Saturday, October 6, 11:59pm</i></p>
+
+    <h1>Introduction</h1>
+    <p>In this class we follow the traditional compiler design approach, starting with the front-end and proceeding toward the back-end.
+    As a whole, the compiler will make many incremental steps, progressively transforming source input to executable output.
+    Operating directly on the characters of a given input source code is cumbersome, so we first seek to raise our level of abstraction.
+    </p>
+    <p>The first step of translation from source to executable program is to perform <em>lexical analysis</em>.
+    In this lab, we shall write a <code>crux.Scanner</code> that transforms an input text into a stream of <code>crux.Token</code>s.
+    </p>
+
+    <h1>What's a <code>crux.Token</code>?</h1>
+    <p>Tokens allow us to break up the input source text into more meaningful chunks.
+    Each token encapsulates a short string of characters that carries some meaning within the Crux language.
+    For example, the <code>NOT_EQUAL</code> token represents the <code>!=</code> operator and the <code>VAR</code> token represents the <code>var</code> keyword.
+    Each <code>crux.Token</code> therefore carries information about its <code>Kind</code>.
+    </p>
+
+    <p>In addition to representing the operators and keywords we also associate literal values, such as numbers and names with a token.
+    For example, the <code>NUMBER</code> token represents the character sequence <code>1.8</code> and the <code>IDENTIFIER</code> token represents the variable name <code>foo</code>.
+    Later stages of the compiler will need to query these token for their lexical string values.
+    For example, according to the Crux grammar, when the <code>crux.Parser</code> (not implemented until Lab 2) comes across a function call it actually sees an <code>IDENTIFIER</code> token.
+    In order to find out which function is being called, the <code>CruxParser</code> asks the <code>IDENTIFIER</code> token for a string value representing the function's name.
+    To support this convenient behavior, each <code>crux.Token</code> also carries the <em>lexeme</em> that it represents.
+    I found it convenient to implement factory functions for these kinds of tokens.
+    </p>
+    
+    <p>Finally, in order to support error reporting later, each <code>crux.Token</code> also carries with it the line number and character position of where it occurred within the input source file.
+    </p>
+
+    <h2>Class Descriptions</h2>
+    <pre>
+crux.Token : Holds token information.
+- kind    : The crux.Token.Kind
+- lineNum : The line number where this token occurs
+- charPos : The character position at which this token starts
+- lexeme  : The token's lexical contents
+
+crux.Token.Kind : An enum of all possible token kinds.
+    </pre>
+
+    <h2>Design Hints</h2>
+    <p>Note that Java <a href="http://docs.oracle.com/javase/1.5.0/docs/guide/language/enums.html">Enum</a>s are quite powerful.
+    You can define your own constructor and custom fields.
+    We can use this feature to define a mapping from names (<code>NOT_EQUAL</code>) to lexemes (<code>!=</code>).
+    There is also a <code>.values()</code> method which allows for-each iteration over all declared enum instances.
+    This method comes in very handy for separating keywords from identifiers, because we can then match a string read from the input text to a corresponding enum instance.
+    </p>
+
+    <p>You may also find certain convenience methods worth implementing.
+    I found that I wanted a method for asking a <code>crux.Token</code> what kind it was, so I implemented a method with the signature: <code>boolean is(Kind kind)</code>.
+    For most tokens a <code>crux.Token(String lexeme, int lineNum, int charPos)</code> constructor was enough.
+    But some kinds of token carry a lexeme dependent on the input source text.
+    For these tokens, I implemented static factory functions such as <code>crux.Token.Identifier(String name, int lineNum, int charPos)</code> and <code>crux.Token.Float(String num, int lineNum, int charPos)</code>.
+    </p>
+
+    <!-- <img src="crux.Token.png" /> -->
+    <!-- <img src="crux.Token.Kind.png" /> -->
+
+    <h1>Scanning the Input</h1>
+    <p>The <code>crux.Scanner</code> is responsible for reading an input file and converting it to a stream of <code>crux.Token</code>s.
+    Our scanner will read the input one character at a time, implementing a very light weight version of the State Machine Pattern.
+    I say lightweight, because the tokens that we must recognize breakdown into well separated categories: one character, two character, and many character.
+    The Crux language has very little overlap between these categories, so not much state needs to be preserved.
+    In fact, the language permits a scanner, whose entire state can be held within a <code>nextChar</code>, that stores the value of the next character read from the file a <code>nextChar</code> 
+    There is <em>no need</em> for the <code>crux.Scanner</code> to perform any look ahead.
+    </p>
+
+    <p>The <code>crux.Scanner</code> returns the stream of tokens through a single method: <code>CruxToxen next()</code>.
+    Just as with an Java Iterator, the scanner <em>incrementally</em> converts the input text into tokens, returning one <code>crux.Token</code> for each call to <code>next()</code>.
+    Some tokens, such as an IDENTIFIER, represent many characters of the input text.
+    However, the scanner reads only as many characters as required to construct the token being returned.
+    Once the scanner has reached the end-of-file, successive calls to <code>next()</code> shall all return an <code>EOF</code> token.
+    </p>
+
+    <h2>Class Descriptions</h2>
+    <pre>
+crux.Scanner : Converts input source into crux.Token stream.
+- lineNum : the current line number in the input.
+- charPos : the current character position on the current line.
+- nextChar : the next character read from the input text.
+- crux.Token next(): returns the next crux.Token in the stream.
+    </pre>
+
+    <h2>Design Hints</h2>
+    <ul>
+      <li>Although not required, you may consider having <code>crux.Scanner</code> implement <code>Iterable&lt;crux.Token&gt;</code> so that testing is easier.</li>
+      <li>The <code>next()</code> method should maintain the following invariant: before returning a Token the next character from the input source has been read into <code>nextChar</code>, but has <em>not</em> been inspected (turned into a Token).
+          This 'primes the pump' for another call to <code>next()</code>, and means you may implement <code>next()</code> under the assumption that, when it begins, <code>nextChar</code> contains a char that has not been tokenized.
+      </li>
+      <li>I personally found it convenient to implement a <code>readChar()</code> method that reads a single character from the input and updates the <code>lineNum</code> and <code>charPos</code> information.</li>
+    </ul>
+
+    <h1>What do I need to implement?</h1>
+    <p>The Lexical Semantics section of the <a href="../languagespec.html">Crux Specification</a>.
+    Your program should be able to read input from a text file, splitting that file up into a stream of tokens, and printing the information about each token to <code>System.out</code>.
+    </p>
+
+    <p>For convenience, you may get a start on this lab by using a pre-made <a href="Lab1_Scanner.zip">Lab1_Scanner.zip</a> project, which contains a <code>crux.Compiler</code> skeleton for the reading and printing parts of the project.
+    </p>
+
+    <h1>Testing</h1>
+    <p>Test cases are available in this <a href="tests.zip">tests.zip</a> file.
+    The provided tests are not meant to be exhaustive.
+    You are strongly encouraged to construct your own.
+    (If chrome gives you a warning that "tests.zip is not commonly downloaded and could be dangerous" it means that Google hasn't performed an automated a virus scan.
+    This warning can be safely ignored, as the tests.zip file contains only text files.)
+    </p>
+
+    <h1>Restrictions</h1>
+    <ul>
+      <li>The <code>crux.Scanner</code> must <em>not</em> read the entire input in one shot. Rather, it needs to read only as much as necessary to produce each token one at a time.</li>
+      <li>Do not use the Regular Expression library, built-in Scanner class, or other advanced character processing functions. The objective is to implement our own very simplistic finite state machine. Simple functions such as <code>Character.isWhiteSpace()</code> and the like are fine.</li>
+      <li>Even if you choose not to use the provided starting project, you must use the same token names, values, and lexemes as indicated by the <a href="../languagespec.html">Crux specification</a>.</li>
+    </ul>
+
+    <h1>Deliverables</h1>
+    <p>A zip file, named Crux.zip, containing the following files (in the <code>crux</code> package):
+    <ul>
+      <li>crux.Scanner.java, which performs incremental tokenization of an input text.</li>
+      <li>crux.Compiler.java, which houses the main() function that begins your program.</li>
+      <li>crux.Token.java, which represents a string of characters read in the input text.</li>
+    </ul>
+    </p>
+
+    <p>Please use the <a href="../../tester/index.php">AutoTester</a> to make sure that your work meets our requirements.
+    We reserve the right to assign 0 points to any submissions which cannot be automatically unzipped and tested.
+    Additionally, we reserve the right to assign 0 points to any submission which 'games' the automated testing by using a lookup which produces only outputs that correspond to the test cases we happen to use.
+    You are bound to all of the rules on the <a href="../submittingprojects.html">Submitting Labs</a> page.
+    Be sure to submit the version of the project that you want graded, as we won't regrade if you submit the wrong version by accident.
+    </p>
+
+    </div>
+    <div id="footer"></div>
+
+  </div></body>
+</html>
