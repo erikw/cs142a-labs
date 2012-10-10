@@ -57,6 +57,8 @@ public class TestFiles {
 		useOutBuffer(false);
 	}
 
+
+	// Lab 1 tests.
 	@Test
 	public void testLab1Public() {
 		testFilesIn("lab1/public");
@@ -70,6 +72,18 @@ public class TestFiles {
 	@Test
 	public void testLab1PrivateSecret() {
 		testFilesIn("lab1/private_secret");
+	}
+
+
+	// Lab 2 tests.
+	@Test
+	public void testLab2Public() {
+		testFilesIn("lab2/public");
+	}
+
+	@Test
+	public void testLab2Private() {
+		testFilesIn("lab2/private");
 	}
 
 	private void testFilesIn(String subdir) {

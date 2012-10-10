@@ -37,7 +37,6 @@ public class Compiler {
 	 */
 	public void compile(String cruxFile) {
         Scanner scanner = null;
-
         try {
             scanner = new Scanner(new FileReader(cruxFile));
         } catch (IOException e) {
@@ -45,14 +44,14 @@ public class Compiler {
 			System.exit(-2);
         }
 
-		// Lab #1 when output was the tokens.
+		// Lab #1 with output being the tokens.
 		//Token token;
 		//do {
 		//	token = scanner.next();
 		//	System.out.println(token);
 		//} while (!token.isKind(Token.Kind.EOF));
 
-		// Lab #2 print the parse tree.
+		// Lab #2 that prints the parse tree.
 		Parser parser = new Parser(scanner);
 		parser.parse();
 		if (parser.hasError()) {

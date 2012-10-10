@@ -130,6 +130,7 @@ public class Parser {
 	 * @param scanner The scanner to use.
 	 */
 	public Parser(Scanner scanner) {
+		this.scanner = scanner;
 		throw new RuntimeException("implement this");
 	}
 
