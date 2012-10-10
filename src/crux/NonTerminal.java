@@ -6,9 +6,10 @@ import java.util.Set;
  * Enum representation of the available non terminals.
  */
 public enum NonTerminal {
-	// NOTE mention that we are not modeling the empty string
-	// NOTE mention that we are not doing a first set for every line in the grammar
-	//		 some lines have already been handled by the CruxScanner
+	// NOTE We are not modeling the empty string.
+	// NOTE We are not doing a first set for every line in the grammar;
+	// some lines have already been handled by the CruxScanner.
+	// TODO which lines?;
 
 	DESIGNATOR(new HashSet<Token.Kind>() {
 		private static final long serialVersionUID = 1L;
@@ -202,7 +203,6 @@ public enum NonTerminal {
 			addAll(NonTerminal.DECLARATION_LIST.firstSet);
 		}
 	});
-	// TODO does this cover all possible nonterminals?
 
 	/* Set for tokens that is in first(nonTerminal. */
 	public final HashSet<Token.Kind> firstSet = new HashSet<Token.Kind>();
