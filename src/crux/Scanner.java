@@ -73,6 +73,7 @@ public class Scanner implements Iterable<Token> {
 				System.err.println("Caught IOException in input stream.");
 				System.exit(1);
 			}
+			// TODO use more efficient switch statement as suggested by the TA. Howerver I don't belive it will make any difference.
 			if (nextChar == -1) {
 				nextChar = EOF;
 				++charPos;
