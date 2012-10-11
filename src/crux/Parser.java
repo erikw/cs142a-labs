@@ -131,13 +131,14 @@ public class Parser {
 	 */
 	public Parser(Scanner scanner) {
 		this.scanner = scanner;
-		throw new RuntimeException("implement this");
 	}
 
 	/**
 	 *	Begin the parsing.
 	 */
 	public void parse() {
+		// Load first token.
+		currentToken = scanner.next();
 		try {
 			program();
 		} catch (QuitParseException qpe) {
@@ -469,7 +470,11 @@ public class Parser {
 	 */
 	public void assignment_statement() {
 		enterRule(NonTerminal.ASSIGNMENT_STATEMENT);
-		// TODO continue here 1
+		expect(Token.Kind.LET);
+		designator();
+		expect(Token.Kind.ASSIGN);
+		expression0();
+		expect(Token.Kind.SEMICOLON);
 		exitRule(NonTerminal.ASSIGNMENT_STATEMENT);
 	}
 	/**

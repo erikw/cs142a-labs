@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 # Handy wrapper for runnign the compiler.
 
-java -cp bin crux.Compiler "$*"
+java -cp bin crux.Compiler $*
