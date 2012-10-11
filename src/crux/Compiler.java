@@ -21,11 +21,13 @@ public class Compiler {
     public static String studentName = "Erik Westrup";
     public static String studentID = "50471668";
     public static String uciNetID = "ewestrup";
-    
+
     /* Usage instructions. */
 	private static final String USAGE_DESCRIPTION = "Baffel blag? Usage:\n$ crxc [-l<1-6>] <source_file>";
 
-	/* The labs available. */
+	/**
+	 * The labs available.
+	 */
 	public static enum Lab { LAB1, LAB2, LAB3, LAB4, LAB5, LAB6 };
 
 	/* Default lab if not specified. */
@@ -45,7 +47,7 @@ public class Compiler {
 	};
 
 	/* The current lab running. */
-	private Lab currentLab;
+	public static Lab currentLab;
 
     /**
      * Construct a default compiler.

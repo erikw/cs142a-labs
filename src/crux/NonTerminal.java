@@ -9,7 +9,6 @@ public enum NonTerminal {
 	// NOTE We are not modeling the empty string.
 	// NOTE We are not doing a first set for every line in the grammar;
 	// some lines have already been handled by the CruxScanner.
-	// TODO which lines?;
 
 	DESIGNATOR(new HashSet<Token.Kind>() {
 		private static final long serialVersionUID = 1L;
@@ -152,7 +151,6 @@ public enum NonTerminal {
 	CALL_STATEMENT(new HashSet<Token.Kind>() {
 		private static final long serialVersionUID = 1L;
 		{
-			// TODO what is the needed for this rule? the semicolon could have been added to call-expression?
 			addAll(NonTerminal.CALL_EXPRESSION.firstSet);
 		}
 	}),

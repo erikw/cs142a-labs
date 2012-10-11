@@ -1,2 +1,2 @@
-* A symbol table some where. -- not until lab2?
-* in lab2, check semantic as well? e.g. main must exist
+* take a look att parser error reporting.
+* make lots of private test cases that exercises all execution paths.

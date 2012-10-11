@@ -337,6 +337,4 @@ public class Scanner implements Iterable<Token> {
 
 
 	}
-
-	// OPTIONAL: any other methods that you find convenient for implementation or testing
 }

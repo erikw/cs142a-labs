@@ -61,7 +61,6 @@ public class TestFiles {
 			System.setSecurityManager(null);
 		}
 
-
 	// Lab 1 tests.
 	@Test
 		public void testLab1Public() {
@@ -232,5 +231,4 @@ public class TestFiles {
 			return exitCode;
 		}
 	}
-
 }

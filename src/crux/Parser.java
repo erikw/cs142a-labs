@@ -13,7 +13,7 @@ public class Parser {
     public static String studentID = "50471668";
     public static String uciNetID = "ewestrup";
 
-	// Grammar Rule Reporting.
+	/* Current depth of the tree (where we are at). */
 	private int parseTreeRecursionDepth = 0;
 
 	/* The string representation of our parse tree. */
@@ -62,8 +62,8 @@ public class Parser {
 	private String reportSyntaxError(NonTerminal nt) {
 		String message = "SyntaxError(" + lineNumber() + "," + charPosition() + ")[Expected one of " + nt.firstSet() + " but got " + currentToken.kind() + ".]";
 		errorBuffer.append(message + "\n");
-		//errorBuffer.append("lexeme = \"" + currentToken + "\"\n"); // TODO delete this when done. Test program probably don't expect this error report to exist.
-		//errorBuffer.append(parseTreeBuffer.toString() + '\n'); // TODO delete this when done. Test program probably don't expect this error report to exist.
+		//errorBuffer.append("lexeme = \"" + currentToken + "\"\n"); // Delete this when done. Test program probably don't expect this error report to exist.
+		//errorBuffer.append(parseTreeBuffer.toString() + '\n'); // Delete this when done. Test program probably don't expect this error report to exist.
 		return message;
 	}
 
@@ -76,8 +76,8 @@ public class Parser {
 	private String reportSyntaxError(Token.Kind kind) {
 		String message = "SyntaxError(" + lineNumber() + "," + charPosition() + ")[Expected " + kind + " but got " + currentToken.kind() + ".]";
 		errorBuffer.append(message + "\n");
-		//errorBuffer.append("lexeme = \"" + currentToken + "\"\n"); // TODO delete this when done. Test program probably don't expect this error report to exist.
-		//errorBuffer.append(parseTreeBuffer.toString() + '\n'); // TODO delete this when done. Test program probably don't expect this error report to exist.
+		//errorBuffer.append("lexeme = \"" + currentToken + "\"\n"); // Delete this when done. Test program probably don't expect this error report to exist.
+		//errorBuffer.append(parseTreeBuffer.toString() + '\n'); // Delete this when done. Test program probably don't expect this error report to exist.
 		return message;
 	}
 
@@ -231,7 +231,7 @@ public class Parser {
 
 
 
-	// =Grammar Rules=
+	// Grammar Rules
 
 	/**
 	 * Production for rule:

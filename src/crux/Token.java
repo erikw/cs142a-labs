@@ -32,10 +32,6 @@ public class Token {
 		SUB("-", Token.Category.OPERATOR),
 		MUL("*", Token.Category.OPERATOR),
 		DIV("/", Token.Category.OPERATOR),
-
-		// Types.
-		INTEGER(Token.Category.MISC),
-		FLOAT(Token.Category.MISC),
 		
 		// Keywords.
 		TRUE("true", Token.Category.KEYWORD),
@@ -54,14 +50,7 @@ public class Token {
 		OR("or", Token.Category.KEYWORD),
 		NOT("not", Token.Category.KEYWORD),
 
-		// These should not exists as they are to be recognized as IDENTIFIERs.
-		//VOID("void", Token.Category.KEYWORD),
-		//BOOL("bool", Token.Category.KEYWORD),
-		//INT("int", Token.Category.KEYWORD),
-		//FLOAT("float", Token.Category.KEYWORD),
-
-		IDENTIFIER(Token.Category.MISC),
-		// Misc.
+		// Operators
 		ASSIGN("=", Token.Category.OPERATOR),
 		COMMA(",", Token.Category.OPERATOR),
 		SEMICOLON(";", Token.Category.OPERATOR),
@@ -73,6 +62,13 @@ public class Token {
 		CLOSE_BRACE("}", Token.Category.OPERATOR),
 		OPEN_BRACKET("[", Token.Category.OPERATOR),
 		CLOSE_BRACKET("]", Token.Category.OPERATOR),
+
+		// Types.
+		INTEGER(Token.Category.MISC),
+		FLOAT(Token.Category.MISC),
+
+		// Misc.
+		IDENTIFIER(Token.Category.MISC),
 		ERROR(Token.Category.MISC),
 		EOF(Token.Category.MISC);
 		
