@@ -1,0 +1,3 @@
+Error parsing file.
+SyntaxError(5,63)[Expected one of [TRUE, CALL, INTEGER, IDENTIFIER, NOT, OPEN_PAREN, FALSE, FLOAT] but got CLOSE_PAREN.]
+SyntaxError(5,63)[Could not complete parsing.]

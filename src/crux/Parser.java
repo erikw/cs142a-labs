@@ -397,7 +397,7 @@ public class Parser {
 		} else if (have(NonTerminal.LITERAL)) {
 			literal();
 		} else {
-			throw new QuitParseException(reportSyntaxError(NonTerminal.LITERAL));
+			throw new QuitParseException(reportSyntaxError(NonTerminal.EXPRESSION3));
 		}
 		exitRule(NonTerminal.EXPRESSION3);
 	}

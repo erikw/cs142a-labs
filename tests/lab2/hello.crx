@@ -1,0 +1,7 @@
+// Hello world crux style!
+
+func main(argc : int) : int {
+	var binstr : int;
+	::print(bintr);
+	return 0;
+}

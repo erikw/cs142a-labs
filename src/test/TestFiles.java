@@ -158,7 +158,7 @@ public class TestFiles {
 				errBuilder.append(String.format("Compiler gave this stderr output: {\n%s\n}\n", errStr));
 			}
 			// Use JUnits smarter diff displayer.
-			errBuilder.append(String.format("exp={\n%s\n}\nact={\n%s\n}\n", expected, actual));
+			//errBuilder.append(String.format("exp={\n%s\n}\nact={\n%s\n}\n", expected, actual));
 			assertEquals(errBuilder.toString(), expected, actual);
 		}
 	}
