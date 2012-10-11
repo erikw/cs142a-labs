@@ -62,6 +62,7 @@ public class Parser {
 	private String reportSyntaxError(NonTerminal nt) {
 		String message = "SyntaxError(" + lineNumber() + "," + charPosition() + ")[Expected one of " + nt.firstSet() + " but got " + currentToken.kind() + ".]";
 		errorBuffer.append(message + "\n");
+		errorBuffer.append("lexeme = \"" + currentToken + "\"\n"); // TODO delete this when done. Test program probably don't expect this error report to exist.
 		return message;
 	}
 
@@ -74,6 +75,7 @@ public class Parser {
 	private String reportSyntaxError(Token.Kind kind) {
 		String message = "SyntaxError(" + lineNumber() + "," + charPosition() + ")[Expected " + kind + " but got " + currentToken.kind() + ".]";
 		errorBuffer.append(message + "\n");
+		errorBuffer.append("lexeme = \"" + currentToken + "\"\n"); // TODO delete this when done. Test program probably don't expect this error report to exist.
 		return message;
 	}
 
@@ -455,11 +457,9 @@ public class Parser {
 	 */
 	public void declaration_list() {
 		enterRule(NonTerminal.DECLARATION_LIST);
-		expect(Token.Kind.OPEN_BRACE);
-		while (accept(NonTerminal.DECLARATION)) {
+		while (have(NonTerminal.DECLARATION)) {
 			declaration();
 		}
-		expect(Token.Kind.CLOSE_BRACE);
 		exitRule(NonTerminal.DECLARATION_LIST);
 	}
 
@@ -584,13 +584,4 @@ public class Parser {
 		expect(Token.Kind.EOF);
 		exitRule(NonTerminal.PROGRAM);
 	}
-
-	/**
-	 * Production for rule:
-	 * 
-	 */
-	//public void () {
-		//enterRule(NonTerminal.);
-		//exitRule(NonTerminal.);
-	//}
 }
