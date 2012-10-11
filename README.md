@@ -5,7 +5,7 @@ A project in the course [CS142A](http://ssllab.org/~erich/) Interpreters and Com
 Compile and run by typing the following commands:
 
 	$ cd cs142a_project/
-	$ ant help
+	$ ant -p
 	$ ant
-	$ ..
+	$ ./crxc [-l<1-6>] <crxc-file>
 

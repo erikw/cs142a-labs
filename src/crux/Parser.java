@@ -60,7 +60,9 @@ public class Parser {
 	 * pre: The unexpected token is at currentToken.
 	 */
 	private String reportSyntaxError(NonTerminal nt) {
-		String message = "SyntaxError(" + lineNumber() + "," + charPosition() + ")[Expected one of " + nt.firstSet() + " but got " + currentToken.kind() + ".]";
+		// While this original line is informative the order of the elements in the firstset is not deterministic so that makes automated testing harder.
+		//String message = "SyntaxError(" + lineNumber() + "," + charPosition() + ")[Expected one of " + nt.firstSet() + " but got " + currentToken.kind() + ".]";
+		String message = "SyntaxError(" + lineNumber() + "," + charPosition() + ")[Expected a token from " + nt.name() + " but got " + currentToken.kind() + ".]";
 		errorBuffer.append(message + "\n");
 		//errorBuffer.append("lexeme = \"" + currentToken + "\"\n"); // Delete this when done. Test program probably don't expect this error report to exist.
 		//errorBuffer.append(parseTreeBuffer.toString() + '\n'); // Delete this when done. Test program probably don't expect this error report to exist.
