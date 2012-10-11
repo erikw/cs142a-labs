@@ -230,7 +230,6 @@ public class Parser {
 	}
 
 
-
 	// Grammar Rules
 
 	/**
@@ -248,9 +247,7 @@ public class Parser {
 		} else if (have(Token.Kind.FALSE)) {
 			expect(Token.Kind.FALSE);
 		} else {
-		// TODO what error is supposed to be repported?
-			String errorMessage = reportSyntaxError(NonTerminal.LITERAL);
-			throw new QuitParseException(errorMessage);
+			throw new QuitParseException(reportSyntaxError(NonTerminal.LITERAL));
 		}
 		exitRule(NonTerminal.LITERAL);
 	}
@@ -298,8 +295,7 @@ public class Parser {
 		} else if (have(Token.Kind.LESS_THAN)) {
 			expect(Token.Kind.LESS_THAN);
 		} else {
-			String errorMessage = reportSyntaxError(NonTerminal.OP0);
-			throw new QuitParseException(errorMessage);
+			throw new QuitParseException(reportSyntaxError(NonTerminal.OP0));
 		}
 		exitRule(NonTerminal.OP0);
 	}
@@ -317,8 +313,7 @@ public class Parser {
 		} else if (have(Token.Kind.OR)) {
 			expect(Token.Kind.OR);
 		} else {
-			String errorMessage = reportSyntaxError(NonTerminal.OP1);
-			throw new QuitParseException(errorMessage);
+			throw new QuitParseException(reportSyntaxError(NonTerminal.OP1));
 		}
 		exitRule(NonTerminal.OP1);
 	}
@@ -336,8 +331,7 @@ public class Parser {
 		} else if (have(Token.Kind.AND)) {
 			expect(Token.Kind.AND);
 		} else {
-			String errorMessage = reportSyntaxError(NonTerminal.OP2);
-			throw new QuitParseException(errorMessage);
+			throw new QuitParseException(reportSyntaxError(NonTerminal.OP2));
 		}
 		exitRule(NonTerminal.OP2);
 	}
@@ -403,9 +397,7 @@ public class Parser {
 		} else if (have(NonTerminal.LITERAL)) {
 			literal();
 		} else {
-			// TODO does output expect error to be reported from here or from the insde the last possible alternative?
-			String errorMessage = reportSyntaxError(NonTerminal.EXPRESSION3);
-			throw new QuitParseException(errorMessage);
+			throw new QuitParseException(reportSyntaxError(NonTerminal.LITERAL));
 		}
 		exitRule(NonTerminal.EXPRESSION3);
 	}
@@ -527,8 +519,10 @@ public class Parser {
 			variable_declaration();
 		} else if (have(NonTerminal.ARRAY_DECLARATION)) {
 			array_declaration();
-		} else {
+		} else if (have(NonTerminal.FUNCTION_DEFINITION)) {
 			function_definition();
+		} else {
+			throw new QuitParseException(reportSyntaxError(NonTerminal.DECLARATION));
 		}
 		exitRule(NonTerminal.DECLARATION);
 	}
@@ -626,8 +620,10 @@ public class Parser {
 			if_statement();
 		} else if (have(NonTerminal.WHILE_STATEMENT)) {
 			while_statement();
-		} else {
+		} else if (have(NonTerminal.RETURN_STATEMENT)) {
 			return_statement();
+		} else {
+			throw new QuitParseException(reportSyntaxError(NonTerminal.STATEMENT));
 		}
 		exitRule(NonTerminal.STATEMENT);
 	}
