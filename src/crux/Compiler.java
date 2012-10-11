@@ -81,7 +81,6 @@ public class Compiler {
             System.err.println("Error accessing the source file: \"" + cruxFile + "\".");
 			System.exit(-2);
         }
-
 		switch(currentLab) {
 			case LAB1:
 				// Lab #1 with output being the tokens.

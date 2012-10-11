@@ -238,6 +238,7 @@ public class Parser {
 	 * literal := INTEGER | FLOAT | TRUE | FALSE .
 	 */
 	public void literal() {
+		enterRule(NonTerminal.LITERAL);
 		if (have(Token.Kind.INTEGER)) {
 			expect(Token.Kind.INTEGER);
 		} else if (have(Token.Kind.FLOAT)) {
@@ -251,6 +252,7 @@ public class Parser {
 			String errorMessage = reportSyntaxError(NonTerminal.LITERAL);
 			throw new QuitParseException(errorMessage);
 		}
+		exitRule(NonTerminal.LITERAL);
 	}
 
 	/**
@@ -259,13 +261,11 @@ public class Parser {
 	 **/
 	public void designator() {
 		enterRule(NonTerminal.DESIGNATOR);
-
 		expect(Token.Kind.IDENTIFIER);
 		while (accept(Token.Kind.OPEN_BRACKET)) {
 			expression0();
 			expect(Token.Kind.CLOSE_BRACKET);
 		}
-
 		exitRule(NonTerminal.DESIGNATOR);
 	}
 
@@ -281,14 +281,78 @@ public class Parser {
 
 	/**
 	 * Production for rule:
+	 * op0 := ">=" | "<=" | "!=" | "==" | ">" | "<" .
+	 */
+	public void op0() {
+		enterRule(NonTerminal.OP0);
+		if (have(Token.Kind.GREATER_EQUAL)) {
+			expect(Token.Kind.GREATER_EQUAL);
+		} else if (have(Token.Kind.LESSER_EQUAL)) {
+			expect(Token.Kind.LESSER_EQUAL);
+		} else if (have(Token.Kind.NOT_EQUAL)) {
+			expect(Token.Kind.NOT_EQUAL);
+		} else if (have(Token.Kind.EQUAL)) {
+			expect(Token.Kind.EQUAL);
+		} else if (have(Token.Kind.GREATER_THAN)) {
+			expect(Token.Kind.GREATER_THAN);
+		} else if (have(Token.Kind.LESS_THAN)) {
+			expect(Token.Kind.LESS_THAN);
+		} else {
+			String errorMessage = reportSyntaxError(NonTerminal.OP0);
+			throw new QuitParseException(errorMessage);
+		}
+		exitRule(NonTerminal.OP0);
+	}
+
+	/**
+	 * Production for rule:
+	 * op1 := "+" | "-" | "or" .
+	 */
+	public void op1() {
+		enterRule(NonTerminal.OP1);
+		if (have(Token.Kind.ADD)) {
+			expect(Token.Kind.ADD);
+		} else if (have(Token.Kind.SUB)) {
+			expect(Token.Kind.SUB);
+		} else if (have(Token.Kind.OR)) {
+			expect(Token.Kind.OR);
+		} else {
+			String errorMessage = reportSyntaxError(NonTerminal.OP1);
+			throw new QuitParseException(errorMessage);
+		}
+		exitRule(NonTerminal.OP1);
+	}
+
+	/**
+	 * Production for rule:
+	 * op2 := "*" | "/" | "and" .
+	 */
+	public void op2() {
+		enterRule(NonTerminal.OP2);
+		if (have(Token.Kind.MUL)) {
+			expect(Token.Kind.MUL);
+		} else if (have(Token.Kind.DIV)) {
+			expect(Token.Kind.DIV);
+		} else if (have(Token.Kind.AND)) {
+			expect(Token.Kind.AND);
+		} else {
+			String errorMessage = reportSyntaxError(NonTerminal.OP2);
+			throw new QuitParseException(errorMessage);
+		}
+		exitRule(NonTerminal.OP2);
+	}
+
+	/**
+	 * Production for rule:
 	 * expression0 := expression1 [ op0 expression1 ] .
 	 */
 	public void expression0() {
 		enterRule(NonTerminal.EXPRESSION0);
-		do {
+		expression1();
+		while (have(NonTerminal.OP0)) {
+			op0();
 			expression1();
-
-		} while (accept(NonTerminal.OP0));
+		}
 		exitRule(NonTerminal.EXPRESSION0);
 	}
 
@@ -298,10 +362,11 @@ public class Parser {
 	 */
 	public void expression1() {
 		enterRule(NonTerminal.EXPRESSION1);
-		do {
+		expression2();
+		while (have(NonTerminal.OP1)) {
+			op1();
 			expression2();
-
-		} while (accept(NonTerminal.OP1));
+		}
 		exitRule(NonTerminal.EXPRESSION1);
 	}
 
@@ -311,10 +376,11 @@ public class Parser {
 	 */
 	public void expression2() {
 		enterRule(NonTerminal.EXPRESSION2);
-		do {
+		expression3();
+		while (accept(NonTerminal.OP2)) {
+			op2();
 			expression3();
-
-		} while (accept(NonTerminal.OP2));
+		}
 		exitRule(NonTerminal.EXPRESSION2);
 	}
 

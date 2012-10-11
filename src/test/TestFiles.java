@@ -6,6 +6,7 @@ import java.io.FilenameFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.security.Permission;
 
 import java.util.Scanner;
 
@@ -41,57 +42,60 @@ public class TestFiles {
 	private PrintStream errStream;
 
 	@Before
-	public void setUp() {
-		compiler = new crux.Compiler();	
-		outOrg = System.out;
-		errOrg = System.err;
-		outBuffer = new ByteArrayOutputStream();
-		errBuffer = new ByteArrayOutputStream();
-		outStream = new PrintStream(outBuffer);
-		errStream = new PrintStream(errBuffer);
-	}
+		public void setUp() {
+			compiler = new crux.Compiler();	
+			outOrg = System.out;
+			errOrg = System.err;
+			outBuffer = new ByteArrayOutputStream();
+			errBuffer = new ByteArrayOutputStream();
+			outStream = new PrintStream(outBuffer);
+			errStream = new PrintStream(errBuffer);
+			// Prevent System.exit()s.
+			System.setSecurityManager(new SysExitSecurityManager());
+		}
 
 	@After
-	public void tearDown() {
-		compiler = null;
-		useOutBuffer(false);
-	}
+		public void tearDown() {
+			compiler = null;
+			useOutBuffer(false);
+			System.setSecurityManager(null);
+		}
 
 
 	// Lab 1 tests.
 	@Test
-	public void testLab1Public() {
-		compiler.setLab(crux.Compiler.Lab.LAB1);
-		testFilesIn("lab1/public");
-	}
+		public void testLab1Public() {
+			compiler.setLab(crux.Compiler.Lab.LAB1);
+			testFilesIn("lab1/public");
+		}
 
 	@Test
-	public void testLab1Private() {
-		compiler.setLab(crux.Compiler.Lab.LAB1);
-		testFilesIn("lab1/public");
-		testFilesIn("lab1/private");
-	}
+		public void testLab1Private() {
+			compiler.setLab(crux.Compiler.Lab.LAB1);
+			testFilesIn("lab1/public");
+			testFilesIn("lab1/private");
+		}
 
 	@Test
-	public void testLab1PrivateSecret() {
-		compiler.setLab(crux.Compiler.Lab.LAB1);
-		testFilesIn("lab1/public");
-		testFilesIn("lab1/private_secret");
-	}
+		public void testLab1PrivateSecret() {
+			compiler.setLab(crux.Compiler.Lab.LAB1);
+			testFilesIn("lab1/public");
+			testFilesIn("lab1/private_secret");
+		}
 
 
 	// Lab 2 tests.
 	@Test
-	public void testLab2Public() {
-		compiler.setLab(crux.Compiler.Lab.LAB2);
-		testFilesIn("lab2/public");
-	}
+		public void testLab2Public() {
+			compiler.setLab(crux.Compiler.Lab.LAB2);
+			testFilesIn("lab2/public");
+		}
 
 	@Test
-	public void testLab2Private() {
-		compiler.setLab(crux.Compiler.Lab.LAB2);
-		testFilesIn("lab2/private");
-	}
+		public void testLab2Private() {
+			compiler.setLab(crux.Compiler.Lab.LAB2);
+			testFilesIn("lab2/private");
+		}
 
 	private void testFilesIn(String subdir) {
 		File dir = new File(fileRoot + "/" + subdir);
@@ -110,8 +114,8 @@ public class TestFiles {
 			String outFile = nameParts[0] + ".out";
 			testFile(fileRoot + "/" + subdir + "/" + cruxFile, fileRoot + "/" + subdir + "/" + outFile);
 		}
-		System.out.printf("In %s: ", subdir);
-		System.out.printf("All tests files passed!\n");
+		//System.out.printf("In %s: ", subdir);
+		//System.out.printf("All tests files passed!\n");
 	}
 
 	/**
@@ -122,7 +126,11 @@ public class TestFiles {
 	private void testFile(String cruxFileName, String outFileName) {
 		System.out.printf("Testing input file \"%s\", with the expected output in \"%s\"\n", cruxFileName, outFileName);
 		useOutBuffer(true);
-		compiler.compile(cruxFileName);
+		try {
+			compiler.compile(cruxFileName);
+		} catch (SysExitException see) {
+			fail("Compilation caused a System.exit(" + see.getExitCode() + ")");
+		}
 		String actual = outBuffer.toString();
 		String errStr = errBuffer.toString();
 		useOutBuffer(false);
@@ -142,12 +150,12 @@ public class TestFiles {
 		expected += '\n'; // Needed apparently.
 
 		actual = actual.replaceAll("\\r", ""); // So tests can be run under Windoze.
-		if (!expected.equals(actual)) {
-			System.out.println("Wrong compiler output.");
-			System.out.printf("exp={\n%s\n}\nact={\n%s\n}\n", expected, actual);
-			fail();
-		}
-		//assertEquals("Wrong compiler output.", expected+'\n', actual);
+		//if (!expected.equals(actual)) {
+			//System.out.println("Wrong compiler output.");
+			//System.out.printf("exp={\n%s\n}\nact={\n%s\n}\n", expected, actual);
+			//fail();
+		//}
+		assertEquals("Wrong compiler output.\n", expected, actual);
 	}
 
 	/**
@@ -172,4 +180,51 @@ public class TestFiles {
 			System.setErr(errOrg);
 		}
 	}
+
+
+	/**
+	 * A SecurityManager that allows catches System.exit() events and throws SysExitException instead of exiting.
+	 */
+	private static class SysExitSecurityManager extends SecurityManager {
+    	public void checkPermission(Permission perm) {
+    		// Allow all.
+    	}
+
+    	public void checkPermission(Permission perm, Object context) {
+    		// Allow all.
+    	}
+
+		/**
+		 * Throw SysExitException instead of exiting.
+		 * @param exitCode The exit code.
+		 */
+    	public void checkExit(int exitCode) {
+    		super.checkExit(exitCode);
+    		throw new SysExitException(exitCode);
+    	}
+	}
+
+	/**
+	 * Exception thrown when the program tried to do a System.exit().
+	 */
+	private static class SysExitException extends SecurityException {
+		/* The exit code that was used during System.exit(). */
+		private int exitCode;
+		/* Construct a exception with an exitcode.
+		 * @param exitCode The exit code that was used in System.exit();
+		 */
+		SysExitException(int exitCode) {
+			super("No exit'ing here!");
+			this.exitCode = exitCode;
+		}
+
+		/**
+		 * Get the exit code.
+		 * @return The exit code.
+		 */
+		public int getExitCode() {
+			return exitCode;
+		}
+	}
+
 }
