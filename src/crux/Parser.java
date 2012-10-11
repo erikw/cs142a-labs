@@ -377,7 +377,7 @@ public class Parser {
 	public void expression2() {
 		enterRule(NonTerminal.EXPRESSION2);
 		expression3();
-		while (accept(NonTerminal.OP2)) {
+		while (have(NonTerminal.OP2)) {
 			op2();
 			expression3();
 		}
@@ -416,6 +416,7 @@ public class Parser {
 	 */
 	public void call_expression() {
 		enterRule(NonTerminal.CALL_EXPRESSION);
+		expect(Token.Kind.CALL);
 		expect(Token.Kind.IDENTIFIER);
 		expect(Token.Kind.OPEN_PAREN);
 		expression_list();

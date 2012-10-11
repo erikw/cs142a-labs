@@ -126,17 +126,15 @@ public class TestFiles {
 	private void testFile(String cruxFileName, String outFileName) {
 		System.out.printf("Testing input file \"%s\", with the expected output in \"%s\"\n", cruxFileName, outFileName);
 		useOutBuffer(true);
+		SysExitException exitException = null;
 		try {
 			compiler.compile(cruxFileName);
 		} catch (SysExitException see) {
-			fail("Compilation caused a System.exit(" + see.getExitCode() + ")");
+			exitException = see;
 		}
 		String actual = outBuffer.toString();
 		String errStr = errBuffer.toString();
 		useOutBuffer(false);
-		if (!errStr.isEmpty()) {
-			System.err.printf("Compiler gave this error output: {\\n%s\\n}\\n", errStr);
-		}
 
 		File outFile = new File(outFileName);
 		java.util.Scanner outScanner = null;
@@ -148,14 +146,22 @@ public class TestFiles {
 		}
 		String expected = outScanner.useDelimiter("\\Z").next();
 		expected += '\n'; // Needed apparently.
-
 		actual = actual.replaceAll("\\r", ""); // So tests can be run under Windoze.
-		//if (!expected.equals(actual)) {
-			//System.out.println("Wrong compiler output.");
-			//System.out.printf("exp={\n%s\n}\nact={\n%s\n}\n", expected, actual);
-			//fail();
-		//}
-		assertEquals("Wrong compiler output.\n", expected, actual);
+
+		if (!expected.equals(actual)) {
+			StringBuilder errBuilder = new StringBuilder();
+			errBuilder.append("Wrong compiler output.\n");
+			if (exitException != null) {
+				errBuilder.append("Compilation caused a System.exit(");
+				errBuilder.append(exitException.getExitCode()).append(")\n");
+			}
+			if (!errStr.isEmpty()) {
+				errBuilder.append(String.format("Compiler gave this stderr output: {\n%s\n}\n", errStr));
+			}
+			// Use JUnits smarter diff displayer.
+			errBuilder.append(String.format("exp={\n%s\n}\nact={\n%s\n}\n", expected, actual));
+			assertEquals(errBuilder.toString(), expected, actual);
+		}
 	}
 
 	/**
