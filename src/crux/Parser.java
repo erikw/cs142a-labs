@@ -62,7 +62,8 @@ public class Parser {
 	private String reportSyntaxError(NonTerminal nt) {
 		String message = "SyntaxError(" + lineNumber() + "," + charPosition() + ")[Expected one of " + nt.firstSet() + " but got " + currentToken.kind() + ".]";
 		errorBuffer.append(message + "\n");
-		errorBuffer.append("lexeme = \"" + currentToken + "\"\n"); // TODO delete this when done. Test program probably don't expect this error report to exist.
+		//errorBuffer.append("lexeme = \"" + currentToken + "\"\n"); // TODO delete this when done. Test program probably don't expect this error report to exist.
+		//errorBuffer.append(parseTreeBuffer.toString() + '\n'); // TODO delete this when done. Test program probably don't expect this error report to exist.
 		return message;
 	}
 
@@ -75,7 +76,8 @@ public class Parser {
 	private String reportSyntaxError(Token.Kind kind) {
 		String message = "SyntaxError(" + lineNumber() + "," + charPosition() + ")[Expected " + kind + " but got " + currentToken.kind() + ".]";
 		errorBuffer.append(message + "\n");
-		errorBuffer.append("lexeme = \"" + currentToken + "\"\n"); // TODO delete this when done. Test program probably don't expect this error report to exist.
+		//errorBuffer.append("lexeme = \"" + currentToken + "\"\n"); // TODO delete this when done. Test program probably don't expect this error report to exist.
+		//errorBuffer.append(parseTreeBuffer.toString() + '\n'); // TODO delete this when done. Test program probably don't expect this error report to exist.
 		return message;
 	}
 
@@ -236,7 +238,19 @@ public class Parser {
 	 * literal := INTEGER | FLOAT | TRUE | FALSE .
 	 */
 	public void literal() {
-		throw new RuntimeException("implement this");
+		if (have(Token.Kind.INTEGER)) {
+			expect(Token.Kind.INTEGER);
+		} else if (have(Token.Kind.FLOAT)) {
+			expect(Token.Kind.FLOAT);
+		} else if (have(Token.Kind.TRUE)) {
+			expect(Token.Kind.TRUE);
+		} else if (have(Token.Kind.FALSE)) {
+			expect(Token.Kind.FALSE);
+		} else {
+		// TODO what error is supposed to be repported?
+			String errorMessage = reportSyntaxError(NonTerminal.LITERAL);
+			throw new QuitParseException(errorMessage);
+		}
 	}
 
 	/**
@@ -429,6 +443,7 @@ public class Parser {
 		expect(Token.Kind.IDENTIFIER);
 		expect(Token.Kind.OPEN_PAREN);
 		parameter_list();
+		expect(Token.Kind.CLOSE_PAREN);
 		expect(Token.Kind.COLON);
 		type();
 		statement_block();
@@ -556,7 +571,7 @@ public class Parser {
 	 */
 	public void statement_list() {
 		enterRule(NonTerminal.STATEMENT_LIST);
-		while (accept(NonTerminal.STATEMENT)) {
+		while (have(NonTerminal.STATEMENT)) {
 			statement();
 		}
 		exitRule(NonTerminal.STATEMENT_LIST);

@@ -1,2 +1,3 @@
 * A symbol table some where. -- not until lab2?
 * in lab2, check semantic as well? e.g. main must exist
+* implement exit manager if I'm allowed to. http://stackoverflow.com/questions/309396/java-how-to-test-methods-that-call-system-exit
