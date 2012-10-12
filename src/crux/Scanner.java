@@ -73,13 +73,16 @@ public class Scanner implements Iterable<Token> {
 				System.err.println("Caught IOException in input stream.");
 				System.exit(1);
 			}
-			if (nextChar == -1) {
-				nextChar = EOF;
-				++charPos;
-			} else if (nextChar == '\n') {
-				++lineNum;
-				charPos = 0;
-			} else {
+			switch (nextChar) {
+				case -1:
+					nextChar = EOF;
+					++charPos;
+					break;	
+				case '\n':
+					++lineNum;
+					charPos = 0;
+					break;
+				default:
 				++charPos;
 			}
 		}
@@ -307,7 +310,7 @@ public class Scanner implements Iterable<Token> {
 			if (cache == null) {
 				cache = scanner.next();
 			}
-			return !cache.isKind(Token.Kind.EOF);
+			return !cache.is(Token.Kind.EOF);
 		}
 
 		/**
@@ -334,6 +337,4 @@ public class Scanner implements Iterable<Token> {
 
 
 	}
-
-	// OPTIONAL: any other methods that you find convenient for implementation or testing
 }

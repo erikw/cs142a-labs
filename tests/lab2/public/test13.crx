@@ -1,0 +1,12 @@
+// test while
+
+func main() : void {
+  while (true) {
+    ::nothing();
+  }
+
+  while 4-5 {
+    ::nothing();
+  }
+
+}

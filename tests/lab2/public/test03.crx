@@ -1,0 +1,6 @@
+// test type
+
+var a: void;
+var b: int;
+var c: float;
+var d: bool;

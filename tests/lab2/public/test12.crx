@@ -1,0 +1,13 @@
+// test if-else
+
+func main() : void {
+  if a < b { ::nothing(); }
+  if (a >= b) { ::nothing(); }
+
+  if ((((a and b)))) {
+    ::nothing();
+  } else {
+    ::nothing();
+  }
+  ::done();
+}

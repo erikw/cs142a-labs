@@ -1,0 +1,272 @@
+<html>
+  <head>
+    <title>CS 142A: Interpreters and Compilers</title>
+    <link href="../../style.css" rel="StyleSheet" type="text/css"></link>
+    <script type="text/javascript" src="../../code/jQuery.js"></script>
+
+  </head>
+
+  <body><div id="container">
+    <div id="header">
+      <p><a href="index.html">CS 142A: Interpreters and Compilers</a></p>
+    </div>
+
+    <div id="leftnav">
+      <!-- should provide a noscript hard link to a navigation page -->
+      <script type="text/javascript" src="../../code/menu.js"></script>
+      <script type="text/javascript">document.write(generateMenu(document.URL));</script>
+    </div>
+
+    <div id="content">
+    
+    <h1>Lab #2: <i>Parser</i></h1>
+    <p><b>Due date and time:</b> <i>Saturday, October 13, 11:59pm</i></span><br>
+    We are not handing out a solution to the previous lab.
+    To avoid delays, please make sure to see the TA or myself to get it working without error as soon as possible.
+    </p>
+
+    <h1>Introduction</h1>
+    <p>Now that we have completed writing a Scanner that tokenizes input Crux source files, we can proceed with implementing the next part of the compiler: a Parser.
+    Because our <code>crux.Parser</code> will ultimately do more than task, we split the implementation into smaller pieces.
+    </p>
+
+    <p>The grammar given in the <a href="../languagespec.html">Crux Specification</a> describes the appearance of sentences within the Crux language.
+    Because Crux is a computer language, some (but not all) of these sentences can be translated into valid Crux programs.
+    In this project, we shall implement a <a href="http://en.wikipedia.org/wiki/Recursive_descent_parser">recursive descent parser</a> for the Crux language.
+    The parser will act as a recognizer, allowing us to reject sentences which have syntax errors (invalid or misplaced tokens), because they could not possibly be Crux source code.
+    </p>
+
+    <h1>What's Recursive Descent?</h1>
+    <p>The Crux language language has been purposefully designed as LL(1) for simplicity of parsing.
+    It can be parsed from <b>L</b>eft to right, constructing a <b>L</b>eftmost derivation with only <b>1</b> token of lookahead.
+    Remarkably, this feature allows us to directly map each rule in Crux's left-factored grammer with a clause of a recursive procedure.
+    During execution of the parse, the Parser will start at the top of the parse tree (rule <code>program</code>) and recursively call itself (<code>program</code> calls <code>declaration_list</code>) descending down through the tree until bottoming out at a terminal (such as those in rule <code>literal</code>).
+    </p>
+
+    <a style="float:right" href="ParseTree.png"><img height="120px" src="ParseTree.png" /></a>
+    <p>Consider an example sentence in the Crux language:
+    <pre>
+func main() : int {return 5;}
+    </pre>
+    The corresponding parse tree is shown to the right (click on it for larger version).
+    All of the grammar production rules involved in describing this sentence are present in the tree (shown to the right, click on it for a larger version).
+    The <code>crux.Parser</code> calls a method for each one of the parser rules (orange boxes) in the tree.
+    For example, the <code>function_declaration</code> method calls the <code>parameter_list</code> method after it has read the <code>FUNC</code>, <code>IDENTIFIER(main)</code>, and <code>OPEN_PAREN</code> tokens.
+    </p>
+
+    <p>
+    Notice that some of the productions consume none of the tokens.
+    The <code>main</code> function in our example has no arguments, so the <code>parameter_list</code> production consumes the empty string, depicted as an empty token-styled box.
+    Therefore the <code>parameter_list</code> method must be able to quit and return without accidentally eating the following <code>CLOSE_PAREN</code> token.
+    </p>
+
+    <h1>Left-Factoring Removes Infinite Recursion</h1>
+    <p>
+    Implementing each rule as a mutually recursive method in the parser can lead to accidental infinite loops.
+    Consider the following (very tiny) grammar, and pseudo-code implementation:
+    <table style="width:100%">
+      <tr><td>
+          <pre>
+letter := letter "a" | "a" .
+          </pre>
+          </td><td>
+          <pre>
+void letter() {
+    switch(currentToken) {
+    case /*first choice*/:
+        letter();
+        eatToken("IDENTIFIER(a)");
+    case /*second choice*/:
+        eatToken("IDENTIFIER(a)");
+    }
+}
+          </pre>
+      </tr>
+    </table>
+    </p>
+
+    <p>What happens if the <code>letter</code> method always tries the first choice?
+    </p>
+    <p>First we call <code>letter</code>, which again calls <code>letter</code> without consuming any tokens of input.
+    The second call in turn calls <code>letter</code> without consuming any tokens of input.
+    The third call again calls <code>letter</code> without consuming any input.
+    And so on, until the Java runtime environment says we made too many calls to <code>letter</code> by throwing a <code>java.lang.StackOverflowError</code>.
+    </p>
+
+    <p>This is a contrived example, and shows the problem rather directly.
+    In realistic grammars, we may have production rules that double-back on themselves in a mutually recursive fashion.
+    For example, it might be a longer chain: <code>expression</code> calls <code>term</code> calls <code>factor</code> calls back to <code>expression</code>.
+    We still have to remove the left-recursion in a process known as <a href="http://en.wikipedia.org/wiki/Left_recursion">left-factoring</a>, as shown in class.
+    </p>
+
+    <h1>FirstSets Allow Predictive Choice</h1>
+    <p>Once we have a grammar that allows us to compose a recursive descent parser without worry of infinite loops, we notice that some of the productions have more than one available expansion.
+    For example, consider a hypothetical <code>statement</code> rule, and its pseudoccode implementation:
+    <table style="width:100%">
+      <tr><td>
+          <pre>
+statement := variable-declaration
+          | statement-block .
+          </pre>
+          </td><td>
+          <pre>
+void letter() {
+    switch(currentToken) {
+    case ???:
+        variable_declaration();
+        break;
+    case ???:
+        statement_block();
+        break;
+    case default:
+        error("couldn't make a choice");
+    }
+}
+          </pre>
+      </tr>
+    </table>
+    </p>
+
+    <p>What if <code>variable_declaration</code> and <code>statement_block</code> both started with <code>"var"</code>?
+    How will the parser be able to decide, from looking just at the <code>currentToken</code> which case it should execute?
+    </p>
+    <p>We can make sure that there is only one unique branch to execute by computing what's called the <code>FirstSet</code> of each non-terminal production rule.
+    The above example happens to be contrived, because when we look at the grammar rules for <code>variable_declaration</code> we see that it may start with either a <code>VAR</code> or <code>ARRAY</code> token, while <code>statement_block</code> always begins with a <code>OPEN_BRACE</code>.
+    <code>FirstSet(variable_delaration)</code> shares no common tokens with <code>FirstSet(statement_block)</code>, so the parser is always able to choose uniquely between these two possible paths, with no information other than the <code>currentToken</code>.
+    </p>
+
+    <h1>What do I need to implement?</h1>
+    <p>The Crux Grammar section of the <a href="../languagespec.html">Crux Specification</a>.
+    Your program should be able to read input from the Scanner, parsing the stream of tokens one at a time, and printing the grammar rules executed.
+    For simplification purposes, we will not implement error recovery.
+    It is expected that your Parser reports the first syntax error (if any) it encounters and quits.
+    </p>
+
+    <p>For convenience, you may get a start on this lab by using a pre-made <a href="Lab2_Parser.zip">Lab2_Parser.zip</a> project, which contains a <code>crux.Compiler</code> skeleton for executing a <code>crux.Parser</code>.
+    As before, you are both allowed and encouraged to make your program easier to read and maintain by implementing helper functions with good names.
+   </p>
+ 
+    <h2>What's Changed Since the Last Lab?</h2>
+    <ul>
+      <li><code>crux.Compiler.main</code> has been changed to create a Parser, call it's <code>parse</code> method, report the parse tree and any syntax errors.</li>
+    </ul>
+
+    <h1>Designing the Parser</h1>
+    <p>Because the parser has already several tasks to accomplish, it makes sense to first sketch some components of the design.
+
+    <h2>Reading Input</h2>
+    <p>The Parser gets it's input from a stream of tokens returned from the Scanner.
+    It's not necessary (nor allowed) to look more than one token ahead.
+    This means that we need only one field <code>currentToken</code> to store the current position in the token stream.
+    </p>
+
+    <p>Sometimes, like when stepping over an <code>OPEN_PAREN</code> this token needs to be consumed.
+    The parser need only report a syntax error if the current token happens to be different than the one expected (<code>OPEN_PAREN</code>
+    At other times, like when detecting whether the optional <code>ELSE</code> branch is present, the token is only consumed if it matches the one expected.
+    Because the else clause is optional, the parser would not report a syntax error if the current token happened to be different.
+    Rather, it would consider the <code>if_statement</code> finished, and pick up where it left off (likely <code>statement_list</code>).
+    Already, we can see that, depending on the grammar, sometimes the current token should be eaten and the token stream advanced and sometimes not; sometimes an error should be reported and sometimes not.
+    </p>
+
+    <p>To support a matrix of possibilities I suggest the following helper functions:
+    <table>
+      <tr><th>Name</th><th>Advance stream?</th><th>Report Error?</th><th>Purpose?</th></tr>
+      <tr><td><code>have</code></td><td>No</td><td>No</td><td>Examine the current token.</td></tr>
+      <tr><td><code>accept</code></td><td>When token matches</td><td>No</td><td>Allow matching tokens to be consumed.</td></tr>
+      <tr><td><code>expect</code></td><td>When token matches</td><td>When token doesn't match</td><td>Report errors on unexpected tokens.</td></tr>
+    </table>
+    Furthermore, these questions will sometimes be asked not on individual <code>crux.Token.Kind</code>s, but on a collection of them.
+    For example, if the Parser has to decide whether there were more statements in a <code>statement_list</code>, it's convenient to call <code>have</code> on the <code>statement</code>'s <code>FirstSet</code>.
+    Each of the above three functions should be overloaded to receive either a <code>Token.Kind</code> or a <code>NonTerminal</code>.
+    </p>
+
+    <h2>Recording the Parse Tree</h2>
+    <p>The recursive descent parser has a method for each production rule in the grammar.
+    When it parses a sentence, it naturally makes a sequence of methods calls that correspond to a pre-order traversal of the parse tree.
+    All that is required in the project, is to record this sequence.
+    </p>
+
+    <p>The <code>crux.Parser</code> contains one field and two methods for tracking the sequence of production rules:
+<pre>
+StringBuffer parseTreeBuffer; A field for storing the sequence of production rules.
+void enterRule(NonTerminal);  Called whenever the parser enters a production rule.
+void exitRule(NonTerminal);   Called whenever the parser exits a production rule.
+String parseTreeReport();     A method to retrieve the production rule sequence.
+</pre>
+
+    <h2>Reporting Syntax Errors</h2>
+    <p>The <code>crux.Parser</code> contains a method specifically for reporting syntax errors: <code>reportSyntaxError(Token tok)</code>.
+    This method produces an easy to read error report, which we should expect to find useful when writing test Crux programs for the full compiler.
+    Despite the fact that (in this lab) only one error will be reported, the parser has a <code>StringBuffer errorBuffer</code> field that records errors for later query.
+
+    <h2>Developing FirstSets</h2>
+    <p>Each of production rules has associated with it a <code>Set&lt;Token.Kind&gt;</code> which describes the collection of tokens which may begin that clause in the grammar.
+    In contrast to terminals (Tokens produced by the Scanner), only the non-terminals (production rules|parser methods) have FirstSets.
+    Because the grammar is already established, these sets never change, so a <code>enum NonTerminal</code> is a perfect fit.
+    </p>
+
+    <p>Ordinarily, it would be cumbersome to compute, for every rule in the grammar, a FirstSet.
+    However, Java has an "anonymous class construction" idiom (with regrettable syntax).
+    This feature allows computational construction (at Java compile time) of the FirstSets.
+    A contrived snippet (<em>not</em> from the Crux grammar) is given below, to show the convenience and use of the <code>Set.add</code> and <code>Set.addAll</code> methods:
+    <table style="width:100%">
+      <tr><td>
+          <pre>
+factor := "not" expression
+       | designator .
+          </pre>
+          </td>
+          <td>
+          <pre>
+FACTOR(new HashSet<Token.Kind>() {
+    private static final long serialVersionUID = 1L;
+    {
+        add(Token.Kind.NOT);
+        addAll(DESIGNATOR.firstSet);
+    }})
+          </pre>
+          </td>
+      </tr>
+    </table>
+    In this example, we must be sure that <code>DESIGNATOR</code> is listed before <code>FACTOR</code>.
+    Otherwise, the Java compiler will complain that DESIGNATOR doesn't exist when it tries to run the <code>addAll</code> line in <code>FACTOR</code>.
+    </p>
+
+    <h1>Testing</h1>
+    <p>Test cases are available in this <a href="tests.zip">tests.zip</a> file.
+    The provided tests are not meant to be exhaustive.
+    You are strongly encouraged to construct your own.
+    (If chrome gives you a warning that "tests.zip is not commonly downloaded and could be dangerous" it means that Google hasn't performed an automated a virus scan.
+    This warning can be safely ignored, as the tests.zip file contains only text files.)
+    </p>
+
+    <h1>Restrictions</h1>
+    <ul>
+      <li>The <code>crux.Parser</code> must read each token, one at a time, only as needed, using the <code>next()</code> method of <code>crux.Scanner</code></li>
+      <li>Naming Convention: NonTerminals are all uppercase with an underscore "_" where the production rule has hyphen "-".</li>
+      <li>Naming Convention: Parser methods are all lowercase with an underscore "_" where the production rule has hyphen "-".</li>
+    </ul>
+
+    <h1>Deliverables</h1>
+    <p>A zip file, named Crux.zip, containing the following files (in the <code>crux</code> package):
+    <ul>
+      <li>crux.NonTerminal.java, which holds the FirstSets of all production rules in the grammar.</li>
+      <li>crux.Parser.java, which performs grammar recognition of an input text.</li>
+      <li>crux.Scanner.java, which performs incremental tokenization of an input text.</li>
+      <li>crux.Compiler.java, which houses the main() function that begins your program.</li>
+      <li>crux.Token.java, which represents a string of characters read in the input text.</li>
+    </ul>
+    </p>
+
+    <p>Please use the <a href="../../tester/index.php">AutoTester</a> to make sure that your work meets our requirements.
+    We reserve the right to assign 0 points to any submissions which cannot be automatically unzipped and tested.
+    Additionally, we reserve the right to assign 0 points to any submission which 'games' the automated testing by using a lookup which produces only outputs that correspond to the test cases we happen to use.
+    You are bound to all of the rules on the <a href="../../submittingprojects.html">Submitting Labs</a> page.
+    Be sure to submit the version of the project that you want graded, as we won't regrade if you submit the wrong version by accident.
+    </p>
+
+    </div>
+    <div id="footer"></div>
+
+  </div></body>
+</html>

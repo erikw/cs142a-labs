@@ -1,0 +1,20 @@
+// test declaration list
+
+var a : int;
+var b : float;
+array x : int[0];
+array y : bool[3][4][7];
+
+func foo() : int {
+  ::printInt();
+}
+
+func gorn() : int {
+  ::killKirk();
+}
+
+func main() : void {
+  ::foo();
+}
+
+array g : float[8][9];

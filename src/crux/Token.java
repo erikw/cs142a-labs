@@ -32,10 +32,6 @@ public class Token {
 		SUB("-", Token.Category.OPERATOR),
 		MUL("*", Token.Category.OPERATOR),
 		DIV("/", Token.Category.OPERATOR),
-
-		// Types.
-		INTEGER(Token.Category.MISC),
-		FLOAT(Token.Category.MISC),
 		
 		// Keywords.
 		TRUE("true", Token.Category.KEYWORD),
@@ -54,14 +50,7 @@ public class Token {
 		OR("or", Token.Category.KEYWORD),
 		NOT("not", Token.Category.KEYWORD),
 
-		// These should not exists as they are to be recognized as IDENTIFIERs.
-		//VOID("void", Token.Category.KEYWORD),
-		//BOOL("bool", Token.Category.KEYWORD),
-		//INT("int", Token.Category.KEYWORD),
-		//FLOAT("float", Token.Category.KEYWORD),
-
-		IDENTIFIER(Token.Category.MISC),
-		// Misc.
+		// Operators
 		ASSIGN("=", Token.Category.OPERATOR),
 		COMMA(",", Token.Category.OPERATOR),
 		SEMICOLON(";", Token.Category.OPERATOR),
@@ -73,6 +62,13 @@ public class Token {
 		CLOSE_BRACE("}", Token.Category.OPERATOR),
 		OPEN_BRACKET("[", Token.Category.OPERATOR),
 		CLOSE_BRACKET("]", Token.Category.OPERATOR),
+
+		// Types.
+		INTEGER(Token.Category.MISC),
+		FLOAT(Token.Category.MISC),
+
+		// Misc.
+		IDENTIFIER(Token.Category.MISC),
 		ERROR(Token.Category.MISC),
 		EOF(Token.Category.MISC);
 		
@@ -139,7 +135,7 @@ public class Token {
 	private int charPos;
 	
 	/* The kind of token the lexeme is of. */
-	Kind kind;
+	private Kind kind;
 
 	/* The actual instance of the token. */
 	private String lexeme = "";
@@ -206,7 +202,7 @@ public class Token {
 	 * Get the line number of the lexeme.
 	 * @return The line number.
 	 */
-	public int getLineNumber() {
+	public int lineNumber() {
 		return lineNum;
 	}
 	
@@ -214,7 +210,7 @@ public class Token {
 	 * Get the character position of the lexeme.
 	 * @return The character position.
 	 */
-	public int getCharPosition() {
+	public int charPosition() {
 		return charPos;
 	}
 
@@ -222,12 +218,20 @@ public class Token {
 	 * Return the lexeme representing or held by this token.
 	 * @return The lexeme string.
 	 */
-	public String getLexeme() {
+	public String lexeme() {
 		if (kind.hasStaticLexeme()) {
 			return kind.default_lexeme;
 		} else {
 			return lexeme;
 		}
+	}
+
+	/**
+	 * Return the kind of this lexeme.
+	 * @return The kind.
+	 */
+	public Token.Kind kind() {
+		return kind;
 	}
 
 	/**
@@ -263,7 +267,7 @@ public class Token {
 	/**
 	 * Query this token if it's of a given kind.
 	 */
-	public boolean isKind(Kind rhs) {
+	public boolean is(Kind rhs) {
 		return kind.equals(rhs);
 	}
 

@@ -1,0 +1,3 @@
+// nesting
+func main(   ) : void { while true { if false { if true { while a { ::nothing(); } } else { ::gorn(); } } ::kirk(); } ::spock(); }		 
+// df
