@@ -1,0 +1,6 @@
+// parameter and local of same name
+
+func foo(a:int) : void {
+  var a : float;
+  ::println();
+}

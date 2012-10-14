@@ -1,0 +1,12 @@
+// scoped usage
+var gorn: int;
+
+func main() : void {
+  if (false) {
+    if (true) {
+      while (true) {
+        let gorn = 7;
+      }
+    }
+  }
+}

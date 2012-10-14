@@ -31,7 +31,7 @@ public class Compiler {
 	public static enum Lab { LAB1, LAB2, LAB3, LAB4, LAB5, LAB6 };
 
 	/* Default lab if not specified. */
-	private static final Lab DEFAULT_LAB = Lab.LAB2;
+	private static final Lab DEFAULT_LAB = Lab.LAB3;
 
 	/* A mapping from integers to enum constants. */
 	private static final Map<Integer, Compiler.Lab> labLookup = new HashMap<Integer, Compiler.Lab>() {
@@ -102,6 +102,17 @@ public class Compiler {
 					System.exit(-3);
 				}
 				System.out.println(parser.parseTreeReport());
+				break;
+			case LAB3:
+        		// Lab #3 that builds builds a symbol table.
+        		Parser p = new Parser(s);
+        		p.parse();
+        		if (p.hasError()) {
+            		System.out.println("Error parsing file.");
+            		System.out.println(p.errorReport());
+            		System.exit(-3);
+        		}
+        		System.out.println("Crux program successfully parsed.");
 				break;
 			default:
 				System.err.println("What lab are you working on?");

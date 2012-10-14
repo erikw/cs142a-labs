@@ -143,6 +143,7 @@ public class Parser {
 	 *	Begin the parsing.
 	 */
 	public void parse() {
+        initSymbolTable();
 		// Load first token.
 		currentToken = scanner.next();
 		try {
@@ -664,4 +665,95 @@ public class Parser {
 		expect(Token.Kind.EOF);
 		exitRule(NonTerminal.PROGRAM);
 	}
+
+	// SymbolTable Management ==========================
+    private SymbolTable symbolTable;
+
+    private void initSymbolTable()
+    {
+        throw new RuntimeException("implement this");
+    }
+
+    private void enterScope()
+    {
+        throw new RuntimeException("implement this");
+    }
+
+    private void exitScope()
+    {
+        throw new RuntimeException("implement this");
+    }
+
+    private Symbol tryResolveSymbol(String name)
+    {
+        try {
+            return symbolTable.lookup(name);
+        } catch (SymbolNotFoundError e) {
+            String message = reportResolveSymbolError(name);
+            return new ErrorSymbol(message);
+        }
+    }
+
+    private String reportResolveSymbolError(String name)
+    {
+        String message = "ResolveSymbolError(" + lineNumber() + "," + charPosition() + ")[Could not find " + name + ".]";
+        errorBuffer.append(message + "\n");
+        errorBuffer.append(symbolTable.toString() + "\n");
+        return message;
+    }
+
+    private Symbol tryDeclareSymbol(String name)
+    {
+        try {
+            return symbolTable.insert(name);
+        } catch (RedeclarationError re) {
+            String message = reportDeclareSymbolError(name);
+            return new ErrorSymbol(message);
+        }
+    }
+
+    private String reportDeclareSymbolError(String name)
+    {
+        String message = "DeclareSymbolError(" + lineNumber() + "," + charPosition() + ")[" + name + " already exists.]";
+        errorBuffer.append(message + "\n");
+        errorBuffer.append(symbolTable.toString() + "\n");
+        return message;
+    }    
+
+
+    private Token expectRetrieve(Token.Kind kind)
+    {
+        Token tok = currentToken;
+        if (accept(kind))
+            return tok;
+        String errorMessage = reportSyntaxError(kind);
+        throw new QuitParseException(errorMessage);
+        //return ErrorToken(errorMessage);
+    }
+
+    private Token expectRetrieve(NonTerminal nt)
+    {
+        Token tok = currentToken;
+        if (accept(nt))
+            return tok;
+        String errorMessage = reportSyntaxError(nt);
+        throw new QuitParseException(errorMessage);
+        //return ErrorToken(errorMessage);
+    }
+
+    private String expectIdentifier()
+    {
+        String name = currentToken.lexeme();
+        if (expect(Token.Kind.IDENTIFIER))
+            return name;
+        return null;
+    }
+
+    private Integer expectInteger()
+    {
+        String num = currentToken.lexeme();
+        if (expect(Token.Kind.INTEGER))
+            return Integer.valueOf(num);
+        return null;
+    }
 }

@@ -1,0 +1,8 @@
+// variables case sensitive
+
+func main() : void {
+  var laMbda : int;
+  var lambda : float;
+
+  ::println();
+}
