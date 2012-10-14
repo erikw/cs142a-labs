@@ -83,7 +83,7 @@ public class Compiler {
             System.err.println("Error accessing the source file: \"" + cruxFile + "\".");
 			System.exit(-2);
         }
-		switch(currentLab) {
+		switch (currentLab) {
 			case LAB1:
 				// Lab #1 with output being the tokens.
 				Token token;
@@ -93,7 +93,7 @@ public class Compiler {
 				} while (!token.is(Token.Kind.EOF));
 				break;
 			case LAB2:
-				// Lab #2 that prints the parse tree.
+			case LAB3:
 				Parser parser = new Parser(scanner);
 				parser.parse();
 				if (parser.hasError()) {
@@ -101,18 +101,16 @@ public class Compiler {
 					System.out.println(parser.errorReport());
 					System.exit(-3);
 				}
-				System.out.println(parser.parseTreeReport());
-				break;
-			case LAB3:
-        		// Lab #3 that builds builds a symbol table.
-        		Parser p = new Parser(s);
-        		p.parse();
-        		if (p.hasError()) {
-            		System.out.println("Error parsing file.");
-            		System.out.println(p.errorReport());
-            		System.exit(-3);
-        		}
-        		System.out.println("Crux program successfully parsed.");
+				switch (currentLab) {
+					case LAB2:
+						// Lab #2 that prints the parse tree.
+						System.out.println(parser.parseTreeReport());
+						break;
+					case LAB3:
+        				// Lab #3 that builds builds a symbol table.
+        				System.out.println("Crux program successfully parsed.");
+						break;
+				}
 				break;
 			default:
 				System.err.println("What lab are you working on?");

@@ -19,39 +19,60 @@ public class Parser {
 	/* The string representation of our parse tree. */
 	private StringBuffer parseTreeBuffer = new StringBuffer();
 
-	/**
-	 * Build parse tree when entering a new production rule.
-	 * @param nonTerminal The non terminal just entered.
-	 */
-	public void enterRule(NonTerminal nonTerminal) {
-		String lineData = new String();
-		for (int i = 0; i < parseTreeRecursionDepth; i++) {
-			lineData += "  ";
-		}
-		lineData += nonTerminal.name();
-		//System.out.println("descending " + lineData);
-		parseTreeBuffer.append(lineData + "\n");
-		parseTreeRecursionDepth++;
-	}
-
-	/**
-	 * Build parse tree when exiting a production rule.
-	 * @param nonTerminal The non terminal just exited.
-	 */
-	private void exitRule(NonTerminal nonTerminal) {
-		parseTreeRecursionDepth--;
-	}
-
-	/**
-	 * Returns a string representation of the parse tree.
-	 * @return The parse tree representation.
-	 */
-	public String parseTreeReport() {
-		return parseTreeBuffer.toString();
-	}
+    /* The symbol table. */
+    private SymbolTable symbolTable;
 
 	/* Buffer for error messages. */
 	private StringBuffer errorBuffer = new StringBuffer();
+
+
+	/* Scanner to fecth tokens from. */
+	private Scanner scanner;
+
+	/* The current token that's being processed. */
+	private Token currentToken;
+
+	/**
+	 * Construct a new parser using a specified scanner.
+	 * @param scanner The scanner to use.
+	 */
+	public Parser(Scanner scanner) {
+		this.scanner = scanner;
+		// TODO create sybol table?
+	}
+
+	/**
+	 *	Begin the parsing.
+	 */
+	public void parse() {
+        initSymbolTable();
+		// Load first token.
+		currentToken = scanner.next();
+		try {
+			program();
+		} catch (QuitParseException qpe) {
+			errorBuffer.append("SyntaxError(" + lineNumber() + "," + charPosition() + ")");
+			errorBuffer.append("[Could not complete parsing.]");
+		}
+	}
+
+	/* Get current tokens line number.
+	 * @return The line number.
+	 */
+	private int lineNumber() {
+		return currentToken.lineNumber();
+	}
+
+	/* Get current tokens char position.
+	 * @return The char position.
+	 */
+	private int charPosition() {
+		return currentToken.charPosition();
+	}
+
+
+
+	//  Grammar rules ==========================
 
 	/**
 	 * Report an error for an unexpected nonterminal.
@@ -100,62 +121,37 @@ public class Parser {
 	}
 
 	/**
-	 * A unchecked exception thrown when the parser had to quit its operation.
+	 * Returns a string representation of the parse tree.
+	 * @return The parse tree representation.
 	 */
-	private class QuitParseException extends RuntimeException {
-		private static final long serialVersionUID = 1L;
-		public QuitParseException(String errorMessage) {
-			super(errorMessage);
-		}
+	public String parseTreeReport() {
+		return parseTreeBuffer.toString();
 	}
 
-	/* Get current tokens line number.
-	 * @return The line number.
-	 */
-	private int lineNumber() {
-		return currentToken.lineNumber();
-	}
-
-	/* Get current tokens char position.
-	 * @return The char position.
-	 */
-	private int charPosition() {
-		return currentToken.charPosition();
-	}
-
-
-
-	/* Scanner to fecth tokens from. */
-	private Scanner scanner;
-
-	/* The current token that's being processed. */
-	private Token currentToken;
 
 	/**
-	 * Construct a new parser using a specified scanner.
-	 * @param scanner The scanner to use.
+	 * Build parse tree when entering a new production rule.
+	 * @param nonTerminal The non terminal just entered.
 	 */
-	public Parser(Scanner scanner) {
-		this.scanner = scanner;
+	public void enterRule(NonTerminal nonTerminal) {
+		String lineData = new String();
+		for (int i = 0; i < parseTreeRecursionDepth; i++) {
+			lineData += "  ";
+		}
+		lineData += nonTerminal.name();
+		//System.out.println("descending " + lineData);
+		parseTreeBuffer.append(lineData + "\n");
+		parseTreeRecursionDepth++;
 	}
 
 	/**
-	 *	Begin the parsing.
+	 * Build parse tree when exiting a production rule.
+	 * @param nonTerminal The non terminal just exited.
 	 */
-	public void parse() {
-        initSymbolTable();
-		// Load first token.
-		currentToken = scanner.next();
-		try {
-			program();
-		} catch (QuitParseException qpe) {
-			errorBuffer.append("SyntaxError(" + lineNumber() + "," + charPosition() + ")");
-			errorBuffer.append("[Could not complete parsing.]");
-		}
+	private void exitRule(NonTerminal nonTerminal) {
+		parseTreeRecursionDepth--;
 	}
 
-
-	// =Helper functions=
 
 	/* Examine if the current token is of a specified kind.
 	 * @param kind The kind to test for.
@@ -233,7 +229,7 @@ public class Parser {
 	}
 
 
-	// Grammar Rules
+	// Grammar Rules======
 
 	/**
 	 * Production for rule:
@@ -426,7 +422,7 @@ public class Parser {
 	public void expression_list() {
 		enterRule(NonTerminal.EXPRESSION_LIST);
 		if (have(NonTerminal.EXPRESSION0)) {
-			 do {
+			do {
 				expression0();
 			} while (accept(Token.Kind.COMMA));
 		}
@@ -667,25 +663,34 @@ public class Parser {
 	}
 
 	// SymbolTable Management ==========================
-    private SymbolTable symbolTable;
 
-    private void initSymbolTable()
-    {
+    /**
+     * Initialize the symboltable with predefined symbols.
+     */
+    private void initSymbolTable() {
         throw new RuntimeException("implement this");
     }
 
-    private void enterScope()
-    {
+    /**
+     * Enters a new scobe for symbols.
+     */
+    private void enterScope() {
         throw new RuntimeException("implement this");
     }
 
-    private void exitScope()
-    {
+    /**
+     * Exit current symbol scope.
+     */
+    private void exitScope() {
         throw new RuntimeException("implement this");
     }
 
-    private Symbol tryResolveSymbol(String name)
-    {
+    /**
+     * Try to resolve a given symbol name.
+     * @param name The symbol name to look up.
+     * @return A found matching symbol or ErrorSymbol.
+     */
+    private Symbol tryResolveSymbol(String name) {
         try {
             return symbolTable.lookup(name);
         } catch (SymbolNotFoundError e) {
@@ -694,16 +699,24 @@ public class Parser {
         }
     }
 
-    private String reportResolveSymbolError(String name)
-    {
+    /**
+     * Report a resolve error for a given symbol name.
+     * @param name The errornous symbol name.
+     * @return An error message built from the current symbol.
+     */
+    private String reportResolveSymbolError(String name) {
         String message = "ResolveSymbolError(" + lineNumber() + "," + charPosition() + ")[Could not find " + name + ".]";
         errorBuffer.append(message + "\n");
         errorBuffer.append(symbolTable.toString() + "\n");
         return message;
     }
 
-    private Symbol tryDeclareSymbol(String name)
-    {
+    /**
+     * Try to declare a symbo name.
+     * @param name The symbol name to declare.
+     * @return The new symbol or ErrorSymbol if it already existed.
+     */
+    private Symbol tryDeclareSymbol(String name) {
         try {
             return symbolTable.insert(name);
         } catch (RedeclarationError re) {
@@ -712,8 +725,12 @@ public class Parser {
         }
     }
 
-    private String reportDeclareSymbolError(String name)
-    {
+    /**
+     * Report a redeclaration error for a symbol name.
+     * @param name The redeclared symbol name.
+     * @return An error message generated from the current information.
+     */
+    private String reportDeclareSymbolError(String name) {
         String message = "DeclareSymbolError(" + lineNumber() + "," + charPosition() + ")[" + name + " already exists.]";
         errorBuffer.append(message + "\n");
         errorBuffer.append(symbolTable.toString() + "\n");
@@ -721,18 +738,23 @@ public class Parser {
     }    
 
 
-    private Token expectRetrieve(Token.Kind kind)
-    {
+    /**
+     * TODO
+     */
+    private Token expectRetrieve(Token.Kind kind) {
         Token tok = currentToken;
-        if (accept(kind))
+        if (accept(kind)) {
             return tok;
+        }
         String errorMessage = reportSyntaxError(kind);
         throw new QuitParseException(errorMessage);
         //return ErrorToken(errorMessage);
     }
 
-    private Token expectRetrieve(NonTerminal nt)
-    {
+    /**
+     * TODO
+     */
+    private Token expectRetrieve(NonTerminal nt) {
         Token tok = currentToken;
         if (accept(nt))
             return tok;
@@ -741,19 +763,33 @@ public class Parser {
         //return ErrorToken(errorMessage);
     }
 
-    private String expectIdentifier()
-    {
+    /**
+     * TODO
+     */
+    private String expectIdentifier() {
         String name = currentToken.lexeme();
         if (expect(Token.Kind.IDENTIFIER))
             return name;
         return null;
     }
 
-    private Integer expectInteger()
-    {
+    /**
+     * TODO
+     */
+    private Integer expectInteger() {
         String num = currentToken.lexeme();
         if (expect(Token.Kind.INTEGER))
             return Integer.valueOf(num);
         return null;
     }
+
+	/**
+	 * A unchecked exception thrown when the parser had to quit its operation.
+	 */
+	private class QuitParseException extends RuntimeException {
+		private static final long serialVersionUID = 1L;
+		public QuitParseException(String errorMessage) {
+			super(errorMessage);
+		}
+	}
 }
