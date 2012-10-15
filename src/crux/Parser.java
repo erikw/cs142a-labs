@@ -38,7 +38,7 @@ public class Parser {
 	 */
 	public Parser(Scanner scanner) {
 		this.scanner = scanner;
-		// TODO create sybol table?
+		symbolTable = new SymbolTable();
 	}
 
 	/**
@@ -496,10 +496,16 @@ public class Parser {
 	 * function-definition := "func" IDENTIFIER "(" parameter-list ")" ":" type statement-block .
 	 */
 	public void function_definition() {
+		// TODO can function be defined inside other functions or are the always at the root-scope?
 		enterRule(NonTerminal.FUNCTION_DEFINITION);
 		expect(Token.Kind.FUNC);
-		expect(Token.Kind.IDENTIFIER);
+		//expect(Token.Kind.IDENTIFIER); // TODO switch on currentlab to preserve behaviour from lab2? or do that in the symbol error reporting?
+		String identifier = expectIdentifier();
+		if (identifier != null ) {
+			tryDeclareSymbol(identifier); // TODO do we need to save ref to returned (error?) symbol?
+		}
 		expect(Token.Kind.OPEN_PAREN);
+		enterScope();
 		parameter_list();
 		expect(Token.Kind.CLOSE_PAREN);
 		expect(Token.Kind.COLON);
@@ -657,8 +663,10 @@ public class Parser {
 	 */
 	public void program() {
 		enterRule(NonTerminal.PROGRAM);
+		enterScope();
 		declaration_list();
 		expect(Token.Kind.EOF);
+		exitScope();
 		exitRule(NonTerminal.PROGRAM);
 	}
 
@@ -668,21 +676,26 @@ public class Parser {
      * Initialize the symboltable with predefined symbols.
      */
     private void initSymbolTable() {
-        throw new RuntimeException("implement this");
+        for (String function : symbolTable.PREDEF_FUNCS) {
+			tryDeclareSymbol(function);
+        }
     }
 
     /**
      * Enters a new scobe for symbols.
      */
     private void enterScope() {
-        throw new RuntimeException("implement this");
+        if (symbolTable.getDepth() != 0) {
+        	symbolTable = new SymbolTable(symbolTable);
+        }
     }
 
     /**
      * Exit current symbol scope.
      */
     private void exitScope() {
-        throw new RuntimeException("implement this");
+       //SymbolTable parent = symbolTable.getParent();
+       	symbolTable = (symbolTable.getDepth() == 0) ? symbolTable : symbolTable.getParent();
     }
 
     /**
@@ -693,7 +706,7 @@ public class Parser {
     private Symbol tryResolveSymbol(String name) {
         try {
             return symbolTable.lookup(name);
-        } catch (SymbolNotFoundError e) {
+        } catch (SymbolNotFoundError snfe) {
             String message = reportResolveSymbolError(name);
             return new ErrorSymbol(message);
         }
@@ -718,6 +731,10 @@ public class Parser {
      */
     private Symbol tryDeclareSymbol(String name) {
         try {
+            if (symbolTable == null) {
+				System.err.println("NULL syboltable.");
+				System.exit(-23);
+            }
             return symbolTable.insert(name);
         } catch (RedeclarationError re) {
             String message = reportDeclareSymbolError(name);
@@ -756,8 +773,9 @@ public class Parser {
      */
     private Token expectRetrieve(NonTerminal nt) {
         Token tok = currentToken;
-        if (accept(nt))
+        if (accept(nt)) {
             return tok;
+        }
         String errorMessage = reportSyntaxError(nt);
         throw new QuitParseException(errorMessage);
         //return ErrorToken(errorMessage);
@@ -768,9 +786,11 @@ public class Parser {
      */
     private String expectIdentifier() {
         String name = currentToken.lexeme();
-        if (expect(Token.Kind.IDENTIFIER))
+        if (expect(Token.Kind.IDENTIFIER)) {
             return name;
-        return null;
+        } else {
+        	return null;
+        }
     }
 
     /**
@@ -778,9 +798,11 @@ public class Parser {
      */
     private Integer expectInteger() {
         String num = currentToken.lexeme();
-        if (expect(Token.Kind.INTEGER))
+        if (expect(Token.Kind.INTEGER)) {
             return Integer.valueOf(num);
-        return null;
+        } else {
+        	return null;
+        }
     }
 
 	/**

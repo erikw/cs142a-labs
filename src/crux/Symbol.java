@@ -4,7 +4,6 @@ package crux;
  * Represenation of a symbol.
  */
 public class Symbol {
-
     /* The name of the symbol. */
     private String name;
 
@@ -42,12 +41,13 @@ public class Symbol {
     }
 }
 
+// TODO make private, inner?
 /**
  * An smbol representing an error.
  */
 class ErrorSymbol extends Symbol {
     /**
-     * Construct a new erro symbol.
+     * Construct a new error symbol.
      */
     public ErrorSymbol(String message) {
         super(message);

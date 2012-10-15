@@ -96,6 +96,22 @@ public class TestFiles {
 			testFilesIn("lab2/private");
 		}
 
+	// Lab 3 tests.
+	@Test
+		public void testLab3Public() {
+			compiler.setLab(crux.Compiler.Lab.LAB3);
+			testFilesIn("lab3/public");
+		}
+
+	@Test
+		public void testLab3Private() {
+			compiler.setLab(crux.Compiler.Lab.LAB3);
+			testFilesIn("lab3/private");
+		}
+
+
+	// Helper functions.
+
 	private void testFilesIn(String subdir) {
 		File dir = new File(fileRoot + "/" + subdir);
 		String[] cruxFiles = dir.list(new FilenameFilter() {
