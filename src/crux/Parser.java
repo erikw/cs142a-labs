@@ -237,17 +237,7 @@ public class Parser {
 	 */
 	public void literal() {
 		enterRule(NonTerminal.LITERAL);
-		if (have(Token.Kind.INTEGER)) {
-			expect(Token.Kind.INTEGER);
-		} else if (have(Token.Kind.FLOAT)) {
-			expect(Token.Kind.FLOAT);
-		} else if (have(Token.Kind.TRUE)) {
-			expect(Token.Kind.TRUE);
-		} else if (have(Token.Kind.FALSE)) {
-			expect(Token.Kind.FALSE);
-		} else {
-			throw new QuitParseException(reportSyntaxError(NonTerminal.LITERAL));
-		}
+		expect(NonTerminal.LITERAL);
 		exitRule(NonTerminal.LITERAL);
 	}
 
@@ -281,21 +271,7 @@ public class Parser {
 	 */
 	public void op0() {
 		enterRule(NonTerminal.OP0);
-		if (have(Token.Kind.GREATER_EQUAL)) {
-			expect(Token.Kind.GREATER_EQUAL);
-		} else if (have(Token.Kind.LESSER_EQUAL)) {
-			expect(Token.Kind.LESSER_EQUAL);
-		} else if (have(Token.Kind.NOT_EQUAL)) {
-			expect(Token.Kind.NOT_EQUAL);
-		} else if (have(Token.Kind.EQUAL)) {
-			expect(Token.Kind.EQUAL);
-		} else if (have(Token.Kind.GREATER_THAN)) {
-			expect(Token.Kind.GREATER_THAN);
-		} else if (have(Token.Kind.LESS_THAN)) {
-			expect(Token.Kind.LESS_THAN);
-		} else {
-			throw new QuitParseException(reportSyntaxError(NonTerminal.OP0));
-		}
+		expect(NonTerminal.OP0);
 		exitRule(NonTerminal.OP0);
 	}
 
@@ -305,15 +281,7 @@ public class Parser {
 	 */
 	public void op1() {
 		enterRule(NonTerminal.OP1);
-		if (have(Token.Kind.ADD)) {
-			expect(Token.Kind.ADD);
-		} else if (have(Token.Kind.SUB)) {
-			expect(Token.Kind.SUB);
-		} else if (have(Token.Kind.OR)) {
-			expect(Token.Kind.OR);
-		} else {
-			throw new QuitParseException(reportSyntaxError(NonTerminal.OP1));
-		}
+		expect(NonTerminal.OP1);
 		exitRule(NonTerminal.OP1);
 	}
 
@@ -323,15 +291,7 @@ public class Parser {
 	 */
 	public void op2() {
 		enterRule(NonTerminal.OP2);
-		if (have(Token.Kind.MUL)) {
-			expect(Token.Kind.MUL);
-		} else if (have(Token.Kind.DIV)) {
-			expect(Token.Kind.DIV);
-		} else if (have(Token.Kind.AND)) {
-			expect(Token.Kind.AND);
-		} else {
-			throw new QuitParseException(reportSyntaxError(NonTerminal.OP2));
-		}
+		expect(NonTerminal.OP2);
 		exitRule(NonTerminal.OP2);
 	}
 

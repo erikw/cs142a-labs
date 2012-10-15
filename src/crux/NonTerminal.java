@@ -214,7 +214,7 @@ public enum NonTerminal {
 
 	/**
 	 * Get the first set of this non terminal.
-	 * @return The first est.
+	 * @return The first set.
 	 */
 	public final Set<Token.Kind> firstSet() {
 		return firstSet;
