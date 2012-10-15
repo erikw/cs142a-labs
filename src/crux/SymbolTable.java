@@ -103,7 +103,6 @@ public class SymbolTable {
         	indent += "  ";
         }
 
-        //for (Symbol s : table) 
         for (Symbol s : table.values()) {
             sb.append(indent + s.toString() + "\n");
         }

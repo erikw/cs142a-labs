@@ -1,5 +1,5 @@
 Error parsing file.
-ResolveSymbolError(7,10)[Could not find foo.]
+ResolveSymbolError(7,7)[Could not find foo.]
 Symbol(readInt)
 Symbol(readFloat)
 Symbol(printBool)

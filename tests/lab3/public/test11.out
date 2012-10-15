@@ -1,5 +1,5 @@
 Error parsing file.
-ResolveSymbolError(15,15)[Could not find _.]
+ResolveSymbolError(15,13)[Could not find _.]
 Symbol(readInt)
 Symbol(readFloat)
 Symbol(printBool)
@@ -15,7 +15,7 @@ Symbol(destroy_all_humans)
   Symbol(greek)
     Symbol(x)
 
-ResolveSymbolError(17,11)[Could not find x.]
+ResolveSymbolError(17,9)[Could not find x.]
 Symbol(readInt)
 Symbol(readFloat)
 Symbol(printBool)
@@ -30,7 +30,7 @@ Symbol(destroy_all_humans)
   Symbol(laMbda)
   Symbol(greek)
 
-ResolveSymbolError(18,11)[Could not find y.]
+ResolveSymbolError(18,9)[Could not find y.]
 Symbol(readInt)
 Symbol(readFloat)
 Symbol(printBool)
@@ -45,7 +45,7 @@ Symbol(destroy_all_humans)
   Symbol(laMbda)
   Symbol(greek)
 
-DeclareSymbolError(21,10)[gorn already exists.]
+DeclareSymbolError(21,5)[gorn already exists.]
 Symbol(readInt)
 Symbol(readFloat)
 Symbol(printBool)

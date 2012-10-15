@@ -1,5 +1,5 @@
 Error parsing file.
-DeclareSymbolError(4,6)[a already exists.]
+DeclareSymbolError(4,5)[a already exists.]
 Symbol(readInt)
 Symbol(readFloat)
 Symbol(printBool)

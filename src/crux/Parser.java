@@ -660,14 +660,16 @@ public class Parser {
 
     /**
      * Try to resolve a given symbol name.
-     * @param name The symbol name to look up.
+     * @param ident The identifier to resolve.
      * @return A found matching symbol or ErrorSymbol.
      */
-    private Symbol tryResolveSymbol(String name) {
+    private Symbol tryResolveSymbol(Token ident) {
+        assert(ident.is(Token.Kind.IDENTIFIER));
+        String name = ident.lexeme();
         try {
             return symbolTable.lookup(name);
         } catch (SymbolNotFoundError snfe) {
-            String message = reportResolveSymbolError(name);
+            String message = reportResolveSymbolError(name, ident.lineNumber(), ident.charPosition());
             return new ErrorSymbol(message);
         }
     }
@@ -675,10 +677,12 @@ public class Parser {
     /**
      * Report a resolve error for a given symbol name.
      * @param name The errornous symbol name.
+     * @param lineNum The line number where the error occured.
+     * @param charPos The character position where the error occured.
      * @return An error message built from the current symbol.
      */
-    private String reportResolveSymbolError(String name) {
-        String message = "ResolveSymbolError(" + lineNumber() + "," + charPosition() + ")[Could not find " + name + ".]";
+    private String reportResolveSymbolError(String name, int lineNum, int charPos) {
+        String message = "ResolveSymbolError(" + lineNum + "," + charPos + ")[Could not find " + name + ".]";
         errorBuffer.append(message + "\n");
         errorBuffer.append(symbolTable.toString() + "\n");
         return message;
@@ -686,18 +690,16 @@ public class Parser {
 
     /**
      * Try to declare a symbo name.
-     * @param name The symbol name to declare.
+     * @param ident The identifier to declare.
      * @return The new symbol or ErrorSymbol if it already existed.
      */
-    private Symbol tryDeclareSymbol(String name) {
+    private Symbol tryDeclareSymbol(Token ident) {
+        assert(ident.is(Token.Kind.IDENTIFIER));
+        String name = ident.lexeme();
         try {
-            if (symbolTable == null) {
-				System.err.println("NULL syboltable.");
-				System.exit(-23);
-            }
             return symbolTable.insert(name);
         } catch (RedeclarationError re) {
-            String message = reportDeclareSymbolError(name);
+            String message = reportDeclareSymbolError(name, ident.lineNumber(), ident.charPosition());
             return new ErrorSymbol(message);
         }
     }
@@ -705,10 +707,12 @@ public class Parser {
     /**
      * Report a redeclaration error for a symbol name.
      * @param name The redeclared symbol name.
+     * @param lineNum The line number where the error occured.
+     * @param charPos The character position where the error occured.
      * @return An error message generated from the current information.
      */
-    private String reportDeclareSymbolError(String name) {
-        String message = "DeclareSymbolError(" + lineNumber() + "," + charPosition() + ")[" + name + " already exists.]";
+    private String reportDeclareSymbolError(String name, int lineNum, int charPos) {
+        String message = "DeclareSymbolError(" + lineNum + "," + charPos + ")[" + name + " already exists.]";
         errorBuffer.append(message + "\n");
         errorBuffer.append(symbolTable.toString() + "\n");
         return message;
@@ -742,7 +746,7 @@ public class Parser {
     }
 
     /**
-     * TODO
+     * TODO was in original skel but not new one.
      */
     private String expectIdentifier() {
         String name = currentToken.lexeme();
