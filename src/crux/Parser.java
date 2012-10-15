@@ -460,10 +460,8 @@ public class Parser {
 		enterRule(NonTerminal.FUNCTION_DEFINITION);
 		expect(Token.Kind.FUNC);
 		//expect(Token.Kind.IDENTIFIER); // TODO switch on currentlab to preserve behaviour from lab2? or do that in the symbol error reporting?
-		String identifier = expectIdentifier();
-		if (identifier != null ) {
-			tryDeclareSymbol(identifier); // TODO do we need to save ref to returned (error?) symbol?
-		}
+		Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
+		tryDeclareSymbol(identifier);	// TODO do we need to save ref to returned (error?) symbol?	
 		expect(Token.Kind.OPEN_PAREN);
 		enterScope();
 		parameter_list();
@@ -636,8 +634,8 @@ public class Parser {
      * Initialize the symboltable with predefined symbols.
      */
     private void initSymbolTable() {
-        for (String function : symbolTable.PREDEF_FUNCS) {
-			tryDeclareSymbol(function);
+        for (String predefFunction : symbolTable.PREDEF_FUNCS) {
+			symbolTable.insert(predefFunction);
         }
     }
 
@@ -689,7 +687,7 @@ public class Parser {
     }
 
     /**
-     * Try to declare a symbo name.
+     * Try to declare a symbol name.
      * @param ident The identifier to declare.
      * @return The new symbol or ErrorSymbol if it already existed.
      */
