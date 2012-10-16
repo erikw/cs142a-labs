@@ -1,0 +1,12 @@
+// test all expression3
+
+func main() : type {
+  let a = not 5;
+  let a = (4);
+  let a = b[3];
+  let a = ::foo();
+  let a = 9;
+  let a = 3.4;
+  let a = true;
+  let a = false;
+}

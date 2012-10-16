@@ -1,0 +1,8 @@
+// test expression-list empty
+
+func main() : void {
+  ::call();
+  ::call(4);
+  ::call(3,5,7,9,0,2,3,4);
+}
+
