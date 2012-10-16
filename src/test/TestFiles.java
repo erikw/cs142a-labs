@@ -167,7 +167,7 @@ public class TestFiles {
 			StringBuilder errBuilder = new StringBuilder();
 			errBuilder.append("Wrong compiler output.\n");
 			if (exitException != null) {
-				errBuilder.append("Compilation caused a System.exit(");
+				errBuilder.append("(cux-)Compilation caused a System.exit(");
 				errBuilder.append(exitException.getExitCode()).append(")\n");
 			}
 			if (!errStr.isEmpty()) {

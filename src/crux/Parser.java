@@ -442,7 +442,9 @@ public class Parser {
 	public void array_declaration() {
 		enterRule(NonTerminal.ARRAY_DECLARATION);
 		expect(Token.Kind.ARRAY);
-		expect(Token.Kind.IDENTIFIER);
+		//expect(Token.Kind.IDENTIFIER);
+		Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
+		tryDeclareSymbol(identifier);
 		expect(Token.Kind.COLON);
 		type();
 		expect(Token.Kind.OPEN_BRACKET);
@@ -625,10 +627,8 @@ public class Parser {
 	 */
 	public void program() {
 		enterRule(NonTerminal.PROGRAM);
-		enterScope();
 		declaration_list();
 		expect(Token.Kind.EOF);
-		exitScope();
 		exitRule(NonTerminal.PROGRAM);
 	}
 
@@ -647,17 +647,16 @@ public class Parser {
      * Enters a new scobe for symbols.
      */
     private void enterScope() {
-        if (symbolTable.getDepth() != 0) {
-        	symbolTable = new SymbolTable(symbolTable);
-        }
+        symbolTable = new SymbolTable(symbolTable);
     }
 
     /**
      * Exit current symbol scope.
      */
     private void exitScope() {
-       	//SymbolTable parent = symbolTable.getParent();
-       	symbolTable = (symbolTable.getDepth() == 0) ? symbolTable : symbolTable.getParent();
+       	if (symbolTable.getDepth() != 0) {
+       		symbolTable = symbolTable.getParent();
+       	}
     }
 
     /**
