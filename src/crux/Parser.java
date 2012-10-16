@@ -247,18 +247,8 @@ public class Parser {
 	 **/
 	public void designator() {
 		enterRule(NonTerminal.DESIGNATOR);
-		switch (Compiler.currentLab) {
-			case LAB2:
-				expect(Token.Kind.IDENTIFIER);
-				break;
-			case LAB3:
-				Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
-				tryResolveSymbol(identifier); // TODO save return value?
-				break;
-			default:
-				System.err.println("Unsupported lab.");
-				System.exit(1);
-		}
+		Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
+		tryResolveSymbol(identifier); // TODO save return value?
 		while (accept(Token.Kind.OPEN_BRACKET)) {
 			expression0();
 			expect(Token.Kind.CLOSE_BRACKET);
@@ -380,18 +370,8 @@ public class Parser {
 	public void call_expression() {
 		enterRule(NonTerminal.CALL_EXPRESSION);
 		expect(Token.Kind.CALL);
-		switch (Compiler.currentLab) {
-			case LAB2:
-				expect(Token.Kind.IDENTIFIER);
-				break;
-			case LAB3:
-				Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
-				tryResolveSymbol(identifier);
-				break;
-			default:
-				System.err.println("Unsupported lab.");
-				System.exit(1);
-		}
+		Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
+		tryResolveSymbol(identifier);
 		expect(Token.Kind.OPEN_PAREN);
 		expression_list();
 		expect(Token.Kind.CLOSE_PAREN);
@@ -418,18 +398,8 @@ public class Parser {
 	 */
 	public void paramter() {
 		enterRule(NonTerminal.PARAMETER);
-		switch (Compiler.currentLab) {
-			case LAB2:
-				expect(Token.Kind.IDENTIFIER);
-				break;
-			case LAB3:
-				Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
-				tryDeclareSymbol(identifier);
-				break;
-			default:
-				System.err.println("Unsupported lab.");
-				System.exit(1);
-		}
+		Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
+		tryDeclareSymbol(identifier);
 		expect(Token.Kind.COLON);
 		type();
 		exitRule(NonTerminal.PARAMETER);
@@ -457,7 +427,8 @@ public class Parser {
 	public void variable_declaration() {
 		enterRule(NonTerminal.VARIABLE_DECLARATION);
 		expect(Token.Kind.VAR);
-		expect(Token.Kind.IDENTIFIER);
+		Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
+		tryDeclareSymbol(identifier);
 		expect(Token.Kind.COLON);
 		type();
 		expect(Token.Kind.SEMICOLON);
@@ -493,18 +464,8 @@ public class Parser {
 		// TODO can function be defined inside other functions or are the always at the root-scope?
 		enterRule(NonTerminal.FUNCTION_DEFINITION);
 		expect(Token.Kind.FUNC);
-		switch (Compiler.currentLab) {
-			case LAB2:
-				expect(Token.Kind.IDENTIFIER);
-				break;
-			case LAB3:
-				Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
-				tryDeclareSymbol(identifier);	// TODO do we need to save ref to returned (error?) symbol?	
-				break;
-			default:
-				System.err.println("Unsupported lab.");
-				System.exit(1);
-		}
+		Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
+		tryDeclareSymbol(identifier);	// TODO do we need to save ref to returned (error?) symbol?	
 		expect(Token.Kind.OPEN_PAREN);
 		enterScope();
 		parameter_list();
@@ -724,8 +685,10 @@ public class Parser {
      */
     private String reportResolveSymbolError(String name, int lineNum, int charPos) {
         String message = "ResolveSymbolError(" + lineNum + "," + charPos + ")[Could not find " + name + ".]";
-        errorBuffer.append(message + "\n");
-        errorBuffer.append(symbolTable.toString() + "\n");
+        if (Compiler.currentLab != Compiler.Lab.LAB2) {
+        	errorBuffer.append(message + "\n");
+        	errorBuffer.append(symbolTable.toString() + "\n");
+        }
         return message;
     }
 
@@ -754,8 +717,10 @@ public class Parser {
      */
     private String reportDeclareSymbolError(String name, int lineNum, int charPos) {
         String message = "DeclareSymbolError(" + lineNum + "," + charPos + ")[" + name + " already exists.]";
-        errorBuffer.append(message + "\n");
-        errorBuffer.append(symbolTable.toString() + "\n");
+        if (Compiler.currentLab != Compiler.Lab.LAB2) {
+        	errorBuffer.append(message + "\n");
+        	errorBuffer.append(symbolTable.toString() + "\n");
+        }
         return message;
     }    
 
