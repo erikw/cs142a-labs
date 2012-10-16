@@ -248,7 +248,7 @@ public class Parser {
 	public void designator() {
 		enterRule(NonTerminal.DESIGNATOR);
 		Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
-		tryResolveSymbol(identifier); // TODO save return value?
+		tryResolveSymbol(identifier);
 		while (accept(Token.Kind.OPEN_BRACKET)) {
 			expression0();
 			expect(Token.Kind.CLOSE_BRACKET);
@@ -262,7 +262,7 @@ public class Parser {
 	 */
 	public void type() {
 		enterRule(NonTerminal.TYPE);
-		// TODO when to check that the identifier is one of {void, bool, int, float}? should these be in the symbol table?
+		// TODO in a future lab, check that the identifier is one of {void, bool, int, float}? should these be in the symbol table
 		expect(Token.Kind.IDENTIFIER);
 		exitRule(NonTerminal.TYPE);
 	}
@@ -463,11 +463,10 @@ public class Parser {
 	 * function-definition := "func" IDENTIFIER "(" parameter-list ")" ":" type statement-block .
 	 */
 	public void function_definition() {
-		// TODO can function be defined inside other functions or are the always at the root-scope?
 		enterRule(NonTerminal.FUNCTION_DEFINITION);
 		expect(Token.Kind.FUNC);
 		Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
-		tryDeclareSymbol(identifier);	// TODO do we need to save ref to returned (error?) symbol?	
+		tryDeclareSymbol(identifier);
 		expect(Token.Kind.OPEN_PAREN);
 		enterScope();
 		parameter_list();
@@ -732,7 +731,10 @@ public class Parser {
 
 
     /**
-     * TODO
+     * Same as expect(Token.Kind) but the Token is returned.
+     * @param kind The expected kind.
+     * @return The found token.
+     * @throws QuitParseException when the token was not found.
      */
     private Token expectRetrieve(Token.Kind kind) {
         Token tok = currentToken;
@@ -745,7 +747,10 @@ public class Parser {
     }
 
     /**
-     * TODO
+     * Same as expect(NonTerminal) but the Token is returned.
+     * @param nt The expected kind.
+     * @return The found token.
+     * @throws QuitParseException when the token was not found.
      */
     private Token expectRetrieve(NonTerminal nt) {
         Token tok = currentToken;
@@ -758,19 +763,7 @@ public class Parser {
     }
 
     /**
-     * TODO was in original skel but not new one.
-     */
-    private String expectIdentifier() {
-        String name = currentToken.lexeme();
-        if (expect(Token.Kind.IDENTIFIER)) {
-            return name;
-        } else {
-        	return null;
-        }
-    }
-
-    /**
-     * TODO what's the point of this one?
+     * TODO might be needed in a future lab according to the TA.
      */
     private Integer expectInteger() {
         String num = currentToken.lexeme();
