@@ -247,7 +247,18 @@ public class Parser {
 	 **/
 	public void designator() {
 		enterRule(NonTerminal.DESIGNATOR);
-		expect(Token.Kind.IDENTIFIER);
+		switch (Compiler.currentLab) {
+			case LAB2:
+				expect(Token.Kind.IDENTIFIER);
+				break;
+			case LAB3:
+				Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
+				tryResolveSymbol(identifier); // TODO save return value?
+				break;
+			default:
+				System.err.println("Unsupported lab.");
+				System.exit(1);
+		}
 		while (accept(Token.Kind.OPEN_BRACKET)) {
 			expression0();
 			expect(Token.Kind.CLOSE_BRACKET);
@@ -261,6 +272,7 @@ public class Parser {
 	 */
 	public void type() {
 		enterRule(NonTerminal.TYPE);
+		// TODO when to check that the identifier is one of {void, bool, int, float}? should these be in the symbol table?
 		expect(Token.Kind.IDENTIFIER);
 		exitRule(NonTerminal.TYPE);
 	}
@@ -368,7 +380,18 @@ public class Parser {
 	public void call_expression() {
 		enterRule(NonTerminal.CALL_EXPRESSION);
 		expect(Token.Kind.CALL);
-		expect(Token.Kind.IDENTIFIER);
+		switch (Compiler.currentLab) {
+			case LAB2:
+				expect(Token.Kind.IDENTIFIER);
+				break;
+			case LAB3:
+				Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
+				tryResolveSymbol(identifier);
+				break;
+			default:
+				System.err.println("Unsupported lab.");
+				System.exit(1);
+		}
 		expect(Token.Kind.OPEN_PAREN);
 		expression_list();
 		expect(Token.Kind.CLOSE_PAREN);
@@ -395,7 +418,18 @@ public class Parser {
 	 */
 	public void paramter() {
 		enterRule(NonTerminal.PARAMETER);
-		expect(Token.Kind.IDENTIFIER);
+		switch (Compiler.currentLab) {
+			case LAB2:
+				expect(Token.Kind.IDENTIFIER);
+				break;
+			case LAB3:
+				Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
+				tryDeclareSymbol(identifier);
+				break;
+			default:
+				System.err.println("Unsupported lab.");
+				System.exit(1);
+		}
 		expect(Token.Kind.COLON);
 		type();
 		exitRule(NonTerminal.PARAMETER);
@@ -459,9 +493,18 @@ public class Parser {
 		// TODO can function be defined inside other functions or are the always at the root-scope?
 		enterRule(NonTerminal.FUNCTION_DEFINITION);
 		expect(Token.Kind.FUNC);
-		//expect(Token.Kind.IDENTIFIER); // TODO switch on currentlab to preserve behaviour from lab2? or do that in the symbol error reporting?
-		Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
-		tryDeclareSymbol(identifier);	// TODO do we need to save ref to returned (error?) symbol?	
+		switch (Compiler.currentLab) {
+			case LAB2:
+				expect(Token.Kind.IDENTIFIER);
+				break;
+			case LAB3:
+				Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
+				tryDeclareSymbol(identifier);	// TODO do we need to save ref to returned (error?) symbol?	
+				break;
+			default:
+				System.err.println("Unsupported lab.");
+				System.exit(1);
+		}
 		expect(Token.Kind.OPEN_PAREN);
 		enterScope();
 		parameter_list();
@@ -652,7 +695,7 @@ public class Parser {
      * Exit current symbol scope.
      */
     private void exitScope() {
-       //SymbolTable parent = symbolTable.getParent();
+       	//SymbolTable parent = symbolTable.getParent();
        	symbolTable = (symbolTable.getDepth() == 0) ? symbolTable : symbolTable.getParent();
     }
 
@@ -756,7 +799,7 @@ public class Parser {
     }
 
     /**
-     * TODO
+     * TODO what's the point of this one?
      */
     private Integer expectInteger() {
         String num = currentToken.lexeme();

@@ -68,7 +68,7 @@ public class SymbolTable {
      */
     private Symbol get(String name) {
         Symbol target = table.get(name);
-        if (target == null) {
+        if (target == null && parent !=null) {
         	target = parent.lookup(name);
         } 
 		return target;
