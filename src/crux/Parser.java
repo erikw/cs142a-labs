@@ -641,10 +641,10 @@ public class Parser {
 	// SymbolTable Management ==========================
 
     /**
-     * Initialize the symboltable with predefined symbols.
+     * Initialize the symbolTable with predefined symbols.
      */
     private void initSymbolTable() {
-        for (String predefFunction : symbolTable.PREDEF_FUNCS) {
+        for (String predefFunction : SymbolTable.PREDEF_FUNCS) {
 			symbolTable.insert(predefFunction);
         }
     }
@@ -653,16 +653,14 @@ public class Parser {
      * Enters a new scobe for symbols.
      */
     private void enterScope() {
-        symbolTable = new SymbolTable(symbolTable);
+        symbolTable = symbolTable.mutate();
     }
 
     /**
      * Exit current symbol scope.
      */
     private void exitScope() {
-       	if (symbolTable.getDepth() != 0) {
-       		symbolTable = symbolTable.getParent();
-       	}
+    	symbolTable = symbolTable.getParent();
     }
 
     /**
@@ -743,7 +741,6 @@ public class Parser {
         }
         String errorMessage = reportSyntaxError(kind);
         throw new QuitParseException(errorMessage);
-        //return ErrorToken(errorMessage);
     }
 
     /**
@@ -759,7 +756,6 @@ public class Parser {
         }
         String errorMessage = reportSyntaxError(nt);
         throw new QuitParseException(errorMessage);
-        //return ErrorToken(errorMessage);
     }
 
     /**

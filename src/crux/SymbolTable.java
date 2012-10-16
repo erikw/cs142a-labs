@@ -1,15 +1,13 @@
 package crux;
 
-//import java.util.Vector; // TODO huh?
 import java.util.Map;
 import java.util.LinkedHashMap;
-
-// TODO implement null object pattern to make recusrion more beautifull!
 
 /**
  * A table of symbols.
  */
-public class SymbolTable {
+@SuppressWarnings("unchecked") // Needed to suppress warning from whoIsMyFather. I know what I'm doing here.
+public class SymbolTable extends AbstractSymbolTable {
 	/* Functions that are available as a part of the crux language. */
     public static final String[] PREDEF_FUNCS = { 
         "readInt",
@@ -21,10 +19,7 @@ public class SymbolTable {
     };
 
     /* The parent scope of this table. */
-    private SymbolTable parent;
-
-    /* The depth of this scope. */
-    private int depth;
+    private AbstractSymbolTable parent;
 
     /* The known symbols and names in this scope. */
     private Map<String, Symbol> table;
@@ -33,16 +28,16 @@ public class SymbolTable {
      * Construct a new symbol table.
      */
     public SymbolTable() {
-        this(null);
+        this(AbstractSymbolTable.NULL);
     }
 
     /**
      * Construct a new symbol table with a parent.
      * @param parent The parent of this table.
      */
-    public SymbolTable(SymbolTable parent) {
+    public SymbolTable(AbstractSymbolTable parent) {
+		super(parent.depth + 1);
         this.parent = parent;
-        depth = (parent == null) ? 0 : (parent.getDepth() + 1);
         table = new LinkedHashMap<String, Symbol>();
     }
 
@@ -68,7 +63,7 @@ public class SymbolTable {
      */
     private Symbol get(String name) {
         Symbol target = table.get(name);
-        if (target == null && parent !=null) {
+        if (target == null) {
         	target = parent.lookup(name);
         } 
 		return target;
@@ -91,12 +86,11 @@ public class SymbolTable {
 
     /**
      * Get a string representation of the symbol table.
+     * @return A string representation of all the scopes.
      */
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        if (parent != null) {
-            sb.append(parent.toString());
-        }
+        sb.append(parent.toString());
 
         String indent = new String();
         for (int i = 0; i < depth; i++) {
@@ -110,23 +104,30 @@ public class SymbolTable {
     }
 
     /**
-     * Get the parent of this table.
-     * @return The parent symbol table of null if no sunch table exists.
+     * Create a new child symbol table from this table.
+     * @return A child symbol table.
      */
-    public SymbolTable getParent() {
-     	return parent;
+    public SymbolTable mutate() {
+    	return new SymbolTable(this);
     }
 
     /**
-     * Get the depth of this scope.
-     * @return The depth.
+     * Get the parent of this table.
+     * Uses helper method because the root table's parent (NULL) should not be
+     * exposed so we have to determine this in a nice way.
      */
-    public int getDepth() {
-     	return depth;
+    public SymbolTable getParent() {
+		return parent.whoIsMyFather(this);
+    }
+
+    /**
+     * The father of a child is its parent for normal tables.
+     */
+    protected SymbolTable whoIsMyFather(AbstractSymbolTable child) {
+    	return this; // Luke, I'm your father.
     }
 }
 
-// TODO visibillity?
 /**
  * An error representing the act of not finding a symbol in the table.
  */
@@ -153,7 +154,6 @@ class SymbolNotFoundError extends Error {
     }
 }
 
-// TODO visibillity?
 /**
  * An error representing the act redeclaring an symbol.
  */

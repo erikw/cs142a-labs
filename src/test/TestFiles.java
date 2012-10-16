@@ -229,6 +229,8 @@ public class TestFiles {
 	 * Exception thrown when the program tried to do a System.exit().
 	 */
 	private static class SysExitException extends SecurityException {
+		private static final long serialVersionUID = 1L;
+
 		/* The exit code that was used during System.exit(). */
 		private int exitCode;
 		/* Construct a exception with an exitcode.

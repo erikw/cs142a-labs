@@ -41,9 +41,8 @@ public class Symbol {
     }
 }
 
-// TODO make private, inner?
 /**
- * An smbol representing an error.
+ * An symbol representing an error.
  */
 class ErrorSymbol extends Symbol {
     /**
