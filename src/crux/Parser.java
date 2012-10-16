@@ -475,6 +475,7 @@ public class Parser {
 		expect(Token.Kind.COLON);
 		type();
 		statement_block();
+		exitScope();
 		exitRule(NonTerminal.FUNCTION_DEFINITION);
 	}
 
@@ -541,9 +542,13 @@ public class Parser {
 		enterRule(NonTerminal.IF_STATEMENT);
 		expect(Token.Kind.IF);
 		expression0();
+		enterScope();
 		statement_block();
+		exitScope();
 		if (accept(Token.Kind.ELSE)) {
+			enterScope();
 			statement_block();
+			exitScope();
 		}
 		exitRule(NonTerminal.IF_STATEMENT);
 	}
@@ -556,7 +561,9 @@ public class Parser {
 		enterRule(NonTerminal.WHILE_STATEMENT);
 		expect(Token.Kind.WHILE);
 		expression0();
+		enterScope();
 		statement_block();
+		exitScope();
 		exitRule(NonTerminal.WHILE_STATEMENT);
 	}
 
