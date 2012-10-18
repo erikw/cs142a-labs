@@ -1,0 +1,10 @@
+// syntax error on if-statement
+
+func id(id1:void,id2:void,id3:void) : type {
+  if a < b {}
+  if (a>b) {} else {}
+
+  if a > b
+  else {}
+}
+

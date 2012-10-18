@@ -1,0 +1,25 @@
+// test parameters
+
+func main() : void {
+  let a = 7;
+}
+
+func main(a : void) : void {
+  let a = 7;
+}
+
+func main(a: void, b:int) : void {
+  let a =  7;
+}
+
+func main(a:void, b:int, c:float) : void {
+  let a = 7;
+}
+
+func main(a:void, b:int, c:float, d:bool): void {
+  let a = 7;
+}
+
+func main(main : grue, b : gorn, c:int, d:void) : void {
+  let a = 7;
+}

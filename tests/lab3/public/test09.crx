@@ -1,0 +1,9 @@
+// test block-level scope
+
+func main() : void {
+  var a : int;
+  if (true) {
+    var a: float;
+    ::foo();
+  }
+}

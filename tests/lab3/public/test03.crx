@@ -1,0 +1,11 @@
+// function and variable of same name
+
+var foo : int;
+
+func foo() : void {
+  ::println();
+}
+
+func main() : void {
+  ::println();
+}

@@ -1,0 +1,5 @@
+// params of same name
+
+func foo(a:int, b:float, a:bool) : void {
+  ::println();
+}

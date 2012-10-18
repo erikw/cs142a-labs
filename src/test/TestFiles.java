@@ -71,14 +71,12 @@ public class TestFiles {
 	@Test
 		public void testLab1Private() {
 			compiler.setLab(crux.Compiler.Lab.LAB1);
-			testFilesIn("lab1/public");
 			testFilesIn("lab1/private");
 		}
 
 	@Test
 		public void testLab1PrivateSecret() {
 			compiler.setLab(crux.Compiler.Lab.LAB1);
-			testFilesIn("lab1/public");
 			testFilesIn("lab1/private_secret");
 		}
 
@@ -95,6 +93,28 @@ public class TestFiles {
 			compiler.setLab(crux.Compiler.Lab.LAB2);
 			testFilesIn("lab2/private");
 		}
+
+	@Test
+		public void testLab2PrivateSecret() {
+			compiler.setLab(crux.Compiler.Lab.LAB2);
+			testFilesIn("lab2/private_secret");
+		}
+
+	// Lab 3 tests.
+	@Test
+		public void testLab3Public() {
+			compiler.setLab(crux.Compiler.Lab.LAB3);
+			testFilesIn("lab3/public");
+		}
+
+	@Test
+		public void testLab3Private() {
+			compiler.setLab(crux.Compiler.Lab.LAB3);
+			testFilesIn("lab3/private");
+		}
+
+
+	// Helper functions.
 
 	private void testFilesIn(String subdir) {
 		File dir = new File(fileRoot + "/" + subdir);
@@ -151,7 +171,7 @@ public class TestFiles {
 			StringBuilder errBuilder = new StringBuilder();
 			errBuilder.append("Wrong compiler output.\n");
 			if (exitException != null) {
-				errBuilder.append("Compilation caused a System.exit(");
+				errBuilder.append("(cux-)Compilation caused a System.exit(");
 				errBuilder.append(exitException.getExitCode()).append(")\n");
 			}
 			if (!errStr.isEmpty()) {
@@ -213,6 +233,8 @@ public class TestFiles {
 	 * Exception thrown when the program tried to do a System.exit().
 	 */
 	private static class SysExitException extends SecurityException {
+		private static final long serialVersionUID = 1L;
+
 		/* The exit code that was used during System.exit(). */
 		private int exitCode;
 		/* Construct a exception with an exitcode.

@@ -1,0 +1,8 @@
+// test declarations
+
+var id : type;
+array a  : void[3];
+array a : void[3] [4] [6    ];
+
+func id(id1:void,id2:void,id3:void) : type {}
+

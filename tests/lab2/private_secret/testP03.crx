@@ -1,0 +1,10 @@
+// test all possible expression2
+
+func main() : type {
+  
+  let a = 5;
+  let a = 4 * 3;
+  let a = 4 / 3;
+  let a = 4 and 3;
+  let a = 4 * 3 / 2 and 1;
+}

@@ -1,0 +1,9 @@
+// test all possible expression1
+
+func main() : type {
+  let a = 5;
+  let a = 4 + 4;
+  let a = 4 - 4;
+  let a = 4 or 4;
+  let a = 4 + 4 - 2 + 8 or 7;
+}

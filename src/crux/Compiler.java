@@ -31,7 +31,7 @@ public class Compiler {
 	public static enum Lab { LAB1, LAB2, LAB3, LAB4, LAB5, LAB6 };
 
 	/* Default lab if not specified. */
-	private static final Lab DEFAULT_LAB = Lab.LAB2;
+	private static final Lab DEFAULT_LAB = Lab.LAB3;
 
 	/* A mapping from integers to enum constants. */
 	private static final Map<Integer, Compiler.Lab> labLookup = new HashMap<Integer, Compiler.Lab>() {
@@ -83,7 +83,7 @@ public class Compiler {
             System.err.println("Error accessing the source file: \"" + cruxFile + "\".");
 			System.exit(-2);
         }
-		switch(currentLab) {
+		switch (currentLab) {
 			case LAB1:
 				// Lab #1 with output being the tokens.
 				Token token;
@@ -93,7 +93,7 @@ public class Compiler {
 				} while (!token.is(Token.Kind.EOF));
 				break;
 			case LAB2:
-				// Lab #2 that prints the parse tree.
+			case LAB3:
 				Parser parser = new Parser(scanner);
 				parser.parse();
 				if (parser.hasError()) {
@@ -101,7 +101,16 @@ public class Compiler {
 					System.out.println(parser.errorReport());
 					System.exit(-3);
 				}
-				System.out.println(parser.parseTreeReport());
+				switch (currentLab) {
+					case LAB2:
+						// Lab #2 that prints the parse tree.
+						System.out.println(parser.parseTreeReport());
+						break;
+					case LAB3:
+        				// Lab #3 that builds builds a symbol table.
+        				System.out.println("Crux program successfully parsed.");
+						break;
+				}
 				break;
 			default:
 				System.err.println("What lab are you working on?");

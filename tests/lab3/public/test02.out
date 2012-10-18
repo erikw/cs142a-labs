@@ -1,0 +1,11 @@
+Error parsing file.
+DeclareSymbolError(4,5)[a already exists.]
+Symbol(readInt)
+Symbol(readFloat)
+Symbol(printBool)
+Symbol(printInt)
+Symbol(printFloat)
+Symbol(println)
+Symbol(a)
+
+

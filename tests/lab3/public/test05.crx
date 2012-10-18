@@ -1,0 +1,9 @@
+// shadow global with local
+
+var a : int;
+
+func main() : void {
+  var a : float;
+
+  ::printFloat(a);
+}

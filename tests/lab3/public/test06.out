@@ -1,0 +1,11 @@
+Error parsing file.
+ResolveSymbolError(4,5)[Could not find foo.]
+Symbol(readInt)
+Symbol(readFloat)
+Symbol(printBool)
+Symbol(printInt)
+Symbol(printFloat)
+Symbol(println)
+Symbol(main)
+
+
