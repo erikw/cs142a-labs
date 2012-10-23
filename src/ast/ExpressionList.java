@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Command for an expression list.
+ */
 public class ExpressionList extends Command implements Iterable<Expression> {
 	
 	private List<Expression> list;
@@ -21,12 +24,10 @@ public class ExpressionList extends Command implements Iterable<Expression> {
 		return list.size();
 	}
 
-	@Override
 	public Iterator<Expression> iterator() {
 		return list.iterator();
 	}
 
-	@Override
 	public void accept(CommandVisitor visitor) {
 		visitor.visit(this);
 	}

@@ -1,19 +1,18 @@
 package ast;
 
+/**
+ * Command for a comparsion.
+ */
 public class Comparison extends Command implements Expression {
-	
 	private Expression left;
 	private Expression right;
 	private Operation op;
 	
-	public enum Operation
-	{
-		GT,
-		GE,
-		EQ,
-		NE,
-		LE,
-		LT;
+	/**
+	 * The different types of comparsions.
+	 */
+	public enum Operation {
+		GT, GE, EQ, NE, LE, LT;
 	}
 
 	public Comparison(int lineNum, int charPos, Expression leftSide, Operation op, Expression rightSide) {
@@ -35,12 +34,10 @@ public class Comparison extends Command implements Expression {
 		return op;
 	}
 	
-	@Override
 	public String toString() {
 		return super.toString() + "[" + op + "]";
 	}
 	
-	@Override
 	public void accept(CommandVisitor visitor) {
 		visitor.visit(this);
 	}

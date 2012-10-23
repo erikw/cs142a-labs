@@ -2,6 +2,9 @@ package ast;
 
 import crux.Symbol;
 
+/**
+ * Command for a function call.
+ */
 public class Call extends Command implements Statement, Expression {
 	
 	private Symbol func;
@@ -21,14 +24,11 @@ public class Call extends Command implements Statement, Expression {
 		return args;
 	}
 	
-	@Override
 	public String toString() {
 		return super.toString() + "[" + func + "]";
 	}
 
-	@Override
 	public void accept(CommandVisitor visitor) {
 		visitor.visit(this);
 	}
-
 }

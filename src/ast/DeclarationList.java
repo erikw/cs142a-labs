@@ -4,8 +4,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Command for a declaration list.
+ */
 public class DeclarationList extends Command implements Iterable<Declaration> {
 	
+	/* The list of declarations. */
 	private List<Declaration> list;
 	
 	public DeclarationList(int lineNum, int charPos) {
@@ -13,16 +17,18 @@ public class DeclarationList extends Command implements Iterable<Declaration> {
 		list = new ArrayList<Declaration>();
 	}
 	
+	/**
+	 * Add a command to this list.
+	 * @param command The command to add.
+	 */
 	public void add(Declaration command) {
 		list.add(command);
 	}
 
-	@Override
 	public Iterator<Declaration> iterator() {
 		return list.iterator();
 	}
 
-	@Override
 	public void accept(CommandVisitor visitor) {
 		visitor.visit(this);
 	}

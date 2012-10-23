@@ -1,5 +1,8 @@
 package ast;
 
+/**
+ * Command for a literal float type.
+ */
 public class LiteralFloat extends Command implements Expression {
 	
 	private Float value;
@@ -13,14 +16,11 @@ public class LiteralFloat extends Command implements Expression {
 		return value;
 	}
 	
-	@Override
 	public String toString() {
 		return super.toString() + "[" + value + "]";
 	}
 
-	@Override
 	public void accept(CommandVisitor visitor) {
 		visitor.visit(this);
 	}
-
 }

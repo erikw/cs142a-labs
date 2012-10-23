@@ -2,6 +2,9 @@ package ast;
 
 import crux.Symbol;
 
+/**
+ * A command for a variable declaration.
+ */
 public class VariableDeclaration extends Command implements Declaration, Statement {
 
 	private Symbol sym;
@@ -11,19 +14,15 @@ public class VariableDeclaration extends Command implements Declaration, Stateme
 		this.sym = sym;
 	}
 	
-	@Override
 	public Symbol symbol() {
 		return sym;
 	}
 	
-	@Override
 	public String toString() {
 		return super.toString() + "[" + sym.toString() + "]";
 	}
 
-	@Override
 	public void accept(CommandVisitor visitor) {
 		visitor.visit(this);
 	}
-
 }

@@ -1,7 +1,9 @@
 package ast;
 
+/**
+ * Command for an if-else-branch.
+ */
 public class IfElseBranch extends Command implements Statement {
-	
 	private Expression cond;
 	private StatementList thenBlock;
 	private StatementList elseBlock;
@@ -25,9 +27,7 @@ public class IfElseBranch extends Command implements Statement {
 		return elseBlock;
 	}
 
-	@Override
 	public void accept(CommandVisitor visitor) {
 		visitor.visit(this);
 	}
-
 }

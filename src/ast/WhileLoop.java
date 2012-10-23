@@ -1,5 +1,8 @@
 package ast;
 
+/**
+ * Command for a while loop.
+ */
 public class WhileLoop extends Command implements Statement {
 	
 	private Expression cond;
@@ -21,9 +24,7 @@ public class WhileLoop extends Command implements Statement {
 		return body;
 	}
 
-	@Override
 	public void accept(CommandVisitor visitor) {
 		visitor.visit(this);
 	}
-
 }

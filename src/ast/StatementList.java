@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * A command for a statement list.
+ */
 public class StatementList extends Command implements Iterable<Statement> {
-	
 	private List<Statement> list;
 	
 	public StatementList(int lineNum, int charPos) {
@@ -17,12 +19,10 @@ public class StatementList extends Command implements Iterable<Statement> {
 		list.add(command);
 	}
 
-	@Override
 	public Iterator<Statement> iterator() {
 		return list.iterator();
 	}
 
-	@Override
 	public void accept(CommandVisitor visitor) {
 		visitor.visit(this);
 	}

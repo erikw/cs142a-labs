@@ -1,4 +1,3 @@
-   
 Command (abstract base)
 |- DeclarationList
 |- StatementList

@@ -1,7 +1,9 @@
 package ast;
 
+/**
+ * Command for a dereference.
+ */
 public class Dereference extends Command implements Expression {
-	
 	private Expression expression;
 	
 	public Dereference(int lineNum, int charPos, Expression expression) {
@@ -13,7 +15,6 @@ public class Dereference extends Command implements Expression {
 		return expression;
 	}
 
-	@Override
 	public void accept(CommandVisitor visitor) {
 		visitor.visit(this);
 	}

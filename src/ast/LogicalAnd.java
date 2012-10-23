@@ -1,5 +1,8 @@
 package ast;
 
+/**
+ * Command for a locigal and.
+ */
 public class LogicalAnd extends Command implements Expression {
 	private Expression left;
 	private Expression right;
@@ -18,7 +21,6 @@ public class LogicalAnd extends Command implements Expression {
 		return right;
 	}
 	
-	@Override
 	public void accept(CommandVisitor visitor) {
 		visitor.visit(this);
 	}

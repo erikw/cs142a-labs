@@ -1,5 +1,8 @@
 package ast;
 
+/**
+ * Command for a literal boolean type.
+ */
 public class LiteralBool extends Command implements Expression {
 	
 	public enum Value
@@ -19,14 +22,11 @@ public class LiteralBool extends Command implements Expression {
 		return value;
 	}
 	
-	@Override
 	public String toString() {
 		return super.toString() + "[" + value + "]";
 	}
 	
-	@Override
 	public void accept(CommandVisitor visitor) {
 		visitor.visit(this);
 	}
-
 }
