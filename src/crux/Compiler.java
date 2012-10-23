@@ -31,7 +31,7 @@ public class Compiler {
 	public static enum Lab { LAB1, LAB2, LAB3, LAB4, LAB5, LAB6 };
 
 	/* Default lab if not specified. */
-	private static final Lab DEFAULT_LAB = Lab.LAB3;
+	private static final Lab DEFAULT_LAB = Lab.LAB4;
 
 	/* A mapping from integers to enum constants. */
 	private static final Map<Integer, Compiler.Lab> labLookup = new HashMap<Integer, Compiler.Lab>() {
@@ -80,7 +80,7 @@ public class Compiler {
         try {
             scanner = new Scanner(new FileReader(cruxFile));
         } catch (IOException e) {
-            System.err.println("Error accessing the source file: \"" + cruxFile + "\".");
+            System.err.println("Error accessing the source file: \"" + cruxFile + "\"");
 			System.exit(-2);
         }
 		switch (currentLab) {
@@ -112,40 +112,49 @@ public class Compiler {
 						break;
 				}
 				break;
+			case LAB4:
+        		Parser parser = new Parser(scanner);
+        		ast.Command syntaxTree = parser.parse();
+        		if (parser.hasError()) {
+            		System.out.println("Error parsing file " + cruxFile);
+            		System.out.println(parser.errorReport());
+            		System.exit(-3);
+				}
+        		ast.PrettyPrinter prettyPrinter = new ast.PrettyPrinter();
+        		syntaxTree.accept(prettyPrinter);
+        		System.out.println(prettyPrinter.toString());
 			default:
 				System.err.println("What lab are you working on?");
 		}
 
-	}
-
-	/**
-	 * Main method that starts the compilation.
-	 *
-	 */
-	public static void main(String[] args) {
-        String sourceFile = null;
-        Lab lab = null;
-        if (args.length == 1) {
-        	sourceFile = args[0];
-        } else if (args.length == 2) {
-			Matcher matcher  = Pattern.compile("-l\\s?([1-6])").matcher(args[0]);;
-			if (matcher.matches()) {
-				String labNumStr = matcher.group(1);
-				int labNum = Integer.valueOf(labNumStr);
-				lab = labLookup.get(labNum);
-				if (lab == null) {
-					System.err.println("Unspported lab.");
+		/**
+	 	 * Main method that starts the compilation.
+	 	 *
+	 	 */
+		public static void main(String[] args) {
+        	String sourceFile = null;
+        	Lab lab = null;
+        	if (args.length == 1) {
+        		sourceFile = args[0];
+        	} else if (args.length == 2) {
+				Matcher matcher  = Pattern.compile("-l\\s?([1-6])").matcher(args[0]);;
+				if (matcher.matches()) {
+					String labNumStr = matcher.group(1);
+					int labNum = Integer.valueOf(labNumStr);
+					lab = labLookup.get(labNum);
+					if (lab == null) {
+						System.err.println("Unspported lab.");
+						System.exit(1);
+					}
+				} else {
+					System.err.println(USAGE_DESCRIPTION) ;
 					System.exit(1);
 				}
-			} else {
-				System.err.println(USAGE_DESCRIPTION) ;
+        		sourceFile = args[1];
+        	} else {
+				System.err.println(USAGE_DESCRIPTION);
 				System.exit(1);
-			}
-        	sourceFile = args[1];
-        } else {
-			System.err.println(USAGE_DESCRIPTION);
-			System.exit(1);
-        }
-    	((lab != null) ? new Compiler(lab) : new Compiler()).compile(sourceFile);
-    }
-}
+        	}
+    		((lab != null) ? new Compiler(lab) : new Compiler()).compile(sourceFile);
+    	}
+	}

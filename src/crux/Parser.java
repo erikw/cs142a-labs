@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import ast.Command;
+
 /**
  * Syntactic parser that reads a stream of tokens and builds a parse tree.
  */
@@ -32,6 +34,8 @@ public class Parser {
 	/* The current token that's being processed. */
 	private Token currentToken;
 
+// Parser ==========================================
+
 	/**
 	 * Construct a new parser using a specified scanner.
 	 * @param scanner The scanner to use.
@@ -43,16 +47,20 @@ public class Parser {
 
 	/**
 	 *	Begin the parsing.
+	 *	@return An AST command representing the parsed and abstracted program.
 	 */
-	public void parse() {
+	public ast.Command parse() {
         initSymbolTable();
 		// Load first token.
 		currentToken = scanner.next();
 		try {
-			program();
+			return program();
 		} catch (QuitParseException qpe) {
+			// TODO keep these error reportings from pre-lab4 or switch them?
 			errorBuffer.append("SyntaxError(" + lineNumber() + "," + charPosition() + ")");
 			errorBuffer.append("[Could not complete parsing.]");
+
+            return new ast.Error(lineNumber(), charPosition(), "Could not complete parsing.");
 		}
 	}
 
@@ -72,7 +80,6 @@ public class Parser {
 
 
 
-	//  Grammar rules ==========================
 
 	/**
 	 * Report an error for an unexpected nonterminal.
@@ -229,16 +236,179 @@ public class Parser {
 	}
 
 
-	// Grammar Rules======
+// SymbolTable Management ==========================
+
+    /**
+     * Initialize the symbolTable with predefined symbols.
+     */
+    private void initSymbolTable() {
+        for (String predefFunction : SymbolTable.PREDEF_FUNCS) {
+			symbolTable.insert(predefFunction);
+        }
+    }
+
+    /**
+     * Try to resolve a given symbol name.
+     * @param ident The identifier to resolve.
+     * @return A found matching symbol or ErrorSymbol.
+     */
+    private Symbol tryResolveSymbol(Token ident) {
+        assert(ident.is(Token.Kind.IDENTIFIER));
+        String name = ident.lexeme();
+        try {
+            return symbolTable.lookup(name);
+        } catch (SymbolNotFoundError snfe) {
+            String message = reportResolveSymbolError(name, ident.lineNumber(), ident.charPosition());
+            return new ErrorSymbol(message);
+        }
+    }
+
+// Helper Methods ==========================================
+    /**
+     * Enters a new scobe for symbols.
+     */
+    private void enterScope() {
+        symbolTable = symbolTable.mutate();
+    }
+
+    /**
+     * Exit current symbol scope.
+     */
+    private void exitScope() {
+    	symbolTable = symbolTable.getParent();
+    }
+
+
+    /**
+     * Report a resolve error for a given symbol name.
+     * @param name The errornous symbol name.
+     * @param lineNum The line number where the error occured.
+     * @param charPos The character position where the error occured.
+     * @return An error message built from the current symbol.
+     */
+    private String reportResolveSymbolError(String name, int lineNum, int charPos) {
+        String message = "ResolveSymbolError(" + lineNum + "," + charPos + ")[Could not find " + name + ".]";
+        if (Compiler.currentLab != Compiler.Lab.LAB2) {
+        	errorBuffer.append(message + "\n");
+        	errorBuffer.append(symbolTable.toString() + "\n");
+        }
+        return message;
+    }
+
+    /**
+     * Try to declare a symbol name.
+     * @param ident The identifier to declare.
+     * @return The new symbol or ErrorSymbol if it already existed.
+     */
+    private Symbol tryDeclareSymbol(Token ident) {
+        assert(ident.is(Token.Kind.IDENTIFIER));
+        String name = ident.lexeme();
+        try {
+            return symbolTable.insert(name);
+        } catch (RedeclarationError re) {
+            String message = reportDeclareSymbolError(name, ident.lineNumber(), ident.charPosition());
+            return new ErrorSymbol(message);
+        }
+    }
+
+    /**
+     * Report a redeclaration error for a symbol name.
+     * @param name The redeclared symbol name.
+     * @param lineNum The line number where the error occured.
+     * @param charPos The character position where the error occured.
+     * @return An error message generated from the current information.
+     */
+    private String reportDeclareSymbolError(String name, int lineNum, int charPos) {
+        String message = "DeclareSymbolError(" + lineNum + "," + charPos + ")[" + name + " already exists.]";
+        if (Compiler.currentLab != Compiler.Lab.LAB2) {
+        	errorBuffer.append(message + "\n");
+        	errorBuffer.append(symbolTable.toString() + "\n");
+        }
+        return message;
+    }    
+
+
+    /**
+     * Same as expect(Token.Kind) but the Token is returned.
+     * @param kind The expected kind.
+     * @return The found token.
+     * @throws QuitParseException when the token was not found.
+     */
+    private Token expectRetrieve(Token.Kind kind) {
+        Token tok = currentToken;
+        if (accept(kind)) {
+            return tok;
+        }
+        String errorMessage = reportSyntaxError(kind);
+        throw new QuitParseException(errorMessage);
+        //return ErrorToken(errorMessage);
+    }
+
+    /**
+     * Same as expect(NonTerminal) but the Token is returned.
+     * @param nt The expected kind.
+     * @return The found token.
+     * @throws QuitParseException when the token was not found.
+     */
+    private Token expectRetrieve(NonTerminal nt) {
+        Token tok = currentToken;
+        if (accept(nt)) {
+            return tok;
+        }
+        String errorMessage = reportSyntaxError(nt);
+        throw new QuitParseException(errorMessage);
+        //return ErrorToken(errorMessage);
+    }
+
+    /*
+     * TODO needed?
+     */
+    private String expectIdentifier() {
+        String name = currentToken.lexeme();
+        if (expect(Token.Kind.IDENTIFIER)) {
+            return name;
+        }
+        return null;
+    }
+
+    /**
+     * TODO might be needed in a future lab according to the TA.
+     */
+    private Integer expectInteger() {
+        String num = currentToken.lexeme();
+        if (expect(Token.Kind.INTEGER)) {
+            return Integer.valueOf(num);
+        } else {
+        	return null;
+        }
+    }
+
+	/**
+	 * A unchecked exception thrown when the parser had to quit its operation.
+	 */
+	private class QuitParseException extends RuntimeException {
+		private static final long serialVersionUID = 1L;
+		public QuitParseException(String errorMessage) {
+			super(errorMessage);
+		}
+	}
+
+	//  Grammar rules ==========================
 
 	/**
 	 * Production for rule:
 	 * literal := INTEGER | FLOAT | TRUE | FALSE .
 	 */
-	public void literal() {
+	public ast.Expression  literal() {
+		ast.Expression expr;
 		enterRule(NonTerminal.LITERAL);
-		expect(NonTerminal.LITERAL);
+
+		//expect(NonTerminal.LITERAL);
+        Token tok = expectRetrieve(NonTerminal.LITERAL);
+        expr = Command.newLiteral(tok);
+
 		exitRule(NonTerminal.LITERAL);
+		return expr;
 	}
 
 	/**
@@ -631,152 +801,11 @@ public class Parser {
 	 * Production for rule:
 	 * program := declaration-list EOF .
 	 */
-	public void program() {
+	public ast.DeclarationList program() {
+        throw new RuntimeException("add code to each grammar rule, to build as ast.");
 		enterRule(NonTerminal.PROGRAM);
 		declaration_list();
 		expect(Token.Kind.EOF);
 		exitRule(NonTerminal.PROGRAM);
-	}
-
-	// SymbolTable Management ==========================
-
-    /**
-     * Initialize the symbolTable with predefined symbols.
-     */
-    private void initSymbolTable() {
-        for (String predefFunction : SymbolTable.PREDEF_FUNCS) {
-			symbolTable.insert(predefFunction);
-        }
-    }
-
-    /**
-     * Enters a new scobe for symbols.
-     */
-    private void enterScope() {
-        symbolTable = symbolTable.mutate();
-    }
-
-    /**
-     * Exit current symbol scope.
-     */
-    private void exitScope() {
-    	symbolTable = symbolTable.getParent();
-    }
-
-    /**
-     * Try to resolve a given symbol name.
-     * @param ident The identifier to resolve.
-     * @return A found matching symbol or ErrorSymbol.
-     */
-    private Symbol tryResolveSymbol(Token ident) {
-        assert(ident.is(Token.Kind.IDENTIFIER));
-        String name = ident.lexeme();
-        try {
-            return symbolTable.lookup(name);
-        } catch (SymbolNotFoundError snfe) {
-            String message = reportResolveSymbolError(name, ident.lineNumber(), ident.charPosition());
-            return new ErrorSymbol(message);
-        }
-    }
-
-    /**
-     * Report a resolve error for a given symbol name.
-     * @param name The errornous symbol name.
-     * @param lineNum The line number where the error occured.
-     * @param charPos The character position where the error occured.
-     * @return An error message built from the current symbol.
-     */
-    private String reportResolveSymbolError(String name, int lineNum, int charPos) {
-        String message = "ResolveSymbolError(" + lineNum + "," + charPos + ")[Could not find " + name + ".]";
-        if (Compiler.currentLab != Compiler.Lab.LAB2) {
-        	errorBuffer.append(message + "\n");
-        	errorBuffer.append(symbolTable.toString() + "\n");
-        }
-        return message;
-    }
-
-    /**
-     * Try to declare a symbol name.
-     * @param ident The identifier to declare.
-     * @return The new symbol or ErrorSymbol if it already existed.
-     */
-    private Symbol tryDeclareSymbol(Token ident) {
-        assert(ident.is(Token.Kind.IDENTIFIER));
-        String name = ident.lexeme();
-        try {
-            return symbolTable.insert(name);
-        } catch (RedeclarationError re) {
-            String message = reportDeclareSymbolError(name, ident.lineNumber(), ident.charPosition());
-            return new ErrorSymbol(message);
-        }
-    }
-
-    /**
-     * Report a redeclaration error for a symbol name.
-     * @param name The redeclared symbol name.
-     * @param lineNum The line number where the error occured.
-     * @param charPos The character position where the error occured.
-     * @return An error message generated from the current information.
-     */
-    private String reportDeclareSymbolError(String name, int lineNum, int charPos) {
-        String message = "DeclareSymbolError(" + lineNum + "," + charPos + ")[" + name + " already exists.]";
-        if (Compiler.currentLab != Compiler.Lab.LAB2) {
-        	errorBuffer.append(message + "\n");
-        	errorBuffer.append(symbolTable.toString() + "\n");
-        }
-        return message;
-    }    
-
-
-    /**
-     * Same as expect(Token.Kind) but the Token is returned.
-     * @param kind The expected kind.
-     * @return The found token.
-     * @throws QuitParseException when the token was not found.
-     */
-    private Token expectRetrieve(Token.Kind kind) {
-        Token tok = currentToken;
-        if (accept(kind)) {
-            return tok;
-        }
-        String errorMessage = reportSyntaxError(kind);
-        throw new QuitParseException(errorMessage);
-    }
-
-    /**
-     * Same as expect(NonTerminal) but the Token is returned.
-     * @param nt The expected kind.
-     * @return The found token.
-     * @throws QuitParseException when the token was not found.
-     */
-    private Token expectRetrieve(NonTerminal nt) {
-        Token tok = currentToken;
-        if (accept(nt)) {
-            return tok;
-        }
-        String errorMessage = reportSyntaxError(nt);
-        throw new QuitParseException(errorMessage);
-    }
-
-    /**
-     * TODO might be needed in a future lab according to the TA.
-     */
-    private Integer expectInteger() {
-        String num = currentToken.lexeme();
-        if (expect(Token.Kind.INTEGER)) {
-            return Integer.valueOf(num);
-        } else {
-        	return null;
-        }
-    }
-
-	/**
-	 * A unchecked exception thrown when the parser had to quit its operation.
-	 */
-	private class QuitParseException extends RuntimeException {
-		private static final long serialVersionUID = 1L;
-		public QuitParseException(String errorMessage) {
-			super(errorMessage);
-		}
 	}
 }

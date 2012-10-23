@@ -1,0 +1,46 @@
+   
+Command (abstract base)
+|- DeclarationList
+|- StatementList
+|- ExpressionList
+|- LiteralBoolean
+|- LiteralFloat
+|- LiteralInteger
+|- Symbol
+|- ArrayDeclaration
+|- VariableDeclaration
+|- FunctionDefinition
+|- Index
+|- Call
+|- Assignment
+|- IfElseBranch
+|- WhileLoop
+|- Return
+|- Arithmetic: Add, Sub, Mul, Div
+|- Logical: And, Or, Not
+|- Comparison: GT, GE, EQ, LE, LT
+`- Error
+
+Declaration (Interface)
+|- ArrayDeclaration
+|- VarDeclaration
+|- FuncDefinition
+`- Error
+
+Statement (Interface)
+|- ArrayDeclaration
+|- VarDeclaration
+|- Call
+|- Assignment
+|- IfElseBranch
+|- WhileLoop
+|- Assign
+`- Error
+
+Expression (Interface)
+|- Call
+|- Index
+|- Arithmetic: Add, Sub, Mul, Div
+|- Logical: And, Or, Not
+|- Comparison: GT, GE, EQ, LE, LT
+`- Error
