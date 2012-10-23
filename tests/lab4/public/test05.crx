@@ -1,0 +1,13 @@
+// test comparisons
+
+func main() : void {
+  var a:float;
+  var b:float;
+
+  ::printBool(a < b);
+  ::printBool(a <= b);
+  ::printBool(a == b);
+  ::printBool(a != b);
+  ::printBool(a >= b);
+  ::printBool(a > b);
+}

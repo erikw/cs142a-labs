@@ -1,0 +1,9 @@
+// test multiple functions
+
+func foo() : void {
+  ::printInt(5);
+}
+
+func main() : void {
+  ::foo();
+}

@@ -1,0 +1,5 @@
+// show many parameters to function
+
+func foo(a:int, b:int, c:int, d:int, e:int, f:int, g:int) : int {
+  return a + b * c or d - e / f and g;
+}

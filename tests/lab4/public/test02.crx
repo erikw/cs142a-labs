@@ -1,0 +1,12 @@
+// test arithmetic
+
+var i : int;
+var j : int;
+
+func main() : void {
+  ::printInt(i+j);
+  ::printInt(j-i);
+  ::printInt(j/i);
+  ::printInt(j*i);
+  ::printInt( 1 + 2 - 3 * 5 / 6 * (7-8) );
+}

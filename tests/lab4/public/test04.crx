@@ -1,0 +1,7 @@
+// test index operator
+
+array x: int[10][10][10];
+
+func main() : void {
+  ::printInt(x[2][3][4]);
+}

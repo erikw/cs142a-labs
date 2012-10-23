@@ -1,0 +1,15 @@
+ast.DeclarationList(3,1)
+  ast.ArrayDeclaration(3,1)[Symbol(x)]
+  ast.FunctionDefinition(5,1)[Symbol(main), []]
+    ast.StatementList(6,3)
+      ast.Call(6,3)[Symbol(printInt)]
+        ast.ExpressionList(6,14)
+          ast.Dereference(6,14)
+            ast.Index(6,22)
+              ast.Index(6,19)
+                ast.Index(6,16)
+                  ast.AddressOf(6,14)[x]
+                  ast.LiteralInt(6,16)[2]
+                ast.LiteralInt(6,19)[3]
+              ast.LiteralInt(6,22)[4]
+

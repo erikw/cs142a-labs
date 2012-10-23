@@ -1,0 +1,12 @@
+// test while loop
+
+func main() : void {
+  var x:bool;
+
+  while (x) {
+    ::println();
+    ::printBool(x);
+    let x = not x;
+  }
+  ::println();
+}
