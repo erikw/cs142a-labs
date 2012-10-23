@@ -10,13 +10,11 @@ public class Division extends Command implements Expression {
 		right = rightSide;
 	}
 	
-	public Expression leftSide()
-	{
+	public Expression leftSide() {
 		return left;
 	}
 	
-	public Expression rightSide()
-	{
+	public Expression rightSide() {
 		return right;
 	}
 	

@@ -11,14 +11,12 @@ public class Error extends Command implements Declaration, Statement, Expression
 		this.message = message;
 	}
 	
-	public String message()
-	{
+	public String message() {
 		return message;
 	}
 	
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return super.toString() + "[" + message + "]";
 	}
 	

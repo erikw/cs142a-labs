@@ -13,19 +13,16 @@ public class Call extends Command implements Statement, Expression {
 		this.args = args;
 	}
 	
-	public Symbol function()
-	{
+	public Symbol function() {
 		return func;
 	}
 	
-	public ExpressionList arguments()
-	{
+	public ExpressionList arguments() {
 		return args;
 	}
 	
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return super.toString() + "[" + func + "]";
 	}
 

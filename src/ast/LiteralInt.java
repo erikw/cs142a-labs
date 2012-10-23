@@ -9,14 +9,12 @@ public class LiteralInt extends Command implements Expression {
 		this.value = value;
 	}
 	
-	public Integer value()
-	{
+	public Integer value() {
 		return value;
 	}
 	
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return super.toString() + "[" + value + "]";
 	}
 	

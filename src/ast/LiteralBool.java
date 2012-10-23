@@ -15,14 +15,12 @@ public class LiteralBool extends Command implements Expression {
 		this.value = value;
 	}
 	
-	public Value value()
-	{
+	public Value value() {
 		return value;
 	}
 	
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return super.toString() + "[" + value + "]";
 	}
 	

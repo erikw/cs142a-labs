@@ -23,24 +23,20 @@ public class Comparison extends Command implements Expression {
 		this.op = op;
 	}
 	
-	public Expression leftSide()
-	{
+	public Expression leftSide() {
 		return left;
 	}
 	
-	public Expression rightSide()
-	{
+	public Expression rightSide() {
 		return right;
 	}
 	
-	public Operation operation()
-	{
+	public Operation operation() {
 		return op;
 	}
 	
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return super.toString() + "[" + op + "]";
 	}
 	

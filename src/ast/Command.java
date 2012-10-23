@@ -7,35 +7,29 @@ public abstract class Command implements Visitable {
 	private int lineNum;
 	private int charPos;
 	
-	public Command(int lineNum, int charPos)
-	{
+	public Command(int lineNum, int charPos) {
 		this.lineNum = lineNum;
 		this.charPos = charPos;
 	}
 	
-	public int lineNumber()
-	{
+	public int lineNumber() {
 		return lineNum;
 	}
 	
-	public int charPosition()
-	{
+	public int charPosition() {
 		return charPos;
 	}
 	
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return this.getClass().getName() + "(" + lineNumber() + "," + charPosition() + ")";
 	}
 
-	public static Expression newExpression(Expression leftSide, Token op, Expression rightSide)
-	{
+	public static Expression newExpression(Expression leftSide, Token op, Expression rightSide) {
 		int lineNum = op.lineNumber();
 		int charPos = op.charPosition();
 		
-		switch(op.kind())
-		{
+		switch(op.kind()) {
 		case ADD: return new Addition(lineNum, charPos, leftSide, rightSide);
 		case SUB: return new Subtraction(lineNum, charPos, leftSide, rightSide);
 		case MUL: return new Multiplication(lineNum, charPos, leftSide, rightSide);
@@ -56,10 +50,8 @@ public abstract class Command implements Visitable {
 		}
 	}
 	
-	public static Expression newLiteral(Token tok)
-	{
-		switch(tok.kind())
-		{
+	public static Expression newLiteral(Token tok) {
+		switch(tok.kind()) {
 		case TRUE: return new LiteralBool(tok.lineNumber(), tok.charPosition(), LiteralBool.Value.TRUE);
 		case FALSE: return new LiteralBool(tok.lineNumber(), tok.charPosition(), LiteralBool.Value.FALSE);
 		case INTEGER: return new LiteralInt(tok.lineNumber(), tok.charPosition(), Integer.valueOf(tok.lexeme()));

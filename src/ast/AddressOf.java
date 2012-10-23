@@ -9,14 +9,12 @@ public class AddressOf extends Command implements Expression {
 		this.symbol = sym;
 	}
 	
-	public crux.Symbol symbol()
-	{
+	public crux.Symbol symbol() {
 		return symbol;
 	}
 	
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return super.toString() + "[" + symbol.name() + "]";
 	}
 

@@ -6,8 +6,7 @@ public class ArrayDeclaration extends Command implements Declaration, Statement 
 	
 	private Symbol symbol;
 	
-	public ArrayDeclaration(int lineNum, int charPos, Symbol symbol)
-	{
+	public ArrayDeclaration(int lineNum, int charPos, Symbol symbol) {
 		super(lineNum, charPos);
 		this.symbol = symbol;
 	}

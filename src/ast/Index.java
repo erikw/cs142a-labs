@@ -11,13 +11,11 @@ public class Index extends Command implements Expression {
 		this.amount = amount;
 	}
 	
-	public Expression base()
-	{
+	public Expression base() {
 		return base;
 	}
 	
-	public Expression amount()
-	{
+	public Expression amount() {
 		return amount;
 	}
 

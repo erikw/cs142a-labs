@@ -9,8 +9,7 @@ public class Return extends Command implements Statement {
 		this.arg = arg;
 	}
 	
-	public Expression argument()
-	{
+	public Expression argument() {
 		return arg;
 	}
 

@@ -8,14 +8,12 @@ public class StatementList extends Command implements Iterable<Statement> {
 	
 	private List<Statement> list;
 	
-	public StatementList(int lineNum, int charPos)
-	{
+	public StatementList(int lineNum, int charPos) {
 		super(lineNum, charPos);
 		list = new ArrayList<Statement>();
 	}
 	
-	public void add(Statement command)
-	{
+	public void add(Statement command) {
 		list.add(command);
 	}
 

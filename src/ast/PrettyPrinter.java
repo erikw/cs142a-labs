@@ -5,8 +5,7 @@ public class PrettyPrinter implements CommandVisitor {
 	private int depth = 0;
 	private StringBuffer sb = new StringBuffer();
 	
-	private void println(Object obj)
-	{
+	private void println(Object obj) {
 		String indent = new String();
 		for (int i = 0; i < depth; i++) {
 			indent += "  ";
@@ -15,8 +14,7 @@ public class PrettyPrinter implements CommandVisitor {
 		sb.append(indent + obj.toString() + "\n");
 	}
 	
-	public String toString()
-	{
+	public String toString() {
 		return sb.toString();
 	}
 	
@@ -157,8 +155,7 @@ public class PrettyPrinter implements CommandVisitor {
 	}
 	
 	@Override
-	public void visit(Dereference node)
-	{
+	public void visit(Dereference node) {
 		println(node);
 		depth++;
 		node.expression().accept(this);

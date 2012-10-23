@@ -8,19 +8,16 @@ public class ExpressionList extends Command implements Iterable<Expression> {
 	
 	private List<Expression> list;
 	
-	public ExpressionList(int lineNum, int charPos)
-	{
+	public ExpressionList(int lineNum, int charPos) {
 		super(lineNum, charPos);
 		list = new ArrayList<Expression>();
 	}
 	
-	public void add(Expression command)
-	{
+	public void add(Expression command) {
 		list.add(command);
 	}
 	
-	public int size()
-	{
+	public int size() {
 		return list.size();
 	}
 

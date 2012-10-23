@@ -8,14 +8,12 @@ public class DeclarationList extends Command implements Iterable<Declaration> {
 	
 	private List<Declaration> list;
 	
-	public DeclarationList(int lineNum, int charPos)
-	{
+	public DeclarationList(int lineNum, int charPos) {
 		super(lineNum, charPos);
 		list = new ArrayList<Declaration>();
 	}
 	
-	public void add(Declaration command)
-	{
+	public void add(Declaration command) {
 		list.add(command);
 	}
 

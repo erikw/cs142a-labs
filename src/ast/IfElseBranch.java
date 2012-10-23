@@ -13,18 +13,15 @@ public class IfElseBranch extends Command implements Statement {
 		this.elseBlock = elseBlock;
 	}
 	
-	public Expression condition()
-	{
+	public Expression condition() {
 		return cond;
 	}
 	
-	public StatementList thenBlock()
-	{
+	public StatementList thenBlock() {
 		return thenBlock;
 	}
 	
-	public StatementList elseBlock()
-	{
+	public StatementList elseBlock() {
 		return elseBlock;
 	}
 

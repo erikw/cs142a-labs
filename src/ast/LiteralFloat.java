@@ -9,14 +9,12 @@ public class LiteralFloat extends Command implements Expression {
 		this.value = value;
 	}
 	
-	public Float value()
-	{
+	public Float value() {
 		return value;
 	}
 	
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return super.toString() + "[" + value + "]";
 	}
 

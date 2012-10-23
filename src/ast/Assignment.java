@@ -11,13 +11,11 @@ public class Assignment extends Command implements Statement {
 		this.source = source;
 	}
 	
-	public Expression destination()
-	{
+	public Expression destination() {
 		return dest;
 	}
 	
-	public Expression source()
-	{
+	public Expression source() {
 		return source;
 	}
 

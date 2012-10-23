@@ -8,8 +8,7 @@ public class LogicalNot extends Command implements Expression {
 		this.expr = expr;
 	}
 	
-	public Expression expression()
-	{
+	public Expression expression() {
 		return expr;
 	}
 

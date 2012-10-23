@@ -10,26 +10,22 @@ public class FunctionDefinition extends Command implements Declaration {
 	private StatementList body;
 	private List<Symbol> args;
 	
-	public FunctionDefinition(int lineNum, int charPos, Symbol func, List<Symbol> args, StatementList body)
-	{
+	public FunctionDefinition(int lineNum, int charPos, Symbol func, List<Symbol> args, StatementList body) {
 		super(lineNum, charPos);
 		this.func = func;
 		this.args = args;
 		this.body = body;
 	}
 	
-	public Symbol function()
-	{
+	public Symbol function() {
 		return func;
 	}
 	
-	public StatementList body()
-	{
+	public StatementList body() {
 		return body;
 	}
 	
-	public List<Symbol> arguments()
-	{
+	public List<Symbol> arguments() {
 		return args;
 	}
 
