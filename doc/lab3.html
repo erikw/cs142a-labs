@@ -1,0 +1,169 @@
+<html>
+  <head>
+    <title>CS 142A: Interpreters and Compilers</title>
+    <link href="../../style.css" rel="StyleSheet" type="text/css"></link>
+    <script type="text/javascript" src="../../code/jQuery.js"></script>
+
+  </head>
+
+  <body><div id="container">
+    <div id="header">
+      <p><a href="index.html">CS 142A: Interpreters and Compilers</a></p>
+    </div>
+
+    <div id="leftnav">
+      <!-- should provide a noscript hard link to a navigation page -->
+      <script type="text/javascript" src="../../code/menu.js"></script>
+      <script type="text/javascript">document.write(generateMenu(document.URL));</script>
+    </div>
+
+    <div id="content">
+    
+    <h1>Lab #3: <i>Symbol Table</i></h1>
+    <p><b>Due date and time:</b> <i>Saturday, October 20, 11:59pm</i></span><br>
+    This project handles on the lookup of declared symbols and redefinition errors.
+    We are not handing out a solution to the previous lab.
+    To avoid delays, please make sure to see the TA or myself to get it working without error as soon as possible.
+    </p>
+
+    <h1>Introduction</h1>
+    <p>Now that we have written a Recognizer for our language, we can proceed to add semantics that will give our programs meaning.
+    As you may have noticed in the tests cases for the previous lab, some of the input source test cases which passed the recognizer would not be considered valid crux programs.
+    For example, consider the following input source:
+    <pre>
+func main() : void 
+{
+    ::printInt(x);
+}
+    </pre>
+    This input forms a valid sentence in the Crux grammar, and therefore passes the recognizer.
+    However, we would not consider it a valid Crux program because no variable <code>x</code> has been declared.
+    Our compiler should detect this "use before definition" error as a <em>semantic</em> constraint on the sentences that form Crux programs.
+    To catch and report such errors we shall implement a <code>SymbolTable</code>.
+    </p>
+
+    <h1>Symbols Represent Variables and Functions</h1>
+    <p>We create a <code>Symbol</code> class, so that our compiler can model the variables and functions that Crux programmers declare in their programs.
+    Every time the input source declares a variable or declares a function, the compiler creates a <code>Symbol</code> instance to represent it.
+    A <code>SymbolTable</code> stores each of these <code>Symbol</code>s for later retrieval, when the Crux program uses the variable or calls the function.
+
+    <h1>Modeling Scope</h1>
+    <p>Semantically, the Crux has a layer of <em>scope</em> for each function.
+    According to the Crux grammar, curly braces only occur in a <code>statement-block</code>.
+    However, the <code>statement-block</code> occurs in one of two different places:
+    <ol>
+      <li>The body of code for a newly declared function.</li>
+      <li>The block of code for an if branch, else branch, or while loop.</li>
+    </ol>
+    Conceptually, each time the <code>Parser</code> encounters and <code>statement-block</code> it introduces a new scope to contain any newly declared <code>Symbols</code> (variables and functions).
+    This rule is loosened somewhat because Crux's symbol semantics specify that parameters of a function are also scoped with the function body.
+    </p>
+
+    <p>The Crux grammar allows curly braces to nest (an if-else inside a while loop inside a function).
+    Therefore, our <code>SymbolTable</code> must model the nesting of scopes.
+    Valid Crux source code, contains balanced curly braces; for every open brace there is a close brace.
+    We can therefore treat the nested scopes as a <em>stack</em> of <code>SymbolTable</code>s; one table for each scope.
+    The parser models the entry of a scope by calling the <code>enterScope()</code> helper method.
+    Similarly, when a scope closes (a closing curly brace), the parser calls <code>exitScope()</code>.
+    </p>
+
+    <h2>Symbol Table Design Hints</h2>
+    <p>Conceptually, the <code>SymbolTable</code> forms a linked list of <code>Map&lt;String, Symbol&gt;</code>s.
+    Each table has a pointer to a parent table, representing the outer scope.
+    The <code>lookup(String name)</code> method <em>recursively</em> walked the list of tables, proceeding from the innermost scope to outermost scope.
+    The <code>lookup</code> method returns the first <code>Symbol</code> matching <code>name</code>.
+    Otherwise, it signals that no such symbol by the given <code>name</code> exists in any of the scopes.
+    </p>
+
+    <h1>Detectable Symbol Errors</h1>
+    <p>Although we introduce <code>Symbol</code>s in this Lab, we will not be detecting type-invalid usage until a later lab.
+    For this lab, we only check that symbol names do not clash (Redefinition Error) and that they exist (Unknown Symbol Error).
+    If some Crux source code declares and variable and later uses that name to call a function, we shall consider it valid because the name exists in the table when the function is parsed.
+    </p>
+    
+    <h2>Resolve Symbol Errors</h2>
+    <p><code>Symbol</code>s are not available outside of the scope (set of curly braces) where they are declared.
+    If some Crux source code attempts to use a variable or function name that has not been declared in the current scope or any outer scope then the Parser signals a "ResolveSymbolError".
+    </p>
+
+    <p>We implement this functionality through a helper method in the Parser: <code>Symbol tryResolveSymbol(Token ident)</code>.
+    When the Parser encounters an identifier use, it calls <code>tryResolveSymbol</code> to perform a lookup in the <code>currentSymbolTable</code>.
+    If the lookup signals a failure, then <code>tryResolveSymbol</code> logs a "ResolveSymbolError".
+    Otherwise, lookup succeeds and <code>tryResolveSymbol</code> returns the resulting <code>Symbol</code> so that the Parser may resume parsing.
+    </p>
+
+    <h2>Redefinition Errors</h2>
+    <p>
+    In some other languages, lookup uses both type and name to find the correct symbol.
+    For example, Java allow function overloading and can distinguish with method is meant by inspecting the argument types at the callsite.
+    Crux is a simple language, and uses only the name to distinguish among possible symbols.
+    Within each scope, all of the <code>Symbol</code>s carry a unique name.
+    If some Crux source code attempts to declare two variables, or two functions, or a function and a variable by the same name, in the same scope, then the Parser signals a "DeclareSymbolError".
+    </p>
+
+    <p>We implement this functionality through a helper method in the Parser: <code>Symbol tryDeclareSymbol(Token ident)</code>.
+    When the parser encounters a variable declaration or function definition, it calls <code>tryDeclareSymbol</code> to perform an insertion in the <code>currentSymbolTable</code>.
+    If the insertion signals a failure, then <code>tryDeclareSymbol</code> logs a "DeclareSymbolError".
+    Otherwise, insertion succeeded and <code>tryDeclareSymbol</code> returns the newly created <code>Symbol</code> so that the Parser may resume parsing.
+    </p>
+
+    <h1>Predefined Symbols</h1>
+    <p>The Crux Specification contains a section describing certain predefined functions.
+    We consider these functions to be "built-in", because the Crux programmer doesn't have any way to implement them.
+    However, programming in Crux would be might useless without the simple abilities represented by these functions.
+    Before parsing, the symbol table should be pre-loaded with symbols representing these functions.
+
+    <h1>What do I need to implement?</h1>
+    <p>The Crux Symbol Semantics section of the <a href="../languagespec.html">Crux Specification</a>.
+    Your program should be able to correctly identify the two errors, DeclareSymbolError and ResolveSymbolError.
+    After encountering one of these two errors, the Parser logs both the error and the current symbol table before proceeding to parse the rest of the token stream.
+    When logged, the symbol table should report symbols <em>in the order in which they were declared</em> in the Crux input program.
+    </p>
+
+    <p>For convenience, you may get a start on this lab by using a pre-made <a href="Lab3_SymbolTable.zip">Lab3_SymbolTable.zip</a> project, which contains skeletons for both the <code>crux.SymbolTable</code> and <code>crux.Symbol</code> classes, as well as a modified skeleton for <code>crux.Parser</code> which sketches how to handles the error reporting.
+    As before, you are both allowed and encouraged to make your program easier to read and maintain by implementing helper functions with good names.
+    </p>
+
+    <h2>Changes from Lab 2: Parser</h2>
+    <ul>
+      <li>We no longer need to track the parse tree, so you may remove the <code>enterRule</code> and <code>exitRule</code> functions if you feel that they clutter your code.</li>
+      <li>Add helper method to Parser: <code>Symbol tryDeclareSymbol(Token ident)</code>.</li>
+      <li>Add helper method to Parser: <code>Symbol tryResolveSymbol(Token ident)</code>.</li>
+      <li>Create a <code>Symbol</code> class, which (for now) only holds the name of a symbol.</li>
+      <li>Create a <code>SymbolTable</code> class, which models a stack of scopes.</li>
+      <li>(Optional) Add any helper methods to Parser that you think will make your code cleaner and easier to maintain.</li>
+    </ul>
+   
+    <h1>Testing</h1>
+    <p>Test cases are available in this <a href="tests.zip">tests.zip</a> file.
+    The provided tests are not meant to be exhaustive.
+    You are strongly encouraged to construct your own.
+    (If chrome gives you a warning that "tests.zip is not commonly downloaded and could be dangerous" it means that Google hasn't performed an automated a virus scan.
+    This warning can be safely ignored, as the tests.zip file contains only text files.)
+    </p>
+
+    <h1>Deliverables</h1>
+    <p>A zip file, named Crux.zip, containing the following files (in the <code>crux</code> package):
+    <ul>
+      <li>crux.NonTerminal.java, which holds the FirstSets of all production rules in the grammar.</li>
+      <li>crux.Parser.java, which performs grammar recognition of an input text.</li>
+      <li>crux.Scanner.java, which performs incremental tokenization of an input text.</li>
+      <li>crux.Compiler.java, which houses the main() function that begins your program.</li>
+      <li>crux.Token.java, which represents a string of characters read in the input text.</li>
+      <li>crux.SymbolTable.java, which implements the symbol table.</li>
+      <li>crux.Symbol.java, which implements storage for identifiers (functions, variables, and arrays). For now, it stores only the name of the identifier.</li>
+    </ul>
+    </p>
+
+    <p>Please use the <a href="../../tester/index.php">AutoTester</a> to make sure that your work meets our requirements.
+    We reserve the right to assign 0 points to any submissions which cannot be automatically unzipped and tested.
+    Additionally, we reserve the right to assign 0 points to any submission which 'games' the automated testing by using a lookup which produces only outputs that correspond to the test cases we happen to use.
+    You are bound to all of the rules on the <a href="../../submittingprojects.html">Submitting Labs</a> page.
+    Be sure to submit the version of the project that you want graded, as we won't regrade if you submit the wrong version by accident.
+    </p>
+
+    </div>
+    <div id="footer"></div>
+
+  </div></body>
+</html>

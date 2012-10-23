@@ -1,0 +1,418 @@
+<html>
+  <head>
+    <title>CS 142A: Interpreters and Compilers</title>
+    <link href="../../style.css" rel="StyleSheet" type="text/css" \>
+    <script type="text/javascript" src="../../code/jQuery.js"></script>
+
+  </head>
+
+  <body><div id="container">
+    <div id="header">
+      <p><a href="index.html">CS 142A: Interpreters and Compilers</a></p>
+    </div>
+
+    <div id="leftnav">
+      <!-- should provide a noscript hard link to a navigation page -->
+      <script type="text/javascript" src="../../code/menu.js"></script>
+      <script type="text/javascript">document.write(generateMenu(document.URL));</script>
+    </div>
+
+    <div id="content">
+    
+    <h1>Lab #4: <i>Abstract Syntax Tree</i></h1>
+    <p><b>Due date and time:</b> <i>Saturday, November 3, 11:59pm</i></span><br>
+    This project implements the intermediate representation that we use to model crux programs.
+    We are not handing out a solution to the previous lab.
+    To avoid delays, please make sure to see the TA or myself to get it working without error as soon as possible.
+    </p>
+
+    <h1>Introduction</h1>
+    <p>Now that the parser can recognize syntax errors and detect symbol definition and usage errors, we can proceed with building an intermediate representation of crux programs.
+    Between the front-end (parser) and back-end (code generator), we'll represent crux programs as an <a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree">Abstract Syntax Tree</a> (AST).
+    Once crux source code has been transformed into an AST data structure we can further analyze the crux program to detect type errors (lab 5), perform optimizations, and generate code.
+    </p>
+
+    <h1>Design Goals for the AST</h1>
+    <p>The AST that we create must faithfully represent the crux program being compiled.
+    Additionally, we seek to make the AST as clear and easy to use as possible.
+    Because we will later perform traversals over the AST to check for semantic constraints, we consider all of the following issues in the design:
+    </p>
+    <dl>
+      <dt>Concise.</dt>
+      <dd>We should like to clean up any unnecessary features that may be present in the crux source. For example, the AST does not need to extra parentheses that may have been used in an expression.</dd>
+      
+      <dt>Meaningful.</dt>
+      <dd>Nodes in the AST should carry some kind of semantic meaning. For example, we must track when and where variables and functions are declared or defined.</dd>
+      
+      <dt>Instructive.</dt>
+      <dd>Nodes in the AST should represent an action (or instruction) that a computer might take. For example, we can have one node represent an <code>if_statement</code>. It can have 3 children: <code>condition</code>, <code>thenBlock</code>, and <code>elseBlock</code>.
+
+      <dt>Organized.</dt>
+      <dd>Nodes in the AST should be categorically distinguishable. That is, we should be able to identify the difference between statements and expressions.
+    </dl>
+
+    <h1>An AST is not the Parse Tree</h1>
+    <p>In Lab 2, we wrote a recursive descent parser.
+    We recorded the entry and exit of each function and printed out the parse tree of crux source code.
+    That tree records how a crux sentence (input source code) is broken down into syntactic pieces according to the rules of the crux grammar.
+    Just as its name implies the <em>Abstract</em> Syntax Tree, <em>abstracts</em> away some of the pieces that might be present in the parse tree.
+    </p>
+
+    <h2>The AST avoids carrying extra syntax.</h2>
+    <p>A crux sentence is allowed to carry extra information that does not necessarily change the semantics of the program.
+    For example, according to the crux grammar parentheses can be used to nest expressions arbitrarily.
+    Consider the following code examples, their parse trees and the corresponding AST.
+    <table>
+      <tr>
+        <th>Input Crux Statement</th>
+        <th>Parse Tree</th>
+        <th>Abstract Syntax Tree</th>
+      </tr>
+      <tr>
+        <td>
+          <pre>
+if true {
+   return 5;
+}
+          </pre>
+        </td>
+        <td>
+          <pre>
+IF_STATEMENT
+  EXPRESSION0
+    EXPRESSION1
+      EXPRESSION2
+        EXPRESSION3
+          LITERAL
+  STATEMENT_BLOCK
+    STATEMENT_LIST
+      STATEMENT
+        RETURN_STATEMENT
+          EXPRESSION0
+            EXPRESSION1
+              EXPRESSION2
+                EXPRESSION3
+                  LITERAL
+          </pre>
+        </td>
+        <td>
+          <pre>
+ast.IfElseBranch(1,1)
+  ast.LiteralBoolean(1,4)[TRUE]
+  ast.StatementList(2,4)
+    ast.Return(2,4)
+      ast.LiteralInteger(2,11)[5]
+  ast.StatementList(4,1)
+          </pre>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <pre>
+if (((((true))))) {
+   return 5;
+}
+          </pre>
+        </td>
+        <td>
+          <pre>
+IF_STATEMENT
+  EXPRESSION0
+    EXPRESSION1
+      EXPRESSION2
+        EXPRESSION3
+          EXPRESSION0
+            EXPRESSION1
+              EXPRESSION2
+                EXPRESSION3
+                  EXPRESSION0
+                    EXPRESSION1
+                      EXPRESSION2
+                        EXPRESSION3
+                          EXPRESSION0
+                            EXPRESSION1
+                              EXPRESSION2
+                                EXPRESSION3
+                                  EXPRESSION0
+                                    EXPRESSION1
+                                      EXPRESSION2
+                                        EXPRESSION3
+                                          EXPRESSION0
+                                            EXPRESSION1
+                                              EXPRESSION2
+                                                EXPRESSION3
+                                                  LITERAL
+  STATEMENT_BLOCK
+    STATEMENT_LIST
+      STATEMENT
+        RETURN_STATEMENT
+          EXPRESSION0
+            EXPRESSION1
+              EXPRESSION2
+                EXPRESSION3
+                  LITERAL
+          </pre>
+        </td>
+        <td>
+          <pre>
+ast.IfElseBranch(1,1)
+  ast.LiteralBoolean(1,9)[TRUE]
+  ast.StatementList(2,4)
+    ast.Return(2,4)
+      ast.LiteralInteger(2,11)[5]
+  ast.StatementList(4,1)
+          </pre>
+        </td>
+      </tr>
+    </table>
+    </p>
+
+    <h2>The AST has correct operator association.</h2>
+    <p>In the crux grammar, the expression chain (expression0 &rarr; expression1 &rarr; expression2 &rarr; expression3) contains only right-associative rules, which generate a right-associative parse tree.
+    In spite of the parse tree generated, the operators and, or, add, sub, mul, and div are, semantically, all left-associative.
+    The parse tree accurately capture precedence, but incorrectly represent operator associativity.
+    Using right association for the grammar rules aids the construction of a left-factored LL(1) grammar, which in turn aids writing a recursive descent parser.
+    However, we must now take care to ensure that the AST captures the left-associative semantics of these operators.
+    <table>
+      <tr>
+        <th>Input Crux Statement</th>
+        <th>Parse Tree</th>
+        <th>Abstract Syntax Tree</th>
+      </tr>
+      <tr>
+        <td>
+<pre>
+return 3-1-1; // == 1
+</pre>
+        <td>
+          <pre>
+RETURN_STATEMENT
+  EXPRESSION0
+    EXPRESSION1
+      EXPRESSION2
+        EXPRESSION3
+          LITERAL
+      OP1
+      EXPRESSION2
+        EXPRESSION3
+          LITERAL
+      OP1
+      EXPRESSION2
+        EXPRESSION3
+          LITERAL
+          </pre>
+        </td>
+        <td>
+          <pre>
+ast.Return(1,1)
+  ast.Subtraction(1,11)
+    ast.Subtraction(1,9)
+      ast.LiteralInteger(1,8)[3]
+      ast.LiteralInteger(1,10)[1]
+    ast.LiteralInteger(1,12)[1]
+          </pre>
+        </td>
+      </tr>
+    </table>
+    </p>
+
+    <h1>Nodes in the AST</h1>
+    <p>The AST sits somewhere between a parse tree and a list of instructions for a machine to follow.
+    It contains fewer nodes than the parse tree, and organizes those nodes into semantic categories.
+    It contains higher-level information than a list of instructions, including variable declarations and function definitions.
+    We intend the AST to be an intermediate representation that bridges the gap between source code and machine code.
+    </p>
+
+    <h2>The Command Class.</h2>
+    <p>As a tree data structure, the AST is composed of nodes which inherit the abstract base class, <code>Command</code>.
+    (I didn't want to use the term "instruction".)
+    Each <code>Command</code> instance stores the line number and character position of the source code where it begins.
+    Concrete subclasses store more specific information, to faithfully represent commands that actually occur in crux source code.
+    We create a command class to record the actions a computer takes during execution of a crux program.
+    For example, crux has commands for declaring variables, looping, creating constants, evaluating arithmetic and logical expressions, indexing arrays, etc.
+    </p>
+
+    <h2>Categorizing the subclasses.</h2>
+    <p>For each command in the crux source code we associate a subclass of <code>Command</code>.
+    Some commands can only occur in certain parts of the crux grammar.
+    For example, <code>FunctionDefinition</code> can only occur as part of a <code>DeclarationList</code> and not inside a <code>StatementList</code>.
+    In contrast, both <code>ArrayDeclaration</code> and <code>VaribleDeclaration</code> can occur in either a <code>DeclarationList</code> or a <code>StatementList</code>
+    We use these observations to break down the commands into 3 categories, each represented by an interface: <code>Declaration</code>, <code>Statement</code>, <code>Expression</code>.
+    <table>
+      <tr>
+        <th>Command</th>
+        <th>Category<br>(Interface)</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td><code>ArrayDeclaration</code></td>
+        <td>Declaration<br>Statement</td>
+        <td>The creation of an array.</td>
+      </tr>
+      <tr>
+        <td><code>VariableDeclaration</code></td>
+        <td>Expression<br>Statement</td>
+        <td>The creation of variable.</td>
+      </tr>
+      </tr>
+        <td><code>FunctionDefinition</code></td>
+        <td>Declaration</td>
+        <td>The creation of a function.</td>
+      <tr>
+      <tr>
+        <td><code>LiteralBoolean</code></td>
+        <td>Expression</td>
+        <td>An embedded boolean constant, either 'true' or 'false'.</td>
+      </tr>
+      <tr>
+        <td><code>LiteralFloat</code></td>
+        <td>Expression</td>
+        <td>An embedded floating point number.</td>
+      </tr>
+      <tr>
+        <td><code>LiteralInteger</code></td>
+        <td>Expression</td>
+        <td>An embedded integer number.</td>
+      </tr>
+      <tr>
+        <td><code>ReadSymbol</code></td>
+        <td>Expression</td>
+        <td>The occurrence of an identifier as part of an expression (represents the address of that symbol).</td>
+      </tr>
+      <tr>
+        <td><code>Dereference</code></td>
+        <td>Expression</td>
+        <td>Load the value at a given address.</td>
+      <tr>
+        <td><code>Addition</code><br>
+          <code>Subtraction</code><br>
+          <code>Multiplication</code><br>
+          <code>Division</code></td>
+        <td>Expression</td>
+        <td>Represents basic arithmetic of two other expressions.</td>
+      </tr>
+      <tr>
+        <td><code>Comparison</code></td>
+        <td>Expression</td>
+        <td>Represents the comparison (greater than, greater equal, equal, not equal, lesser equal, less than) of two expressions.</td>
+      <tr>
+      <tr>
+        <td><code>LogicalAnd</code><br>
+          <code>LogicalOr</code><br>
+          <code>LogicalNot</code></td>
+        <td>Expression</td>
+        <td>Represents a logical operation (and, or) between two expressions or negation (not) of a single expression.</td>
+      </tr>
+      <tr>
+        <td><code>Index</code></td>
+        <td>Expression</td>
+        <td>An operator for indexing into an array. Both the base and the amount to index are expressions.</td>
+      </tr>
+      <tr>
+        <td><code>Call</code></td>
+        <td>Expression<br>Statement</td>
+        <td>A function call, including an ExpressionList of arguments.</td>
+      </tr>
+      <tr>
+        <td><code>Assignment</code></td>
+        <td>Statement</td>
+        <td>An assignment of a source expression to a destination designator.</td>
+      </tr>
+      </tr>
+        <td><code>IfElseBranch</code></td>
+        <td>Statement</td>
+        <td>Represents an conditional if-else branch. Includes the condition expression, and StatementList's for each of the then and else branches.</td>
+      </tr>
+      <tr>
+        <td><code>WhileLoop</code></td>
+        <td>Statement</td>
+        <td>Represents a while loop, including the conditional expression and a StatementList for the body.</td>
+      </tr>
+      <tr>
+        <td><code>Return</code></td>
+        <td>Statement</td>
+        <td>A way for functions to return a value (and exit early).</td>
+      </tr>
+      </tr>
+        <td><code>Error</code></td>
+        <td>Declaration<br>Expression<br>Statement</td>
+        <td>Represents any error which may have occurred during construction of the AST.</td>
+      <tr>
+    </table>
+    </p>
+
+    <h1>Creating the AST</h1>
+    <p>As the parser recursively descends through the parse tree of an input crux source code, it constructs the AST incrementally.
+    We modify the methods responsible for recursive descent traversal so that the each returns a branch of the final AST.
+    For example, because the <code>program</code> method parses a list of declarations, it returns a <code>ast.DeclarationList</code>.
+    Likewise, each method in the expression chain returns an <code>Expression</code>, being careful to implement correct associativity for the operations involved.
+    By returning AST nodes from each method, the Parser can build up the final AST as it unwinds the recursive travesal.
+    </p>
+
+    <h1>Viewing the AST with a Vistor</h1>
+    <p>From this point forward, we will not be changing the crux language to add new operations.
+    That means we won't be adding any new classes to the <code>Command</code> class hierarchy.
+    However, we will be adding new functionality to each of the existing <code>Command</code> classes.
+    For example, in <a href="../lab5">Lab 5: Types</a>, we'll implement type checking and ascribe a type to each node in the AST.
+    Rather than change all the AST nodes to add a method, we'll use the <a href="http://en.wikipedia.org/wiki/Visitor_pattern">Visitor Pattern</a>.
+    </p>
+
+    <p>In the Visitor pattern, each subclass of the <code>Command</code> hierarchy implements an <code>accept(Visitor visitor)</code> method that dispatches back to the actual visitor.
+    Any class inheriting the <code>CommandVisitor</code> interface can implement additional functionality not present on the <code>Command</code> subclasses.
+    For example, the supplied <code>PrettyPrinter</code> permits us to print the entire AST, but avoids adding a <code>toPrettyString</code> in each of the <code>Command</code> classes.
+    </p>
+
+    <h1>What do I need to implement?</h1>
+    <p>Modify your Parser to produce an AST, and return it from the <code>parse</code> method.
+    The AST must accurately reflect all the commands that can occur in a crux program.
+    It's OK for the AST to contain the two symbol errors generated in <a href="../lab3/">Lab 3: Symbols</a>.
+    If the parser encounters a syntax error, it is unable to represent the crux source as an AST, and returns an Error node instead.
+    </p>
+
+    <p>For convenience, you may get a start on this lab by using a pre-made <a href="Lab4_AbstractSyntaxTree.zip">Lab4_AbstractSyntaxTree.zip</a> project, which contains the <code>ast</code> package.
+    As before, you are both allowed and encouraged to make your program easier to read and maintain by implementing helper functions with good names.
+    </p>
+ 
+    <h2>Changes from Lab 3: Symbols</h2>
+    <ul>
+      <li>The <code>Parser.parse</code> method now returns a <code>Command</code> node representing an AST.</li>
+      <li>Modify the <code>Compiler.main</code> driver to print out the returned AST.</li>
+      <li>Add the <code>ast</code> package, which contains an implementation for each of the AST nodes.</li>
+      <li>Add helper methods to Parser: <code>Token expectRetrieve(NonTerminal nt)</code> and <code>Token expectRetrieve(Token.Kind kind)</code>.</li>
+      <li>Change many (but not necessarily all) of the signatures of the Parser's recursive descent methods to return an <code>ast</code> node instead of <code>void</code>.</li>
+    </ul>
+ 
+    <h1>Testing</h1>
+    <p>Test cases are available in this <a href="tests.zip">tests.zip</a> file.
+    The provided tests are not meant to be exhaustive.
+    You are strongly encouraged to construct your own.
+    (If chrome gives you a warning that "tests.zip is not commonly downloaded and could be dangerous" it means that Google hasn't performed an automated a virus scan.
+    This warning can be safely ignored, as the tests.zip file contains only text files.)
+    </p>
+
+    <h1>Deliverables</h1>
+    <p>A zip file, named Crux.zip, containing the following files (in the <code>crux</code> package):
+    <ul>
+      <li>crux.NonTerminal.java, which holds the FirstSets of all production rules in the grammar.</li>
+      <li>crux.Parser.java, which performs grammar recognition of an input text.</li>
+      <li>crux.Scanner.java, which performs incremental tokenization of an input text.</li>
+      <li>crux.Compiler.java, which houses the main() function that begins your program.</li>
+      <li>crux.Token.java, which represents a string of characters read in the input text.</li>
+      <li>crux.SymbolTable.java, which implements the symbol table.</li>
+      <li>crux.Symbol.java, which implements storage for identifiers (functions, variables, and arrays).</li>
+      <li>The ast package: A class for each Command, a Visitor interface, and a PrettyPrinter.</li>
+    </ul>
+    </p>
+
+    <p>Please use the <a href="../../tester/index.php">AutoTester</a> to make sure that your work meets our requirements.
+    We reserve the right to assign 0 points to any submissions which cannot be automatically unzipped and tested.
+    Additionally, we reserve the right to assign 0 points to any submission which 'games' the automated testing by using a lookup which produces only outputs that correspond to the test cases we happen to use.
+    You are bound to all of the rules on the <a href="../../submittingprojects.html">Submitting Labs</a> page.
+    Be sure to submit the version of the project that you want graded, as we won't regrade if you submit the wrong version by accident.
+    </p>
+        
+    </div>
+    <div id="footer"></div>
+
+  </div></body>
+</html>
