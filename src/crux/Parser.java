@@ -802,10 +802,10 @@ public class Parser {
 	 * program := declaration-list EOF .
 	 */
 	public ast.DeclarationList program() {
+		//enterRule(NonTerminal.PROGRAM);
+		//declaration_list();
+		//expect(Token.Kind.EOF);
+		//exitRule(NonTerminal.PROGRAM);
         throw new RuntimeException("add code to each grammar rule, to build as ast.");
-		enterRule(NonTerminal.PROGRAM);
-		declaration_list();
-		expect(Token.Kind.EOF);
-		exitRule(NonTerminal.PROGRAM);
 	}
 }
