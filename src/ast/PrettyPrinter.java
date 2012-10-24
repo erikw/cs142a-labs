@@ -29,16 +29,18 @@ public class PrettyPrinter implements CommandVisitor {
 	public void visit(ExpressionList node) {
 		println(node);
 		depth++;
-		for (Expression e : node)
+		for (Expression e : node) {
 			e.accept(this);
+		}
 		depth--;
 	}
 
 	public void visit(DeclarationList node) {
 		println(node);
 		depth++;
-		for (Declaration d : node)
+		for (Declaration d : node) {
 			d.accept(this);
+		}
 		depth--;
 	}
 

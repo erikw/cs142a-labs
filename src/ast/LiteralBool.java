@@ -5,6 +5,9 @@ package ast;
  */
 public class LiteralBool extends Command implements Expression {
 	
+	/**
+	 * The possible values of a boolean type.
+	 */
 	public enum Value
 	{
 		FALSE,

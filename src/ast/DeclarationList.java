@@ -18,8 +18,8 @@ public class DeclarationList extends Command implements Iterable<Declaration> {
 	}
 	
 	/**
-	 * Add a command to this list.
-	 * @param command The command to add.
+	 * Add a declaration to this list.
+	 * @param command The declaration to add.
 	 */
 	public void add(Declaration command) {
 		list.add(command);
