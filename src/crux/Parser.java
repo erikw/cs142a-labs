@@ -573,8 +573,10 @@ public class Parser {
 			expr = expression0();
 			expect(Token.Kind.CLOSE_PAREN);
 		} else if (have(NonTerminal.DESIGNATOR)) {
-			ast.Command designator = (ast.Command) designator(); // TODO do this at more places, like call-expr below? TOOD ugly cast just to get line numbers...
-			expr = new ast.Dereference(designator.lineNumber(), designator.charPosition(), (ast.Expression) designator);
+			int lineNumber = currentToken.lineNumber();
+			int charPos = currentToken.charPosition();
+			ast.Expression designator = designator(); // TODO do this at more places, like call-expr below?
+			expr = new ast.Dereference(lineNumber, charPos, designator);
 		} else if (have(NonTerminal.CALL_EXPRESSION)) {
 			expr = call_expression();
 		} else if (have(NonTerminal.LITERAL)) {

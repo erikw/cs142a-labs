@@ -85,6 +85,8 @@
 			<formatter type="plain" usefile="no" />
 			<classpath refid="classpath.tests" />
 			<classpath refid="externalLibs" />
+			<!-- Enalbe java keyword assert. Can by enable on commandline with $(java [-ea|-enableassertions]).  -->
+			<assertions><enable/></assertions>
 
 			<batchtest>
 				<!-- The $* excludes inner classes. -->
