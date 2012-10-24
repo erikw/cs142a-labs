@@ -445,15 +445,20 @@ public class Parser {
 	 * designator := IDENTIFIER { "[" expression0 "]" } .
 	 **/
 	// TODO test in private test case.
-	public void designator() {
+	// TA: index, addresof, dreference
+	// return expressoin?
+	public ast.Expression designator() {
 		enterRule(NonTerminal.DESIGNATOR);
 		Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
-		tryResolveSymbol(identifier);
+		Symbol symbol = tryResolveSymbol(identifier);
+		ast.Expression expr = new ast.AddressOf(identifier.lineNumber(), identifier.charPosition(), symbol);
 		while (accept(Token.Kind.OPEN_BRACKET)) {
-			expression0();
+			ast.Command amount = (ast.Command) expression0(); //  TODO really do we needed to cast stuff? will expressions always be commands?
+			expr = new ast.Index(amount.lineNumber(), amount.charPosition(), expr, (ast.Expression) amount);
 			expect(Token.Kind.CLOSE_BRACKET);
 		}
 		exitRule(NonTerminal.DESIGNATOR);
+		return expr;
 	}
 
 	/**
@@ -568,7 +573,8 @@ public class Parser {
 			expr = expression0();
 			expect(Token.Kind.CLOSE_PAREN);
 		} else if (have(NonTerminal.DESIGNATOR)) {
-			expr = designator();
+			ast.Command designator = (ast.Command) designator(); // TODO do this at more places, like call-expr below? TOOD ugly cast just to get line numbers...
+			expr = new ast.Dereference(designator.lineNumber(), designator.charPosition(), (ast.Expression) designator);
 		} else if (have(NonTerminal.CALL_EXPRESSION)) {
 			expr = call_expression();
 		} else if (have(NonTerminal.LITERAL)) {
@@ -603,7 +609,7 @@ public class Parser {
 	 */
 	public ast.ExpressionList expression_list() {
 		enterRule(NonTerminal.EXPRESSION_LIST);
-		// TODO linenum of empty list?
+		// TODO linenum of empty list does not makes sense but the PrettyPrinter will not look at it anyways so just use the next token, TA says.
 		ast.ExpressionList exprList = new ast.ExpressionList(currentToken.lineNumber(), currentToken.charPosition());
 		if (have(NonTerminal.EXPRESSION0)) {
 			do {
@@ -622,17 +628,17 @@ public class Parser {
 	public Symbol paramter() {
 		enterRule(NonTerminal.PARAMETER);
 		Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
-		tryDeclareSymbol(identifier);
+		Symbol symbol = tryDeclareSymbol(identifier);
 		expect(Token.Kind.COLON);
 		type();
 		exitRule(NonTerminal.PARAMETER);
+		return symbol;
 	}
 
 	/**
 	 * Production for rule:
 	 * parameter-list := [ parameter { "," parameter } ] .
 	 */
-	// TODO return empty list if no paratmers?
 	public List<Symbol> parameter_list() {
 		enterRule(NonTerminal.PARAMETER_LIST);
 		List<Symbol> list = new LinkedList<Symbol>();
@@ -653,10 +659,10 @@ public class Parser {
 	 */
 	public ast.VariableDeclaration variable_declaration() {
 		enterRule(NonTerminal.VARIABLE_DECLARATION);
-		Token var = expectRetrieve(Token.Kind.VAR);
+		Token var = expectRetrieve(Token.Kind.VAR); // TODO can we avoid saving this? TA: will be changed in a code update maybe?
 		Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
 		Symbol symbol = tryDeclareSymbol(identifier);
-		ast.VariableDeclaration varDecl = new ast.VariableDeclaration(var.lineNumber(), var.charPosition(), symbol); // TODO what lienno/charpos to use? where symbol is or where the vardecl beginns?
+		ast.VariableDeclaration varDecl = new ast.VariableDeclaration(var.lineNumber(), var.charPosition(), symbol);
 		expect(Token.Kind.COLON);
 		type();
 		expect(Token.Kind.SEMICOLON);
@@ -735,14 +741,10 @@ public class Parser {
 	 * Production for rule:
 	 * declaration-list := { declaration } .
 	 */
-	// TODO what is an empty list suppose to be? null? if not, what lineno and charpos does the empty list have?
 	public ast.DeclarationList declaration_list() {
-		ast.DeclarationList declarationList = null;
+		ast.DeclarationList declarationList = new ast.DeclarationList(currentToken.lineNumber(), currentToken.charPosition()); // TODO can be factored out somewhere?
 		enterRule(NonTerminal.DECLARATION_LIST);
 		while (have(NonTerminal.DECLARATION)) {
-			if (declarationList == null) {
-				declarationList = new ast.DeclarationList(currentToken.lineNumber(), currentToken.charPosition()); // TODO can be factored out somewhere?
-			}
 			ast.Declaration declaration = declaration();
 			declarationList.add(declaration);
 		}
@@ -783,45 +785,55 @@ public class Parser {
 	 * Production for rule:
 	 * if-statement := "if" expression0 statement-block [ "else" statement-block ] .
 	 */
-	public void if_statement() {
+	public ast.IfElseBranch if_statement() {
 		enterRule(NonTerminal.IF_STATEMENT);
-		expect(Token.Kind.IF);
-		expression0();
+		Token ifToken = expectRetrieve(Token.Kind.IF);
+		ast.Expression condition = expression0();
 		enterScope();
-		statement_block();
+		ast.StatementList thenBlock = statement_block();
 		exitScope();
+		ast.StatementList elseBlock;
 		if (accept(Token.Kind.ELSE)) {
 			enterScope();
-			statement_block();
+			elseBlock = statement_block();
 			exitScope();
+		} else { // TODO ugly way, would be cleaner to get an empty list from statemen_block above?
+			elseBlock = new ast.StatementList(currentToken.lineNumber(), currentToken.charPosition());
 		}
+
 		exitRule(NonTerminal.IF_STATEMENT);
+		ast.IfElseBranch ifElseBranch = new ast.IfElseBranch(ifToken.lineNumber(), ifToken.charPosition(), condition, thenBlock, elseBlock);
+		return ifElseBranch;
 	}
 
 	/**
 	 * Production for rule:
 	 * while-statement := "while" expression0 statement-block .
 	 */
-	public void while_statement() {
+	public ast.WhileLoop while_statement() {
 		enterRule(NonTerminal.WHILE_STATEMENT);
-		expect(Token.Kind.WHILE);
-		expression0();
+		Token whileToken = expectRetrieve(Token.Kind.WHILE);
+		ast.Expression condition = expression0();
 		enterScope();
-		statement_block();
+		ast.StatementList body = statement_block();
 		exitScope();
+		ast.WhileLoop whileLoop = new ast.WhileLoop(whileToken.lineNumber(), whileToken.charPosition(), condition, body);
 		exitRule(NonTerminal.WHILE_STATEMENT);
+		return whileLoop;
 	}
 
 	/**
 	 * Production for rule:
 	 * return-statement := "return" expression0 ";" .
 	 */
-	public void return_statement() {
+	public ast.Return return_statement() {
 		enterRule(NonTerminal.RETURN_STATEMENT);
-		expect(Token.Kind.RETURN);
-		expression0();
+		Token returnToken = expectRetrieve(Token.Kind.RETURN);
+		ast.Expression arg = expression0();
 		expect(Token.Kind.SEMICOLON);
+		ast.Return returnStmt = new ast.Return(returnToken.lineNumber(), returnToken.charPosition(), arg);
 		exitRule(NonTerminal.RETURN_STATEMENT);
+		return returnStmt;
 	}
 
 	/**
@@ -857,13 +869,13 @@ public class Parser {
 	 */
 	public ast.StatementList statement_list() {
 		enterRule(NonTerminal.STATEMENT_LIST);
-		//  TODO what to do if no statemts at all?
 		ast.StatementList stmtList = new ast.StatementList(currentToken.lineNumber(), currentToken.charPosition());
 		while (have(NonTerminal.STATEMENT)) {
 			ast.Statement stmt = statement();
 			stmtList.add(stmt);
 		}
 		exitRule(NonTerminal.STATEMENT_LIST);
+		return stmtList;
 	}
 
 	/**
