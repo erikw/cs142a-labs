@@ -1,7 +1,7 @@
 package ast;
 
 /**
- * TODO Command for getting the address of 
+ * Command for getting the address of a symbol.
  */
 public class AddressOf extends Command implements Expression {
 
