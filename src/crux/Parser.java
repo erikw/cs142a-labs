@@ -389,29 +389,6 @@ public class Parser {
         //return ErrorToken(errorMessage);
     }
 
-    /*
-     * TODO needed?
-     */
-    private String expectIdentifier() {
-        String name = currentToken.lexeme();
-        if (expect(Token.Kind.IDENTIFIER)) {
-            return name;
-        }
-        return null;
-    }
-
-    /**
-     * TODO might be needed in a future lab according to the TA.
-     */
-    private Integer expectInteger() {
-        String num = currentToken.lexeme();
-        if (expect(Token.Kind.INTEGER)) {
-            return Integer.valueOf(num);
-        } else {
-        	return null;
-        }
-    }
-
 	/**
 	 * A unchecked exception thrown when the parser had to quit its operation.
 	 */
@@ -446,8 +423,8 @@ public class Parser {
 		Symbol symbol = tryResolveSymbol(identifier);
 		ast.Expression expr = new ast.AddressOf(identifier.lineNumber(), identifier.charPosition(), symbol);
 		while (accept(Token.Kind.OPEN_BRACKET)) {
-			ast.Command amount = (ast.Command) expression0(); //  TODO really do we needed to cast stuff? will expressions always be commands?
-			expr = new ast.Index(amount.lineNumber(), amount.charPosition(), expr, (ast.Expression) amount);
+			ast.Expression amount = expression0();
+			expr = new ast.Index(amount.lineNumber(), amount.charPosition(), expr, amount);
 			expect(Token.Kind.CLOSE_BRACKET);
 		}
 		exitRule(NonTerminal.DESIGNATOR);
@@ -460,7 +437,7 @@ public class Parser {
 	 */
 	public void type() {
 		enterRule(NonTerminal.TYPE);
-		// TODO in a future lab, check that the identifier is one of {void, bool, int, float}? should these be in the symbol table?
+		// TODO in a future lab, check that the identifier is one of {void, bool, int, float}? should these be in the symbol table.
 		expect(Token.Kind.IDENTIFIER);
 		exitRule(NonTerminal.TYPE);
 	}
@@ -567,7 +544,7 @@ public class Parser {
 		} else if (have(NonTerminal.DESIGNATOR)) {
 			int lineNumber = currentToken.lineNumber();
 			int charPos = currentToken.charPosition();
-			ast.Expression designator = designator(); // TODO do this at more places, like call-expr below (tried it but did tests failed)?
+			ast.Expression designator = designator();
 			expr = new ast.Dereference(lineNumber, charPos, designator);
 		} else if (have(NonTerminal.CALL_EXPRESSION)) {
 			expr = call_expression();
@@ -603,7 +580,6 @@ public class Parser {
 	 */
 	public ast.ExpressionList expression_list() {
 		enterRule(NonTerminal.EXPRESSION_LIST);
-		// TODO linenum of empty list does not makes sense but the PrettyPrinter will not look at it anyways so just use the next token, TA says.
 		ast.ExpressionList exprList = new ast.ExpressionList(currentToken.lineNumber(), currentToken.charPosition());
 		if (have(NonTerminal.EXPRESSION0)) {
 			do {
@@ -653,7 +629,7 @@ public class Parser {
 	 */
 	public ast.VariableDeclaration variable_declaration() {
 		enterRule(NonTerminal.VARIABLE_DECLARATION);
-		Token var = expectRetrieve(Token.Kind.VAR); // TODO can we avoid saving this? TA: will be changed in a code update maybe?
+		Token var = expectRetrieve(Token.Kind.VAR);
 		Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
 		Symbol symbol = tryDeclareSymbol(identifier);
 		ast.VariableDeclaration varDecl = new ast.VariableDeclaration(var.lineNumber(), var.charPosition(), symbol);
@@ -789,7 +765,7 @@ public class Parser {
 			enterScope();
 			elseBlock = statement_block();
 			exitScope();
-		} else { // TODO what is cleanest?: eles branch or alwya enter statement_block who retunes an empty list?
+		} else {
 			elseBlock = new ast.StatementList(currentToken.lineNumber(), currentToken.charPosition());
 		}
 		exitRule(NonTerminal.IF_STATEMENT);
