@@ -93,6 +93,4 @@ public abstract class Command implements Visitable {
 			default:		return new Error(tok.lineNumber(), tok.charPosition(), "Unknown Operation: " + tok);
 		}
 	}
-
-	// TODO public static Expression newDeclaration();
 }

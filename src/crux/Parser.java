@@ -57,7 +57,6 @@ public class Parser {
 		try {
 			return program();
 		} catch (QuitParseException qpe) {
-			// TODO keep these error reportings from pre-lab4 or switch them?
 			errorBuffer.append("SyntaxError(" + lineNumber() + "," + charPosition() + ")");
 			errorBuffer.append("[Could not complete parsing.]");
 
@@ -432,7 +431,6 @@ public class Parser {
 	public ast.Expression literal() {
 		enterRule(NonTerminal.LITERAL);
 
-		//expect(NonTerminal.LITERAL);
         Token tok = expectRetrieve(NonTerminal.LITERAL);
 		ast.Expression expr = Command.newLiteral(tok);
 
@@ -444,9 +442,6 @@ public class Parser {
 	 * Production for rule:
 	 * designator := IDENTIFIER { "[" expression0 "]" } .
 	 **/
-	// TODO test in private test case.
-	// TA: index, addresof, dreference
-	// return expressoin?
 	public ast.Expression designator() {
 		enterRule(NonTerminal.DESIGNATOR);
 		Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
@@ -467,7 +462,7 @@ public class Parser {
 	 */
 	public void type() {
 		enterRule(NonTerminal.TYPE);
-		// TODO in a future lab, check that the identifier is one of {void, bool, int, float}? should these be in the symbol table
+		// TODO in a future lab, check that the identifier is one of {void, bool, int, float}? should these be in the symbol table?
 		expect(Token.Kind.IDENTIFIER);
 		exitRule(NonTerminal.TYPE);
 	}
@@ -526,7 +521,6 @@ public class Parser {
 	 * Production for rule:
 	 * expression1 := expression2 { op1  expression2 } .
 	 */
-	// TODO watch out for assosiativity rules here!!
 	public ast.Expression expression1() {
 		enterRule(NonTerminal.EXPRESSION1);
 		ast.Expression expr = expression2();
@@ -575,7 +569,7 @@ public class Parser {
 		} else if (have(NonTerminal.DESIGNATOR)) {
 			int lineNumber = currentToken.lineNumber();
 			int charPos = currentToken.charPosition();
-			ast.Expression designator = designator(); // TODO do this at more places, like call-expr below?
+			ast.Expression designator = designator(); // TODO do this at more places, like call-expr below (tried it but did tests failed)?
 			expr = new ast.Dereference(lineNumber, charPos, designator);
 		} else if (have(NonTerminal.CALL_EXPRESSION)) {
 			expr = call_expression();
@@ -744,7 +738,7 @@ public class Parser {
 	 * declaration-list := { declaration } .
 	 */
 	public ast.DeclarationList declaration_list() {
-		ast.DeclarationList declarationList = new ast.DeclarationList(currentToken.lineNumber(), currentToken.charPosition()); // TODO can be factored out somewhere?
+		ast.DeclarationList declarationList = new ast.DeclarationList(currentToken.lineNumber(), currentToken.charPosition());
 		enterRule(NonTerminal.DECLARATION_LIST);
 		while (have(NonTerminal.DECLARATION)) {
 			ast.Declaration declaration = declaration();
@@ -799,7 +793,7 @@ public class Parser {
 			enterScope();
 			elseBlock = statement_block();
 			exitScope();
-		} else { // TODO ugly way, would be cleaner to get an empty list from statemen_block above?
+		} else { // TODO what is cleanest?: eles branch or alwya enter statement_block who retunes an empty list?
 			elseBlock = new ast.StatementList(currentToken.lineNumber(), currentToken.charPosition());
 		}
 
