@@ -430,10 +430,8 @@ public class Parser {
 	 */
 	public ast.Expression literal() {
 		enterRule(NonTerminal.LITERAL);
-
         Token tok = expectRetrieve(NonTerminal.LITERAL);
 		ast.Expression expr = Command.newLiteral(tok);
-
 		exitRule(NonTerminal.LITERAL);
 		return expr;
 	}
@@ -673,7 +671,6 @@ public class Parser {
 	public ast.ArrayDeclaration array_declaration() {
 		enterRule(NonTerminal.ARRAY_DECLARATION);
 		Token array = expectRetrieve(Token.Kind.ARRAY);
-		//expect(Token.Kind.IDENTIFIER);
 		Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
 		Symbol symbol = tryDeclareSymbol(identifier);
 		ast.ArrayDeclaration arrayDecl = new ast.ArrayDeclaration(array.lineNumber(), array.charPosition(), symbol);
@@ -748,7 +745,6 @@ public class Parser {
 		return declarationList;
 	}
 
-
 	/**
 	 * Production for rule:
 	 * assignment-statement := "let" designator "=" expression0 ";" .
@@ -796,7 +792,6 @@ public class Parser {
 		} else { // TODO what is cleanest?: eles branch or alwya enter statement_block who retunes an empty list?
 			elseBlock = new ast.StatementList(currentToken.lineNumber(), currentToken.charPosition());
 		}
-
 		exitRule(NonTerminal.IF_STATEMENT);
 		ast.IfElseBranch ifElseBranch = new ast.IfElseBranch(ifToken.lineNumber(), ifToken.charPosition(), condition, thenBlock, elseBlock);
 		return ifElseBranch;
