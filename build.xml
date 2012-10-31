@@ -34,7 +34,7 @@
 	<!-- *** Targets *** -->
 	<!-- Here all targets exists. -->
 
-	<target name="compile" depends="clean,tags" description="Compile the sources to the destination.">
+	<target name="compile" depends="tags" description="Compile the sources to the destination.">
 		<mkdir dir="bin" />
 		<javac destdir="${path.destination}" includeantruntime="false" debug="true" debuglevel="lines,vars,source">
 			<src path="${path.source}" />
