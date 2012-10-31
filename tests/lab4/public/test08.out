@@ -1,0 +1,22 @@
+ast.DeclarationList(3,1)
+  ast.FunctionDefinition(3,1)[Symbol(main), []]
+    ast.StatementList(4,3)
+      ast.VariableDeclaration(4,3)[Symbol(x)]
+      ast.WhileLoop(6,3)
+        ast.Dereference(6,10)
+          ast.AddressOf(6,10)[x]
+        ast.StatementList(7,5)
+          ast.Call(7,5)[Symbol(println)]
+            ast.ExpressionList(7,15)
+          ast.Call(8,5)[Symbol(printBool)]
+            ast.ExpressionList(8,17)
+              ast.Dereference(8,17)
+                ast.AddressOf(8,17)[x]
+          ast.Assignment(9,5)
+            ast.AddressOf(9,9)[x]
+            ast.LogicalNot(9,13)
+              ast.Dereference(9,17)
+                ast.AddressOf(9,17)[x]
+      ast.Call(11,3)[Symbol(println)]
+        ast.ExpressionList(11,13)
+

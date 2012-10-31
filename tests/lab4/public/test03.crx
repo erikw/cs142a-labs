@@ -1,0 +1,12 @@
+// test logical operators
+
+var i:bool;
+var j:bool;
+var k:bool;
+
+func main() : void {
+  ::printBool(i and j);
+  ::printBool(i or j);
+  ::printBool(not (i and j));
+  ::printBool(i and j or k);
+}

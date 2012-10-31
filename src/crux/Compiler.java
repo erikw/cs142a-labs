@@ -31,7 +31,7 @@ public class Compiler {
 	public static enum Lab { LAB1, LAB2, LAB3, LAB4, LAB5, LAB6 };
 
 	/* Default lab if not specified. */
-	private static final Lab DEFAULT_LAB = Lab.LAB3;
+	private static final Lab DEFAULT_LAB = Lab.LAB4;
 
 	/* A mapping from integers to enum constants. */
 	private static final Map<Integer, Compiler.Lab> labLookup = new HashMap<Integer, Compiler.Lab>() {
@@ -77,10 +77,11 @@ public class Compiler {
 	 */
 	public void compile(String cruxFile) {
         Scanner scanner = null;
+        Parser parser;
         try {
             scanner = new Scanner(new FileReader(cruxFile));
         } catch (IOException e) {
-            System.err.println("Error accessing the source file: \"" + cruxFile + "\".");
+            System.err.println("Error accessing the source file: \"" + cruxFile + "\"");
 			System.exit(-2);
         }
 		switch (currentLab) {
@@ -94,7 +95,7 @@ public class Compiler {
 				break;
 			case LAB2:
 			case LAB3:
-				Parser parser = new Parser(scanner);
+				parser = new Parser(scanner);
 				parser.parse();
 				if (parser.hasError()) {
 					System.out.println("Error parsing file.");
@@ -112,10 +113,21 @@ public class Compiler {
 						break;
 				}
 				break;
+			case LAB4:
+        		parser = new Parser(scanner);
+        		ast.Command syntaxTree = parser.parse();
+        		if (parser.hasError()) {
+            		System.out.println("Error parsing file " + cruxFile);
+            		System.out.println(parser.errorReport());
+            		System.exit(-3);
+				}
+        		ast.PrettyPrinter prettyPrinter = new ast.PrettyPrinter();
+        		syntaxTree.accept(prettyPrinter);
+        		System.out.println(prettyPrinter.toString());
+        		break;
 			default:
 				System.err.println("What lab are you working on?");
 		}
-
 	}
 
 	/**

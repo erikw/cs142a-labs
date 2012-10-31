@@ -1,0 +1,7 @@
+// test assignment
+
+func main() : void {
+  var x:bool;
+
+  let x = not x and true;
+}

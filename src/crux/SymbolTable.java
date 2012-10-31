@@ -79,9 +79,10 @@ public class SymbolTable extends AbstractSymbolTable {
         Symbol symbol = table.get(name);
         if (symbol != null ) {
         	throw new RedeclarationError(symbol);
-        } else {
-			return table.put(name, new Symbol(name));
-        }
+        } 
+		symbol = new Symbol(name);
+		table.put(name, symbol);
+		return symbol;
     }
 
     /**

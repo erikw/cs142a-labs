@@ -1,0 +1,7 @@
+// test nested expressions
+
+func main() : void {
+  if (((((true))))) {
+    ::printInt(5);
+  }
+}
