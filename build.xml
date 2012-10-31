@@ -39,7 +39,7 @@
 		<javac destdir="${path.destination}" includeantruntime="false" debug="true" debuglevel="lines,vars,source">
 			<src path="${path.source}" />
 			<classpath refid="externalLibs" />
-			<compilerarg value="-Xlint" /> <!-- Enable all recommended warnings. -->
+				<compilerarg value="-Xlint" /> <!-- Enable all recommended warnings. -->
 		</javac>
 	</target>
 
