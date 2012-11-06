@@ -1,0 +1,250 @@
+<html>
+  <head>
+    <title>CS 142A: Interpreters and Compilers</title>
+    <link href="../../style.css" rel="StyleSheet" type="text/css" \>
+    <script type="text/javascript" src="../../code/jQuery.js"></script>
+
+  </head>
+
+  <body><div id="container">
+    <div id="header">
+      <p><a href="index.html">CS 142A: Interpreters and Compilers</a></p>
+    </div>
+
+    <div id="leftnav">
+      <!-- should provide a noscript hard link to a navigation page -->
+      <script type="text/javascript" src="../../code/menu.js"></script>
+      <script type="text/javascript">document.write(generateMenu(document.URL));</script>
+    </div>
+
+    <div id="content">
+    
+    <h1>Lab #5: <i>Types and Type-checking</i></h1>
+    <p><b>Due date and time:</b> <i>Saturday, November 17, 11:59pm</i></span><br>
+    This project implements additional semantic checks on the AST generated in the <a href="../lab4/">previous lab</a>.
+    We are not handing out a solution to the previous lab.
+    To avoid delays, please make sure to see the TA or myself to get it working without error as soon as possible.
+    </p>
+
+    <h1>Before You Begin</h1>
+    <ul>
+      <li>I made a mistake in Lab 4.
+      The ast.ArrayDeclaration should implement only the Declaration interface and <em>not</em> the Statement interface.
+      You may fix that if you care about using the Java type system to help catching catch bugs due to accidentally using an ArrayDeclaration where a Statement is expected.
+      </li>
+      <li>I also have what I would consider a bug in the grammar.
+      I should have designed Crux so that array declarations read as "<code>array a:[5][4][3]int;</code>" instead of "<code>array a:int[5][4][3];</code>".
+      Because of this mistake, some of the error messages and indexing operations will seem like they read backwards.
+      I'm sorry if this causes you some confusion, but I won't change the grammar this late in our implementation.
+      </li>
+    </ul>
+
+    <h1>Introduction</h1>
+    <p>Now that we can construct a tree representation of input crux source code, we are able to perform additional semantic checks.
+    All popular computer languages implement some kind of type system.
+    You are probably quite used to satisfying the Java type system by now.
+    Indeed, hopefully, you are using it (alongside testing) to enforce design constraints on your code, and alert you to mistakes.
+    Depending on the language, the type system can do type checks at runtime (Scheme,JavaScript,Python,Ruby), or compile time (Haskell,OCaml), or a mix of both.
+    Crux sits squarely in the compile time camp, so a crux compiler has to check that all crux programs obey the rules of the crux type system, before it emits machine code.
+    </p>
+
+    <p>In the past we've used the Scanner to recognize illegal characters, the Parser and grammar to recognize illegal syntax, and the Symbol Table to recognize illegal usage of variables and functions.
+    Now we add a type system so that we can detect semantic errors such as the illegal use of expressions, invalid arguments to functions, returns incompatible with their function return type, etc.
+    In many languages the type system embodies a powerful checker, which programmers use to enforce design constraints and catch errors.
+    </p>
+
+    <h1>Designing a Type-checking System</h1>
+    <p>With a type system, we aim to prevent the programmer from accidentally using operations in an invalid manner.
+    For example, it's nonsensical to add the number <code>5</code> with the boolean <code>true</code>.
+    In industrial programming languages, the type system can be quite complicated, allowing for automatic conversions between types (called type coercion), operator and function overloading, multiple or single inheritance, covariant returns, etc.
+    Crux's type system is very simple in comparison.
+    It allows operations (add, sub, mul, div) only between 'like' types.
+    That is, ints operate with ints and floats operate with floats, and return values must match the function return type exactly.
+    </p>
+
+    <p>In spite of the simplicity of our system, we still practice good coding techniques developed for more complex systems.
+    The research article <a href="04287122.pdf">Design Patterns for Teaching Type Checking in a Compiler Construction Course</a> demonstrates how to use the <a href="http://en.wikipedia.org/wiki/Composite_pattern">Composite Pattern</a> to represent a set of base types together with operations which can be performed on those types.
+    The <code>types</code> package in lab implements this design pattern.
+    The abstract base class, <code>Type</code> defines a default implementation for each of the operations in the crux language.
+    A convenience method <code>getBaseType(String typeStr)</code> is present for converting type lexemes into Type objects.
+    </p>
+
+    <h2>The Base Types</h2>
+    <p>Crux has the numerical types int and float represented by <code>IntType</code> and <code>FloatType</code>.
+    It also has the logical type bool, represented by <code>BoolType</code>.
+    Finally, the <code>VoidType</code> is present to distinguish functions that return a value from those which do not.
+    </p>
+
+    <h2>The Composite Types</h2>
+    <p>On top of the base types, Crux allows the creation of arrays, represented by <code>ArrayType</code>, and addresses, represented by <code>AddressType</code>.
+    The constructor for <code>ArrayType</code> takes another type argument to distinguish what type the array contains.
+    Using this argument, we can make an array of one of the base types, or an array of arrays.
+    The constructor for <code>AddressType</code> takes another type argument to distinguish what type of value the address references.
+    Using this argument, we can make addresses over any other type, including arrays.
+    This ability is especially useful for the address arithmetic computation offsets for multi-dimensional arrays.
+    More powerful languages use the composite technique to build up structures and classes.
+    </p>
+
+    <h2>The Function Type</h2>
+    <p>A computer language is not very useful without the function/procedure abstraction.
+    The crux compiler has a <code>FuncType</code> which tracks both the arguments <code>TypeList</code> and return type of a function.
+    Within the type system, the function type could be used to construct functions that return/accept arrays, or even functions that return/accept other functions.
+    However, the Crux grammar prevents us from expressing these more complex programs, restricting us to only the base types.
+    </p>
+
+    <h2>The Error Type</h2>
+    <p>Errors which might occur during type checking are represented with the <code>ErrorType</code>, which contains a field, <code>String message</code>, to convey the reason for the error.
+    </p>
+
+    <h2>The Operations</h2>
+    <p>For each operation available in the crux language, we implement a checking function in the <code>Type</code> base class.
+    Most of these operations, such as the basic arithmetic operations, are immediately recognizable.
+    <table>
+      <tr>
+        <th>Method/Operation</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>Type add(Type that)</td>
+        <td>Addition of two expressions.</td>
+      </tr>
+      <tr>
+        <td>Type sub(Type that)</td>
+        <td>Subtraction of two expressions.</td>
+      </tr>
+      <tr>
+        <td>Type mul(Type that)</td>
+        <td>Multiplication of two expressions.</td>
+      </tr>
+      <tr>
+        <td>Type div(Type that)</td>
+        <td>Division of two expressions.</td>
+      </tr>
+      <tr>
+        <td>Type and(Type that)</td>
+        <td>Logical and of two expressions.</td>
+      </tr>
+      <tr>
+        <td>Type or(Type that)</td>
+        <td>Logical or of two expressions.</td>
+      </tr>
+      <tr>
+        <td>Type not()</td>
+        <td>Negation of one expression.</td>
+      </tr>
+      <tr>
+        <td>Type compare(Type that)</td>
+        <td>Logical comparison of two expressions.</td>
+      </tr>
+      <tr>
+        <td>Type deref()</td>
+        <td>Obtain the value at a given address.</td>
+      </tr>
+      <tr>
+        <td>Type index(Type that)</td>
+        <td>Index into an array.</td>
+      </tr>
+      <tr>
+        <td>Type call(Type args)</td>
+        <td>A function call.</td>
+      </tr>
+      <tr>
+        <td>Type assign(Type source)</td>
+        <td>Assign an expression to a designator.</td>
+      </tr>
+    </table>
+    </p>
+
+    <h2>Equivalence</h2>
+    <p>We also implement an additional method <code>boolean equivalent(Type that)</code>, which allows the type system to detect if two type objects are structurally equivalent.
+    This operation comes in especially handy when checking that the <code>TypeList</code> of a function call matches the function's signature.
+    </p>
+
+    <h1>Laying Some Groundwork</h1>
+    <p>In order to make use of the type system, we shall have to make some modifications to our existing codebase.
+    One of these changes includes the addition of a type field to the <code>Symbol</code> class.
+    When a function, variable, or array is declared we shall store the type information with the newly created symbol.
+    The type field allows the type-checker to access the information when it sees an access of that symbol in the AST.
+    </p>
+
+    <p>Additionally, the <code>Parser</code> needs some modification in order to attach or update the type of newly created symbols.
+    For example, I found that returning a <code>Type</code> from the <code>type()</code> grammar rule and a <code>TypeList</code> from the <code>parameter_list()</code> grammar rule to be convenient.
+    I also found that the addition of the helper <code>Type tryResolveType(String typeStr)</code>, which works analogously to <code>tryResolveSymbol</code>, clarified my intent in the <code>type()</code> grammar rule of the Parser.
+    Finally, a <code>Integer expectIteger()</code> method improved the parsing of array indexes during array declaration.
+    </p>
+
+    <h1>The Type Checker</h1>
+    <p>We implement the TypeChecker as a CommandVisitor.
+    It's job is to walk the AST produced by the Parser, and check for any of the type errors that may occur in the Crux language.
+    It accomplishes this task by first descending down to the leafs of the tree and then propagating type information up to the root as it unwinds.
+    The checker must therefore associate some type information with each node of the AST.
+    </p>
+
+    <p>
+    Java does not allow us to extend the AST nodes for the purpose of adding type information, nor are we able to change the argument type of the visitor methods.
+    As a result of this restriction, we create a <code>HashMap&lt;ast.Command, Type&gt; typeMap</code> which records the association for us.
+    Because the association is external to the nodes in the AST, the TypeChecker manually manages the association.
+
+    <h2>Reporting Errors</h2>
+    <p>
+    The TypeChecker also contains a <code>StringBuffer errorBuffer</code> field for recording any type errors it encounters during its traversal of the AST.
+    Each time the TypeChecker enters an association into the typeMap it checks for the ErrorType and records a message into the errorBuffer when one is present.
+    It's convenient to create a wrapper for the <code>typeMap.put()</code> method, which catches any type error messages.
+    </p>
+
+    <p>Some of the nodes in the AST require additional checks.
+    For example, both the IfElseBranch and WhileLoop, much check that their conditions are a BoolType.
+    Return statements must verify that they are compatible with the function being defined.
+    At least one check, that functions declaring a non-Void return value actually return in all possible paths, requires significant thought.
+    I strongly suggest writing helper and convenience methods.
+    </p>
+
+    <h1>What do I need to implement?</h1>
+    <ul>
+      <li>Modify your Symbol classes to contain a field for storing the type.</li>
+      <li>Modify your Parser so that it attaches the type to the symbols when they are created.</li>
+      <li>Supply the appropriate implementation for the operation methods of classes in the <code>types</code> package.</li>
+      <li>Complete the implementation of the TypeChecker visitor, so that it passes only those programs which satisfy all of the Type Semantics section of the <a href="../languagespec.html">Crux Specification</a>.</li>
+      <li>Add a type specification to each of the predefined functions.</li>
+      <li>Enforce that the main function has the appropriate signature.</li>
+    </ul>
+
+    <p>For convenience, you may get a start on this lab by using a pre-made <a href="Lab5_Types.zip">Lab5_Types.zip</a> project, which contains the <code>types</code> package.
+    As before, you are both allowed and encouraged to make your program easier to read and maintain by implementing helper functions with good names.
+    </p>
+ 
+    <h2>Changes from Lab 4: Abstract Syntax Tree</h2>
+    <ul>
+      <li>Update the Symbol.toString method to also report the type.</li>
+      <li>Update Compiler.main driver to call TypeChecker.check on the Parser's returned AST.</li>
+    </ul>
+ 
+    <h1>Testing</h1>
+    <p>Test cases are available in this <a href="tests.zip">tests.zip</a> file.
+    The provided tests are not meant to be exhaustive.
+    You are strongly encouraged to construct your own.
+    (If chrome gives you a warning that "tests.zip is not commonly downloaded and could be dangerous" it means that Google hasn't performed an automated a virus scan.
+    This warning can be safely ignored, as the tests.zip file contains only text files.)
+    </p>
+
+    <h1>Deliverables</h1>
+    <p>A zip file, named Crux.zip, containing the following files (in the <code>crux</code> package):
+    <ul>
+      <li>The <code>crux</code> package: NonTerminal, Parser, Scanner, Compiler, Token, Symbol and SymbolTable.</li>
+      <li>The <code>ast</code> package: A class for each Command, a CommandVisitor interface, and a PrettyPrinter.</li>
+      <li>The <code>types</code> package: A class for each Type, and a TypeChecker implementing the CommandVisitor interface.</li>
+    </ul>
+    </p>
+
+    <p>Please use the <a href="../../tester/index.php">AutoTester</a>  to make sure that your work meets our requirements.
+    We reserve the right to assign 0 points to any submissions which cannot be automatically unzipped and tested.
+    Additionally, we reserve the right to assign 0 points to any submission which 'games' the automated testing by using a lookup which produces only outputs that correspond to the test cases we happen to use.
+    You are bound to all of the rules on the <a href="../../submittingprojects.html">Submitting Labs</a> page.
+    Be sure to submit the version of the project that you want graded, as we won't regrade if you submit the wrong version by accident.
+    </p>
+        
+    </div>
+    <div id="footer"></div>
+
+  </div></body>
+</html>

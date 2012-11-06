@@ -20,13 +20,13 @@ public class Parser {
 	private int parseTreeRecursionDepth = 0;
 
 	/* The string representation of our parse tree. */
-	private StringBuffer parseTreeBuffer = new StringBuffer();
+	private StringBuilder parseTreeBuffer = new StringBuilder();
 
     /* The symbol table. */
     private SymbolTable symbolTable;
 
 	/* Buffer for error messages. */
-	private StringBuffer errorBuffer = new StringBuffer();
+	private StringBuilder errorBuffer = new StringBuilder();
 
 
 	/* Scanner to fecth tokens from. */
@@ -609,6 +609,7 @@ public class Parser {
 	 * Production for rule:
 	 * parameter-list := [ parameter { "," parameter } ] .
 	 */
+	// TODO change return type according to lab5 instructions
 	public List<Symbol> parameter_list() {
 		enterRule(NonTerminal.PARAMETER_LIST);
 		List<Symbol> list = new LinkedList<Symbol>();

@@ -31,7 +31,7 @@ public class Compiler {
 	public static enum Lab { LAB1, LAB2, LAB3, LAB4, LAB5, LAB6 };
 
 	/* Default lab if not specified. */
-	private static final Lab DEFAULT_LAB = Lab.LAB4;
+	private static final Lab DEFAULT_LAB = Lab.LAB5;
 
 	/* A mapping from integers to enum constants. */
 	private static final Map<Integer, Compiler.Lab> labLookup = new HashMap<Integer, Compiler.Lab>() {
