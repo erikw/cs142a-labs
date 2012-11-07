@@ -3,11 +3,18 @@ package types;
 import java.util.HashMap;
 import ast.*;
 
+/**
+ * A visitor that performed type checking on an AST.
+ */
 public class TypeChecker implements CommandVisitor {
-    
+    /* A map of types TODO */
+    // TODO change to Map?
     private HashMap<Command, Type> typeMap;
-    private StringBuffer errorBuffer;
 
+    /* Buffered error messages. */
+    private StringBuilder errorBuffer;
+
+    // TODO am I suppose to implement these some where?
     /* Useful error strings:
      *
      * "Function " + func.name() + " has a void argument in position " + pos + "."
@@ -26,16 +33,30 @@ public class TypeChecker implements CommandVisitor {
      * "Array " + arrayName + " has invalid base type " + baseType + "."
      */
 
+    /**
+     * Create a new type checker.
+     */
     public TypeChecker() {
         typeMap = new HashMap<Command, Type>();
         errorBuffer = new StringBuffer();
     }
 
+    /**
+     * Report error.
+     * @param lineNum The line number the error occured on.
+     * @param charPos The character position the error occured on.
+     * @param message A describing of the error.
+     */
     private void reportError(int lineNum, int charPos, String message) {
         errorBuffer.append("TypeError(" + lineNum + "," + charPos + ")");
         errorBuffer.append("[" + message + "]" + "\n");
     }
 
+	/**
+	 * Put a command with its type in the type map.
+	 * @param node The command node.
+	 * @param type The type for the node.
+	 */
     private void put(Command node, Type type) {
         if (type instanceof ErrorType) {
             reportError(node.lineNumber(), node.charPosition(), ((ErrorType)type).getMessage());
@@ -43,19 +64,37 @@ public class TypeChecker implements CommandVisitor {
         typeMap.put(node, type);
     }
     
+    /**
+     * Get the type for a given node.
+     * @param node The node to get the type for.
+     * @return The found type or null.
+     */
     public Type getType(Command node) {
         return typeMap.get(node);
     }
     
+    /**
+     * Check a given AST for type errors.
+     * @param ast The AST to check.
+     * @return Indication of success or failre.
+     */
     public boolean check(Command ast) {
         ast.accept(this);
         return !hasError();
     }
     
+    /**
+     * Query for found errors.
+     * @return Indication of error presence.
+     */
     public boolean hasError() {
         return errorBuffer.length() != 0;
     }
     
+    /**
+     * Get the error report.
+     * @return The error report.
+     */
     public String errorReport() {
         return errorBuffer.toString();
     }

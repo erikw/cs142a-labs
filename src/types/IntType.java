@@ -1,7 +1,13 @@
 package types;
 
+/**
+ * Type representing an interer.
+ */
 public class IntType extends Type {
 
+	/**
+	 * Construct a new interger type.
+	 */
     public IntType() {
     }
 
@@ -12,45 +18,58 @@ public class IntType extends Type {
 
     @Override
     public Type add(Type that) {
-        if (!(that instanceof IntType))
+        if (!(that instanceof IntType)) {
             return super.add(that);
-        return new IntType();
+        } else {
+        	return new IntType();
+        }
     }
 
     @Override
     public Type sub(Type that) {
-        if (!(that instanceof IntType))
+        if (!(that instanceof IntType)) {
             return super.sub(that);
-        return new IntType();
+        } else {
+        	return new IntType();
+        }
     }
 
     @Override
     public Type mul(Type that) {
-        if (!(that instanceof IntType))
+        if (!(that instanceof IntType)) {
             return super.mul(that);
-        return new IntType();
+
+        } else {
+        	return new IntType();
+        }
     }
 
     @Override
     public Type div(Type that) {
-        if (!(that instanceof IntType))
+        if (!(that instanceof IntType)) {
             return super.div(that);
-        return new IntType();
+        } else {
+        	return new IntType();
+        }
     }
 
     @Override
     public Type compare(Type that) {
-        if (!(that instanceof IntType))
+        if (!(that instanceof IntType)) {
             return super.compare(that);
-        return new BoolType();
+        } else {
+        	return new BoolType();
+        }
     }
 
     @Override
     public boolean equivalent(Type that) {
-        if (that == null)
+        if (that == null) {
             return false;
-        if (!(that instanceof IntType))
+        } else if (!(that instanceof IntType)) {
             return false;
-        return true;
+        } else {
+            return true;
+        }
     }
 }

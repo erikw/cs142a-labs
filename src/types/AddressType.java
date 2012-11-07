@@ -1,14 +1,25 @@
 package types;
 
+/**
+ * Type representing address of.
+ */
 public class AddressType extends Type {
-    
+    /* The base address. */
     private Type base;
-    
+
+    /**
+     * Construct a new address type.
+     * @param base The base address.
+     */
     public AddressType(Type base) {
         throw new RuntimeError("implement operators");
         this.base = base;
     }
-    
+
+    /**
+     * Get the base address.
+     * @return The base type.
+     */
     public Type base() {
         return base;
     }
@@ -20,12 +31,13 @@ public class AddressType extends Type {
 
     @Override
     public boolean equivalent(Type that) {
-        if (that == null)
+        if (that == null) {
             return false;
-        if (!(that instanceof AddressType))
+        } else if (!(that instanceof AddressType)) {
             return false;
-        
-        AddressType aType = (AddressType)that;
-        return this.base.equivalent(aType.base);
+        } else {
+        	AddressType aType = (AddressType) that;
+        	return this.base.equivalent(aType.base);
+        }
     }
 }

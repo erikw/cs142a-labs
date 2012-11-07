@@ -1,21 +1,29 @@
 package types;
 
+/**
+ * Type representing not a type.
+ */
 public class VoidType extends Type {
-    
+
+    /**
+     * Construct a not a type.
+     */
     public VoidType() {
     }
-    
+
     @Override
     public String toString() {
         return "void";
     }
-    
+
     @Override
     public boolean equivalent(Type that) {
-        if (that == null)
+        if (that == null) {
             return false;
-        if (!(that instanceof VoidType))
+        } else if (!(that instanceof VoidType)) {
             return false;
-        return true;
+        } else {
+            return true;
+        }
     }
 }

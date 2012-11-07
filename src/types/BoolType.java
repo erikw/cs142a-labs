@@ -1,11 +1,17 @@
 package types;
 
+/**
+ * Type representing a boolean type.
+ */
 public class BoolType extends Type {
-    
+
+    /**
+     * Construct a new boolean type.
+     */
     public BoolType() {
         throw new RuntimeError("implement operators");
     }
-    
+
     @Override
     public String toString() {
         return "bool";
@@ -13,11 +19,12 @@ public class BoolType extends Type {
 
     @Override
     public boolean equivalent(Type that) {
-        if (that == null)
+        if (that == null) {
             return false;
-        if (!(that instanceof BoolType))
+        } else if (!(that instanceof BoolType)) {
             return false;
-        
-        return true;
-    }
+        } else {
+        	return true;
+    	}
+	}
 }    
