@@ -26,44 +26,37 @@ public class TypeChecker implements CommandVisitor {
      * "Array " + arrayName + " has invalid base type " + baseType + "."
      */
 
-    public TypeChecker()
-    {
+    public TypeChecker() {
         typeMap = new HashMap<Command, Type>();
         errorBuffer = new StringBuffer();
     }
 
-    private void reportError(int lineNum, int charPos, String message)
-    {
+    private void reportError(int lineNum, int charPos, String message) {
         errorBuffer.append("TypeError(" + lineNum + "," + charPos + ")");
         errorBuffer.append("[" + message + "]" + "\n");
     }
 
-    private void put(Command node, Type type)
-    {
+    private void put(Command node, Type type) {
         if (type instanceof ErrorType) {
             reportError(node.lineNumber(), node.charPosition(), ((ErrorType)type).getMessage());
         }
         typeMap.put(node, type);
     }
     
-    public Type getType(Command node)
-    {
+    public Type getType(Command node) {
         return typeMap.get(node);
     }
     
-    public boolean check(Command ast)
-    {
+    public boolean check(Command ast) {
         ast.accept(this);
         return !hasError();
     }
     
-    public boolean hasError()
-    {
+    public boolean hasError() {
         return errorBuffer.length() != 0;
     }
     
-    public String errorReport()
-    {
+    public String errorReport() {
         return errorBuffer.toString();
     }
 

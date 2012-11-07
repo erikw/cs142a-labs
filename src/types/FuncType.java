@@ -5,32 +5,27 @@ public class FuncType extends Type {
    private TypeList args;
    private Type ret;
    
-   public FuncType(TypeList args, Type returnType)
-   {
+   public FuncType(TypeList args, Type returnType) {
       throw new RuntimeError("implement operators");
       this.args = args;
       this.ret = returnType;
    }
    
-   public Type returnType()
-   {
+   public Type returnType() {
       return ret;
    }
    
-   public TypeList arguments()
-   {
+   public TypeList arguments() {
       return args;
    }
    
    @Override
-   public String toString()
-   {
+   public String toString() {
       return "func(" + args + "):" + ret;
    }
 
    @Override
-   public boolean equivalent(Type that)
-   {
+   public boolean equivalent(Type that) {
       if (that == null)
          return false;
       if (!(that instanceof FuncType))

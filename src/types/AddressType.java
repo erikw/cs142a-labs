@@ -4,20 +4,17 @@ public class AddressType extends Type {
     
     private Type base;
     
-    public AddressType(Type base)
-    {
+    public AddressType(Type base) {
         throw new RuntimeError("implement operators");
         this.base = base;
     }
     
-    public Type base()
-    {
+    public Type base() {
         return base;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "Address(" + base + ")";
     }
 

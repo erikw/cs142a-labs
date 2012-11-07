@@ -8,19 +8,16 @@ public class TypeList extends Type implements Iterable<Type> {
     
     private List<Type> list;
     
-    public TypeList()
-    {
+    public TypeList() {
         list = new ArrayList<Type>();
     }
     
-    public void append(Type type)
-    {
+    public void append(Type type) {
         list.add(type);
     }
     
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("TypeList(");
         for (int i=0; i<list.size()-1; ++i)
@@ -43,8 +40,7 @@ public class TypeList extends Type implements Iterable<Type> {
         if (list.size() != olist.size())
             return false;
         
-        for (int i=0; i<list.size(); ++i)
-        {
+        for (int i=0; i<list.size(); ++i) {
             if (!list.get(i).equivalent(olist.get(i)))
                 return false;
         }
@@ -52,8 +48,7 @@ public class TypeList extends Type implements Iterable<Type> {
     }
     
     @Override
-    public Iterator<Type> iterator()
-    {
+    public Iterator<Type> iterator() {
         return list.iterator();
     }
 }
