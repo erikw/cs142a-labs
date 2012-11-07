@@ -1,11 +1,14 @@
 package crux;
 
-/**
- * Represenation of a symbol.
- */
+import types.Type;
+import types.ErrorType;
+
 public class Symbol {
     /* The name of the symbol. */
     private String name;
+
+    /* The type of the symbol. */
+    private Type type;
 
     /**
      * Construct a new symbol with a name.
@@ -13,6 +16,7 @@ public class Symbol {
      */
     public Symbol(String name) {
         this.name = name;
+        this.type = new ErrorType("Type not set.");
     }
 
     /**
@@ -22,13 +26,27 @@ public class Symbol {
     public String name() {
         return this.name;
     }
+    
+    public void setType(Type type)
+    {
+        this.type = type;
+    }
+    
+    public Type type()
+    {
+        return type;
+    }
 
     /**
      * Get a string represenation of this symbol.
      * @return A string representation.
      */
     public String toString() {
-        return "Symbol(" + name + ")";
+        if (Compiler.currentLab == Compiler.LAB5) {
+        	return "Symbol(" + name + ":" + type + ")";
+        } else {
+        	return "Symbol(" + name + ")";
+        }
     }
 
     /**

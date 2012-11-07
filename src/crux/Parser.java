@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.Stack;
 
 import ast.Command;
+import types.*;
 
 /**
  * Syntactic parser that reads a stream of tokens and builds a parse tree.
@@ -870,4 +871,11 @@ public class Parser {
 		exitRule(NonTerminal.PROGRAM);
 		return declarationList;
 	}
+
+
+// Typing System ===================================
+    
+    private Type tryResolveType(String typeStr) {
+        return Type.getBaseType(typeStr);
+    }
 }
