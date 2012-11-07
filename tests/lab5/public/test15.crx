@@ -1,0 +1,7 @@
+// invalid array
+
+array x : void[3][3][3];
+  
+func main() : void {
+  ::println();
+}

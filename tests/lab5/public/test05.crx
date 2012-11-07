@@ -1,0 +1,9 @@
+// error in argument list
+
+func foo(e:error) : void {
+  ::printInt(7);
+}
+
+func main() : void {
+  ::printInt(8);
+}

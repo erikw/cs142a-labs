@@ -1,0 +1,4 @@
+Error type-checking file.
+TypeError(8,3)[IfElseBranch requires bool condition not int.]
+TypeError(9,3)[IfElseBranch requires bool condition not float.]
+

@@ -1,0 +1,30 @@
+// test addition
+
+func addInts(a:int, b:int) : int {
+  return a + b;
+}
+
+func addFloats(a:float, b:float) : float {
+  return a + b;
+}
+
+func addBools(a:bool, b:bool) : bool {
+  return a + b;
+}
+
+func addIntBool(a:int, b:bool) : void {
+  return a + b;
+}
+
+func addIntFloat(a:int, b:float) : void {
+  return a + b;
+}
+
+func main() : void {
+  ::printFloat(7.0);
+}
+
+func addWithError() : void {
+  var a : int;
+  let a = 1 + 2 + 3 + false + 4 + 5 + 6;
+}

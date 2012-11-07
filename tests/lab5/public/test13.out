@@ -1,0 +1,12 @@
+Error type-checking file.
+TypeError(9,3)[Cannot call func(TypeList(int)):void using TypeList(array[4,int]).]
+TypeError(10,3)[Cannot call func(TypeList(int)):void using TypeList(array[5,int]).]
+TypeError(12,19)[Cannot index Address(int) with int.]
+TypeError(12,14)[Cannot dereference ErrorType(Cannot index Address(int) with int.)]
+TypeError(12,3)[Cannot call func(TypeList(int)):void using TypeList(ErrorType(Cannot dereference ErrorType(Cannot index Address(int) with int.))).]
+TypeError(13,22)[Cannot index Address(int) with int.]
+TypeError(13,14)[Cannot dereference ErrorType(Cannot index Address(int) with int.)]
+TypeError(13,3)[Cannot call func(TypeList(int)):void using TypeList(ErrorType(Cannot dereference ErrorType(Cannot index Address(int) with int.))).]
+TypeError(15,3)[Cannot call func(TypeList(int)):void using TypeList(array[3,array[5,array[7,array[9,int]]]]).]
+TypeError(16,3)[Cannot call func(TypeList(int)):void using TypeList(array[7,array[9,int]]).]
+

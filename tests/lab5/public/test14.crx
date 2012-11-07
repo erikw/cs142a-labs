@@ -1,0 +1,6 @@
+// invalid variable type
+
+func main() : void {
+  var a:void;
+  ::println();
+}

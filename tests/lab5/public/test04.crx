@@ -1,0 +1,9 @@
+// function can't have void arguments
+
+func foo(a:void) : void {
+  return ::foo(a);
+}
+
+func main() : void {
+  ::printInt(7);
+}
