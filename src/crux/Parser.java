@@ -236,6 +236,18 @@ public class Parser {
 		//return false;
 	}
 
+	/**
+	 * Expect an integer token.
+	 * @return An integer or null;
+	 */
+	private Integer expectInteger() {
+		String num = currentToken.lexeme();
+		if (expect(Token.Kind.INTEGER)) {
+		    return Integer.valueOf(num);
+		} else {
+			return null;
+		}
+	}
 
 // SymbolTable Management ==========================
 
@@ -400,6 +412,7 @@ public class Parser {
 		}
 	}
 
+
 	//  Grammar rules ==========================
 
 	/**
@@ -427,6 +440,7 @@ public class Parser {
 			ast.Expression amount = expression0();
 			expr = new ast.Index(amount.lineNumber(), amount.charPosition(), expr, amount);
 			expect(Token.Kind.CLOSE_BRACKET);
+			//symbol.setType(new AddressType(type... // TODO use AddressType here?
 		}
 		exitRule(NonTerminal.DESIGNATOR);
 		return expr;
@@ -436,11 +450,12 @@ public class Parser {
 	 * Production for rule:
 	 * type := IDENTIFIER .
 	 */
-	public void type() {
+	public Type type() {
 		enterRule(NonTerminal.TYPE);
-		// TODO in a future lab, check that the identifier is one of {void, bool, int, float}? should these be in the symbol table.
-		expect(Token.Kind.IDENTIFIER);
+		Token typeToken = expectRetrieve(Token.Kind.IDENTIFIER);
+		Type type = tryResolveType(typeToken.lexeme());
 		exitRule(NonTerminal.TYPE);
+		return type;
 	}
 
 	/**
@@ -601,7 +616,8 @@ public class Parser {
 		Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
 		Symbol symbol = tryDeclareSymbol(identifier);
 		expect(Token.Kind.COLON);
-		type();
+		Type type = type();
+		symbol.setType(type);
 		exitRule(NonTerminal.PARAMETER);
 		return symbol;
 	}
@@ -610,7 +626,6 @@ public class Parser {
 	 * Production for rule:
 	 * parameter-list := [ parameter { "," parameter } ] .
 	 */
-	// TODO change return type according to lab5 instructions
 	public List<Symbol> parameter_list() {
 		enterRule(NonTerminal.PARAMETER_LIST);
 		List<Symbol> list = new LinkedList<Symbol>();
@@ -636,7 +651,8 @@ public class Parser {
 		Symbol symbol = tryDeclareSymbol(identifier);
 		ast.VariableDeclaration varDecl = new ast.VariableDeclaration(var.lineNumber(), var.charPosition(), symbol);
 		expect(Token.Kind.COLON);
-		type();
+		Type type = type();
+		symbol.setType(type);
 		expect(Token.Kind.SEMICOLON);
 		exitRule(NonTerminal.VARIABLE_DECLARATION);
 		return varDecl;
@@ -653,14 +669,15 @@ public class Parser {
 		Symbol symbol = tryDeclareSymbol(identifier);
 		ast.ArrayDeclaration arrayDecl = new ast.ArrayDeclaration(array.lineNumber(), array.charPosition(), symbol);
 		expect(Token.Kind.COLON);
-		type();
+		Type type = type();
 		expect(Token.Kind.OPEN_BRACKET);
-		expect(Token.Kind.INTEGER);
-		expect(Token.Kind.CLOSE_BRACKET);
-		while (accept(Token.Kind.OPEN_BRACKET)) {
-			expect(Token.Kind.INTEGER);
+		// TODO will this produce the correct order of the types or should it be reversed?
+		do {	
+			Integer dimension = expectInteger(); // TODO handle null case
+			type = new ArrayType(dimension, type);
+			symbol.setType(type);
 			expect(Token.Kind.CLOSE_BRACKET);
-		}
+		} while (accept(Token.Kind.OPEN_BRACKET));
 		expect(Token.Kind.SEMICOLON);
 		exitRule(NonTerminal.ARRAY_DECLARATION);
 		return arrayDecl;
@@ -678,9 +695,11 @@ public class Parser {
 		expect(Token.Kind.OPEN_PAREN);
 		enterScope();
 		List<Symbol> args = parameter_list();
+		TypeList argTypes = new TypeList(collectTypes(args));
 		expect(Token.Kind.CLOSE_PAREN);
 		expect(Token.Kind.COLON);
-		type();
+		Type returnType = type();
+		symbol.setType(new FuncType(argTypes, returnType));
 		ast.StatementList body = statement_block();
 		ast.FunctionDefinition funcDecl = new ast.FunctionDefinition(func.lineNumber(), func.charPosition(), symbol, args, body);
 		exitScope();
@@ -875,7 +894,25 @@ public class Parser {
 
 // Typing System ===================================
     
+    /**
+     * Try to look up a type from a string.
+     * @param typeStr The string to lookup.
+     * @return the found type or ErrorType.
+     */
     private Type tryResolveType(String typeStr) {
         return Type.getBaseType(typeStr);
+    }
+
+	/**
+	 * Collect all types in a list of symbols.
+	 * @param symbols The symbols to collect types from.
+	 * @return A list of found types.
+	 */
+    private List<Type> collectTypes(List<Symbol> symbols) {
+		List<Type> types = new LinkedList<Type>();
+		for (Symbol symbol : symbols) {
+			types.add(symbol.type());
+		}
+    	return types;
     }
 }

@@ -1,7 +1,7 @@
 package types;
 
 /**
- * Abstract class representing the types the can exist in a crux program.
+ * Abstract base type representing the types the can exist in a crux program.
  */
 public abstract class Type {
     

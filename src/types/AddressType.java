@@ -3,6 +3,7 @@ package types;
 /**
  * Type representing address of.
  */
+// TODO when should this be used?
 public class AddressType extends Type {
     /* The base address. */
     private Type base;

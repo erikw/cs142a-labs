@@ -27,11 +27,19 @@ public class Symbol {
         return this.name;
     }
     
+    /**
+     * Set the type of this symbol.
+     * @param type The new type of this symbol.
+     */
     public void setType(Type type)
     {
         this.type = type;
     }
-    
+
+    /**
+     * Get the type of this stymbol.
+     * @return The type.
+     */
     public Type type()
     {
         return type;

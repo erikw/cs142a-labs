@@ -16,7 +16,15 @@ public class TypeList extends Type implements Iterable<Type> {
      * Construct a new type list.
      */
     public TypeList() {
-        list = new ArrayList<Type>();
+        this(null); // TODO will null paramter be OK to arralist constructor?
+    }
+
+    /**
+     * Construct a new type list with inital types.
+     * @param initTypes Types to initilaize the list with.
+     */
+    public TypeList(List<Type> initTypes) {
+        list = new ArrayList<Type>(initTypes);
     }
     
     /**
