@@ -1,0 +1,10 @@
+// print case sensitive vars
+
+var a : int;
+
+func main() : void {
+  var laMbda : float;
+  var lambda : int;
+
+  ::unk(a);
+}

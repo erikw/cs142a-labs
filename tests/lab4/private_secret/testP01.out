@@ -1,0 +1,19 @@
+ast.DeclarationList(3,1)
+  ast.ArrayDeclaration(3,1)[Symbol(x)]
+  ast.ArrayDeclaration(4,1)[Symbol(y)]
+  ast.FunctionDefinition(6,1)[Symbol(main), []]
+    ast.StatementList(7,3)
+      ast.Assignment(7,3)
+        ast.Index(7,9)
+          ast.AddressOf(7,7)[y]
+          ast.LiteralInt(7,9)[0]
+        ast.LiteralInt(7,14)[0]
+      ast.Assignment(8,3)
+        ast.Index(8,9)
+          ast.AddressOf(8,7)[x]
+          ast.Dereference(8,9)
+            ast.Index(8,11)
+              ast.AddressOf(8,9)[y]
+              ast.LiteralInt(8,11)[0]
+        ast.LiteralInt(8,17)[5]
+

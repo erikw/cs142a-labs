@@ -1,0 +1,15 @@
+// test operator associativity
+
+func main() : void {
+  var a : int;
+  var b : int;
+  var c : int;
+  var d : int;
+  var e : int;
+  var f : int;
+  var g : int;
+
+  let g = a + b - c + d - e - f;
+  let g = a * b / c * d / e / f;
+  let g = a and b or c and d or e or f;
+}

@@ -1,0 +1,12 @@
+Error parsing file.
+DeclareSymbolError(11,6)[gorn already exists.]
+Symbol(readInt)
+Symbol(readFloat)
+Symbol(printBool)
+Symbol(printInt)
+Symbol(printFloat)
+Symbol(println)
+Symbol(gorn)
+Symbol(main)
+
+

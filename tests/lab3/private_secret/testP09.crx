@@ -1,0 +1,39 @@
+// test many methods, each with problem
+
+
+func main(a:void) : int {
+  var a : int;
+  ::println(b);
+}
+func main2(a:void) : int {
+  var a : int;
+  ::println(b);
+}
+func main3(a:void) : int {
+  var a : int;
+  ::println(b);
+}
+func main4(a:void) : int {
+  var a : int;
+  ::println(b);
+}
+func main5(a:void) : int {
+  var a : int;
+  ::println(b);
+}
+func main6(a:void) : int {
+  var a : int;
+  ::println(b);
+}
+func main7(a:void) : int {
+  var a : int;
+  ::println(b);
+}
+func main8(a:void) : int {
+  var a : int;
+  ::println(b);
+}
+func main9(a:void) : int {
+  var a : int;
+  ::println(b);
+}

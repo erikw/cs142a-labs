@@ -1,0 +1,241 @@
+// deeply nested else's
+
+func main() : void {
+  var a1 : int;
+  
+  if (true) {
+    ::printInt(a1);
+    ::printInt(a2);
+    ::printInt(a3);
+    ::printInt(a4);
+    ::printInt(a5);
+    ::printInt(a6);
+    ::printInt(a7);
+    ::printInt(a8);
+    ::printInt(a9);
+    ::printInt(a10);
+  } else {
+    var a2 : int;
+    
+    if (true) {
+      ::printInt(a1);
+      ::printInt(a2);
+      ::printInt(a3);
+      ::printInt(a4);
+      ::printInt(a5);
+      ::printInt(a6);
+      ::printInt(a7);
+      ::printInt(a8);
+      ::printInt(a9);
+      ::printInt(a10);
+    } else {
+      var a3 : int;
+
+      if (true) {
+        ::printInt(a1);
+        ::printInt(a2);
+        ::printInt(a3);
+        ::printInt(a4);
+        ::printInt(a5);
+        ::printInt(a6);
+        ::printInt(a7);
+        ::printInt(a8);
+        ::printInt(a9);
+        ::printInt(a10);
+      } else {
+        var a4 : int;
+
+        if (true) {
+          ::printInt(a1);
+          ::printInt(a2);
+          ::printInt(a3);
+          ::printInt(a4);
+          ::printInt(a5);
+          ::printInt(a6);
+          ::printInt(a7);
+          ::printInt(a8);
+          ::printInt(a9);
+          ::printInt(a10);
+        } else {
+          var a5 : int;
+
+          if (true) {
+            ::printInt(a1);
+            ::printInt(a2);
+            ::printInt(a3);
+            ::printInt(a4);
+            ::printInt(a5);
+            ::printInt(a6);
+            ::printInt(a7);
+            ::printInt(a8);
+            ::printInt(a9);
+            ::printInt(a10);
+          } else {
+            var a6 : int;
+
+            if (true) {
+              ::printInt(a1);
+              ::printInt(a2);
+              ::printInt(a3);
+              ::printInt(a4);
+              ::printInt(a5);
+              ::printInt(a6);
+              ::printInt(a7);
+              ::printInt(a8);
+              ::printInt(a9);
+              ::printInt(a10);
+            } else {
+              var a7 : int;
+
+              if (true) {
+                ::printInt(a1);
+                ::printInt(a2);
+                ::printInt(a3);
+                ::printInt(a4);
+                ::printInt(a5);
+                ::printInt(a6);
+                ::printInt(a7);
+                ::printInt(a8);
+                ::printInt(a9);
+                ::printInt(a10);
+              } else {
+                var a8 : int;
+
+                if (true) {
+                  ::printInt(a1);
+                  ::printInt(a2);
+                  ::printInt(a3);
+                  ::printInt(a4);
+                  ::printInt(a5);
+                  ::printInt(a6);
+                  ::printInt(a7);
+                  ::printInt(a8);
+                  ::printInt(a9);
+                  ::printInt(a10);
+                } else {
+                  var a9 : int;
+
+                  if (true) {
+                    ::printInt(a1);
+                    ::printInt(a2);
+                    ::printInt(a3);
+                    ::printInt(a4);
+                    ::printInt(a5);
+                    ::printInt(a6);
+                    ::printInt(a7);
+                    ::printInt(a8);
+                    ::printInt(a9);
+                    ::printInt(a10);
+                  } else {
+                    var a10 : int;
+
+                    ::printInt(a1);
+                    ::printInt(a2);
+                    ::printInt(a3);
+                    ::printInt(a4);
+                    ::printInt(a5);
+                    ::printInt(a6);
+                    ::printInt(a7);
+                    ::printInt(a8);
+                    ::printInt(a9);
+                    ::printInt(a10);
+                  }
+                  ::printInt(a1);
+                  ::printInt(a2);
+                  ::printInt(a3);
+                  ::printInt(a4);
+                  ::printInt(a5);
+                  ::printInt(a6);
+                  ::printInt(a7);
+                  ::printInt(a8);
+                  ::printInt(a9);
+                  ::printInt(a10);
+                }
+                ::printInt(a1);
+                ::printInt(a2);
+                ::printInt(a3);
+                ::printInt(a4);
+                ::printInt(a5);
+                ::printInt(a6);
+                ::printInt(a7);
+                ::printInt(a8);
+                ::printInt(a9);
+                ::printInt(a10);
+              }
+              ::printInt(a1);
+              ::printInt(a2);
+              ::printInt(a3);
+              ::printInt(a4);
+              ::printInt(a5);
+              ::printInt(a6);
+              ::printInt(a7);
+              ::printInt(a8);
+              ::printInt(a9);
+              ::printInt(a10);
+            }
+            ::printInt(a1);
+            ::printInt(a2);
+            ::printInt(a3);
+            ::printInt(a4);
+            ::printInt(a5);
+            ::printInt(a6);
+            ::printInt(a7);
+            ::printInt(a8);
+            ::printInt(a9);
+            ::printInt(a10);
+          }
+          ::printInt(a1);
+          ::printInt(a2);
+          ::printInt(a3);
+          ::printInt(a4);
+          ::printInt(a5);
+          ::printInt(a6);
+          ::printInt(a7);
+          ::printInt(a8);
+          ::printInt(a9);
+          ::printInt(a10);
+        }
+        ::printInt(a1);
+        ::printInt(a2);
+        ::printInt(a3);
+        ::printInt(a4);
+        ::printInt(a5);
+        ::printInt(a6);
+        ::printInt(a7);
+        ::printInt(a8);
+        ::printInt(a9);
+        ::printInt(a10);
+      }
+      ::printInt(a1);
+      ::printInt(a2);
+      ::printInt(a3);
+      ::printInt(a4);
+      ::printInt(a5);
+      ::printInt(a6);
+      ::printInt(a7);
+      ::printInt(a8);
+      ::printInt(a9);
+      ::printInt(a10);
+    }
+    ::printInt(a1);
+    ::printInt(a2);
+    ::printInt(a3);
+    ::printInt(a4);
+    ::printInt(a5);
+    ::printInt(a6);
+    ::printInt(a7);
+    ::printInt(a8);
+    ::printInt(a9);
+    ::printInt(a10);
+  }
+  ::printInt(a1);
+  ::printInt(a2);
+  ::printInt(a3);
+  ::printInt(a4);
+  ::printInt(a5);
+  ::printInt(a6);
+  ::printInt(a7);
+  ::printInt(a8);
+  ::printInt(a9);
+  ::printInt(a10);
+}

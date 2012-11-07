@@ -1,0 +1,17 @@
+// test operator precedence
+
+func main() : void {
+  var a:int;
+  var b:int;
+  var c:int;
+  var d:int;
+
+  let d = a + b / c;
+  let d = a - b / c;
+  let d = a + b * c;
+  let d = a - b * c;
+  let d = a / b + c;
+  let d = a * b + c;
+  let d = a / b - c;
+  let d = a * b - c;
+}

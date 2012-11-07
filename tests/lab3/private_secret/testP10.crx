@@ -1,0 +1,13 @@
+// methods by the same name
+
+func gorn(a:int) : int {
+  return a;
+}
+
+func main() : void {
+  return ::main();
+}
+
+func gorn(b:float) : float {
+  return b;
+}

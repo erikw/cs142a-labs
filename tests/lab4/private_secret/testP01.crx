@@ -1,0 +1,9 @@
+// test that dereference appears appropriately
+
+array x : int[1];
+array y : int[2];
+
+func main() : void {
+  let y[0] = 0;
+  let x[y[0]] = 5;
+}

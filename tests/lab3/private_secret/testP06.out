@@ -1,0 +1,12 @@
+Error parsing file.
+ResolveSymbolError(7,12)[Could not find isEven.]
+Symbol(readInt)
+Symbol(readFloat)
+Symbol(printBool)
+Symbol(printInt)
+Symbol(printFloat)
+Symbol(println)
+Symbol(isOdd)
+  Symbol(a)
+
+

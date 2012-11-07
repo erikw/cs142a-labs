@@ -1,0 +1,41 @@
+// test nested loops
+
+func main() : void {
+  var a : int;
+  var b : int;
+  var c : int;
+
+  while (((true))) {
+    while (false) {
+      while true {
+        let a = 7;
+      }
+      let b = 8;
+      if (true) {
+        let a = 9;
+      } else {
+        if (false) {
+          let b = 9;
+        } else {
+          while (false) {
+            let b = 10;
+          }
+        }
+        while (false) {
+          let b = 3;
+        }
+      }
+      while (true) {
+        ::printInt(b);
+      }
+    }
+    if (false) {
+      ::printInt(c);
+    }
+  }
+  if (true) {
+    while (false) {
+      ::printInt(a);
+    }
+  }
+}

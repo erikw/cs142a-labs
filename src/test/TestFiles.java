@@ -113,6 +113,12 @@ public class TestFiles {
 			testFilesIn("lab3/private");
 		}
 
+	@Test
+		public void testLab3PrivateSecret() {
+			compiler.setLab(crux.Compiler.Lab.LAB3);
+			testFilesIn("lab3/private_secret");
+		}
+
 	// Lab 4 tests.
 	@Test
 		public void testLab4Public() {
@@ -125,7 +131,11 @@ public class TestFiles {
 			compiler.setLab(crux.Compiler.Lab.LAB4);
 			testFilesIn("lab4/private");
 		}
-
+	@Test
+		public void testLab4PrivateSecret() {
+			compiler.setLab(crux.Compiler.Lab.LAB4);
+			testFilesIn("lab4/private_secret");
+		}
 
 	// Helper functions.
 

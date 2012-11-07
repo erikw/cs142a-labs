@@ -1,0 +1,10 @@
+// have unknown type
+
+var a : int;
+
+func main() : void {
+  var a : float;
+  var b : nontype;
+
+  ::printFloat(a);
+}

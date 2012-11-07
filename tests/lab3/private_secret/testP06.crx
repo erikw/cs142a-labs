@@ -1,0 +1,15 @@
+// test mutual recursion
+
+func isOdd(a:int) : int {
+  if (0 == a) {
+    return false;
+  }
+  return ::isEven(a-1);
+}
+
+func isEven(a:int) : int {
+  if (0 == a) {
+    return true;
+  }
+  return ::isOdd(a-1);
+}
