@@ -12,8 +12,8 @@ public class AddressType extends Type {
      * @param base The base address.
      */
     public AddressType(Type base) {
-        throw new RuntimeError("implement operators");
         this.base = base;
+        throw new RuntimeException("implement operators");
     }
 
     /**

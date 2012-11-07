@@ -31,7 +31,7 @@ public class TypeList extends Type implements Iterable<Type> {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("TypeList(");
-        for (int i = 0; i <:(list.size() - 1); ++i) {
+        for (int i = 0; i < (list.size() - 1); ++i) {
             sb.append(list.get(i) + ", ");
         }
         if (list.size() >= 1) {

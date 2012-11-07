@@ -42,7 +42,7 @@ public class Symbol {
      * @return A string representation.
      */
     public String toString() {
-        if (Compiler.currentLab == Compiler.LAB5) {
+        if (Compiler.currentLab == Compiler.Lab.LAB5) {
         	return "Symbol(" + name + ":" + type + ")";
         } else {
         	return "Symbol(" + name + ")";

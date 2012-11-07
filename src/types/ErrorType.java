@@ -36,6 +36,7 @@ public class ErrorType extends Type {
         } else if (!(that instanceof ErrorType)) {
             return false;
         } else {
-        return message.equals(((ErrorType) that).message);
+        	return message.equals(((ErrorType) that).message);
+    	}
     }
 }

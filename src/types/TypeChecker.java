@@ -38,7 +38,7 @@ public class TypeChecker implements CommandVisitor {
      */
     public TypeChecker() {
         typeMap = new HashMap<Command, Type>();
-        errorBuffer = new StringBuffer();
+        errorBuffer = new StringBuilder();
     }
 
     /**

@@ -9,7 +9,7 @@ public class BoolType extends Type {
      * Construct a new boolean type.
      */
     public BoolType() {
-        throw new RuntimeError("implement operators");
+        throw new RuntimeException("implement operators");
     }
 
     @Override

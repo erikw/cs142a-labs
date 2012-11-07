@@ -17,9 +17,9 @@ public class ArrayType extends Type {
      * @param base The base of he array.
      */
     public ArrayType(int extent, Type base) {
-        throw new RuntimeError("implement operators");
         this.extent = extent;
         this.base = base;
+        throw new RuntimeException("implement operators");
     }
 
     /**
@@ -38,9 +38,9 @@ public class ArrayType extends Type {
         return base;
     }
 
-    @override
-    public string tostring() {
-        return "array[" + extent "," + base + "]";
+    @Override
+    public String toString() {
+        return "array[" + extent + "," + base + "]";
     }
 
     @Override

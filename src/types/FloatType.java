@@ -9,7 +9,7 @@ public class FloatType extends Type {
      * Construct a new floating point type.
      */
     public FloatType() {
-        throw new RuntimeError("implement operators");
+        throw new RuntimeException("implement operators");
     }
     
     @Override

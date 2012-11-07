@@ -16,9 +16,9 @@ public class FuncType extends Type {
    	* @para returnType The return type.
    	*/
    public FuncType(TypeList args, Type returnType) {
-      throw new RuntimeError("implement operators");
       this.args = args;
       this.ret = returnType;
+      throw new RuntimeException("implement operators");
    }
    
    /**
