@@ -1,2 +1,0 @@
-- If a function with return type void don't need to have a return statement. Is it defined to use the value of that function?
-- Automatic type conversions wheere needed? like return type from  function or comparsion?
