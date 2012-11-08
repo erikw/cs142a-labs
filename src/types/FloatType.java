@@ -9,7 +9,6 @@ public class FloatType extends Type {
      * Construct a new floating point type.
      */
     public FloatType() {
-        throw new RuntimeException("implement operators");
     }
     
     @Override
@@ -25,6 +24,43 @@ public class FloatType extends Type {
             return false;
         } else {
         	return true;
+        }
+    }
+
+    @Override
+    public Type add(Type that) {
+        if (!(that instanceof FloatType)) {
+            return super.add(that);
+        } else {
+        	return new FloatType();
+        }
+    }
+
+    @Override
+    public Type sub(Type that) {
+        if (!(that instanceof FloatType)) {
+            return super.sub(that);
+        } else {
+        	return new FloatType();
+        }
+    }
+
+    @Override
+    public Type mul(Type that) {
+        if (!(that instanceof FloatType)) {
+            return super.mul(that);
+
+        } else {
+        	return new FloatType();
+        }
+    }
+
+    @Override
+    public Type div(Type that) {
+        if (!(that instanceof FloatType)) {
+            return super.div(that);
+        } else {
+        	return new FloatType();
         }
     }
 }

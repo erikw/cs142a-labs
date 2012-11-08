@@ -42,102 +42,102 @@ public class TestFiles {
 	private PrintStream errStream;
 
 	@Before
-		public void setUp() {
-			compiler = new crux.Compiler();	
-			outOrg = System.out;
-			errOrg = System.err;
-			outBuffer = new ByteArrayOutputStream();
-			errBuffer = new ByteArrayOutputStream();
-			outStream = new PrintStream(outBuffer);
-			errStream = new PrintStream(errBuffer);
-			// Prevent System.exit()s.
-			System.setSecurityManager(new SysExitSecurityManager());
-		}
+	public void setUp() {
+		compiler = new crux.Compiler();	
+		outOrg = System.out;
+		errOrg = System.err;
+		outBuffer = new ByteArrayOutputStream();
+		errBuffer = new ByteArrayOutputStream();
+		outStream = new PrintStream(outBuffer);
+		errStream = new PrintStream(errBuffer);
+		// Prevent System.exit()s.
+		System.setSecurityManager(new SysExitSecurityManager());
+	}
 
 	@After
-		public void tearDown() {
-			compiler = null;
-			useOutBuffer(false);
-			System.setSecurityManager(null);
-		}
+	public void tearDown() {
+		compiler = null;
+		useOutBuffer(false);
+		System.setSecurityManager(null);
+	}
 
 	// Lab 1 tests.
 	@Test
-		public void testLab1Public() {
-			compiler.setLab(crux.Compiler.Lab.LAB1);
-			testFilesIn("lab1/public");
-		}
+	public void testLab1Public() {
+		compiler.setLab(crux.Compiler.Lab.LAB1);
+		testFilesIn("lab1/public");
+	}
 
 	@Test
-		public void testLab1Private() {
-			compiler.setLab(crux.Compiler.Lab.LAB1);
-			testFilesIn("lab1/private");
-		}
+	public void testLab1Private() {
+		compiler.setLab(crux.Compiler.Lab.LAB1);
+		testFilesIn("lab1/private");
+	}
 
 	@Test
-		public void testLab1PrivateSecret() {
-			compiler.setLab(crux.Compiler.Lab.LAB1);
-			testFilesIn("lab1/private_secret");
-		}
+	public void testLab1PrivateSecret() {
+		compiler.setLab(crux.Compiler.Lab.LAB1);
+		testFilesIn("lab1/private_secret");
+	}
 
 
 	// Lab 2 tests.
 	@Test
-		public void testLab2Public() {
-			compiler.setLab(crux.Compiler.Lab.LAB2);
-			testFilesIn("lab2/public");
-		}
+	public void testLab2Public() {
+		compiler.setLab(crux.Compiler.Lab.LAB2);
+		testFilesIn("lab2/public");
+	}
 
 	@Test
-		public void testLab2Private() {
-			compiler.setLab(crux.Compiler.Lab.LAB2);
-			testFilesIn("lab2/private");
-		}
+	public void testLab2Private() {
+		compiler.setLab(crux.Compiler.Lab.LAB2);
+		testFilesIn("lab2/private");
+	}
 
 	@Test
-		public void testLab2PrivateSecret() {
-			compiler.setLab(crux.Compiler.Lab.LAB2);
-			testFilesIn("lab2/private_secret");
-		}
+	public void testLab2PrivateSecret() {
+		compiler.setLab(crux.Compiler.Lab.LAB2);
+		testFilesIn("lab2/private_secret");
+	}
 
 	// Lab 3 tests.
 	@Test
-		public void testLab3Public() {
-			compiler.setLab(crux.Compiler.Lab.LAB3);
-			testFilesIn("lab3/public");
-		}
+	public void testLab3Public() {
+		compiler.setLab(crux.Compiler.Lab.LAB3);
+		testFilesIn("lab3/public");
+	}
 
 	@Test
-		public void testLab3Private() {
-			compiler.setLab(crux.Compiler.Lab.LAB3);
-			testFilesIn("lab3/private");
-		}
+	public void testLab3Private() {
+		compiler.setLab(crux.Compiler.Lab.LAB3);
+		testFilesIn("lab3/private");
+	}
 
 	// Lab 4 tests.
 	@Test
-		public void testLab4Public() {
-			compiler.setLab(crux.Compiler.Lab.LAB4);
-			testFilesIn("lab4/public");
-		}
+	public void testLab4Public() {
+		compiler.setLab(crux.Compiler.Lab.LAB4);
+		testFilesIn("lab4/public");
+	}
 
 	@Test
-		public void testLab4Private() {
-			compiler.setLab(crux.Compiler.Lab.LAB4);
-			testFilesIn("lab4/private");
-		}
+	public void testLab4Private() {
+		compiler.setLab(crux.Compiler.Lab.LAB4);
+		testFilesIn("lab4/private");
+	}
 
 	// Lab 5 tests.
 	@Test
-		public void testLab5Public() {
-			compiler.setLab(crux.Compiler.Lab.LAB5);
-			testFilesIn("lab5/public");
-		}
+	public void testLab5Public() {
+		compiler.setLab(crux.Compiler.Lab.LAB5);
+		testFilesIn("lab5/public");
+	}
 
 	@Test
-		public void testLab5Private() {
-			compiler.setLab(crux.Compiler.Lab.LAB5);
-			testFilesIn("lab5/private");
-		}
+	public void testLab5Private() {
+		compiler.setLab(crux.Compiler.Lab.LAB5);
+		testFilesIn("lab5/private");
+	}
 
 
 	// Helper functions.

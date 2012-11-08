@@ -41,4 +41,12 @@ public class AddressType extends Type {
         	return this.base.equivalent(aType.base);
         }
     }
+
+    public Type assign(Type source) {
+        if (!source.equivalent(base)) {
+        	return super.assign(source);
+        } else {
+        	return new VoidType();  // TODO TA's slides says so...
+        }
+    }
 }

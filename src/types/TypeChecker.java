@@ -1,5 +1,6 @@
 package types;
 
+import java.util.Map;
 import java.util.HashMap;
 import ast.*;
 
@@ -8,8 +9,7 @@ import ast.*;
  */
 public class TypeChecker implements CommandVisitor {
     /* A map of types TODO */
-    // TODO change to Map?
-    private HashMap<Command, Type> typeMap;
+    private Map<Command, Type> typeMap;
 
     /* Buffered error messages. */
     private StringBuilder errorBuffer;
@@ -42,7 +42,7 @@ public class TypeChecker implements CommandVisitor {
     }
 
     /**
-     * Report error.
+     * Report an error.
      * @param lineNum The line number the error occured on.
      * @param charPos The character position the error occured on.
      * @param message A describing of the error.
@@ -60,8 +60,9 @@ public class TypeChecker implements CommandVisitor {
     private void put(Command node, Type type) {
         if (type instanceof ErrorType) {
             reportError(node.lineNumber(), node.charPosition(), ((ErrorType)type).getMessage());
+        } else {
+        	typeMap.put(node, type);
         }
-        typeMap.put(node, type);
     }
     
     /**
@@ -98,6 +99,18 @@ public class TypeChecker implements CommandVisitor {
     public String errorReport() {
         return errorBuffer.toString();
     }
+
+    /**
+     * Visit and get type for node.
+     * @param node The node to visit.
+     * @return The type of the node.
+     */
+    private Type visitRetriveType(Visitable node) {
+		node.accept(this);
+		return getType((Command) node); // TODO not good to cast...
+    }
+
+// Visitor methods ===================================
 
     @Override
     public void visit(ExpressionList node) {
@@ -156,42 +169,54 @@ public class TypeChecker implements CommandVisitor {
     
     @Override
     public void visit(Addition node) {
-        throw new RuntimeException("Implement this");
+        Type lhs = visitRetriveType(node.leftSide());
+        Type rhs = visitRetriveType(node.rightSide());
+		put(node, lhs.add(rhs));
     }
     
     @Override
     public void visit(Subtraction node) {
-        throw new RuntimeException("Implement this");
+        Type lhs = visitRetriveType(node.leftSide());
+        Type rhs = visitRetriveType(node.rightSide());
+		put(node, lhs.sub(rhs));
     }
     
     @Override
     public void visit(Multiplication node) {
-        throw new RuntimeException("Implement this");
+        Type lhs = visitRetriveType(node.leftSide());
+        Type rhs = visitRetriveType(node.rightSide());
+		put(node, lhs.mul(rhs));
     }
     
     @Override
     public void visit(Division node) {
-        throw new RuntimeException("Implement this");
+        Type lhs = visitRetriveType(node.leftSide());
+        Type rhs = visitRetriveType(node.rightSide());
+		put(node, lhs.div(rhs));
     }
     
     @Override
     public void visit(LogicalAnd node) {
-        throw new RuntimeException("Implement this");
+        Type lhs = visitRetriveType(node.leftSide());
+        Type rhs = visitRetriveType(node.rightSide());
+		put(node, lhs.and(rhs));
     }
 
     @Override
     public void visit(LogicalOr node) {
-        throw new RuntimeException("Implement this");
+        Type lhs = visitRetriveType(node.leftSide());
+        Type rhs = visitRetriveType(node.rightSide());
+		put(node, lhs.or(rhs));
     }
 
     @Override
     public void visit(LogicalNot node) {
-        throw new RuntimeException("Implement this");
+		put(node, visitRetriveType(node.expression()));
     }
     
     @Override
     public void visit(Dereference node) {
-        throw new RuntimeException("Implement this");
+        put(node, visitRetriveType(node.expression()));
     }
 
     @Override
@@ -201,7 +226,9 @@ public class TypeChecker implements CommandVisitor {
 
     @Override
     public void visit(Assignment node) {
-        throw new RuntimeException("Implement this");
+        Type srcType = visitRetriveType(node.source());
+        Type destType = visitRetriveType(node.destination());
+        put(node, destType.assign(srcType));
     }
 
     @Override

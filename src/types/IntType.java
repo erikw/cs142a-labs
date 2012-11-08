@@ -17,11 +17,22 @@ public class IntType extends Type {
     }
 
     @Override
+    public boolean equivalent(Type that) {
+        if (that == null) {
+            return false;
+        } else if (!(that instanceof IntType)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    @Override
     public Type add(Type that) {
         if (!(that instanceof IntType)) {
             return super.add(that);
         } else {
-        	return new IntType();
+        	return new IntType(); // TODO return this to not create unnecessary objects?
         }
     }
 
@@ -59,17 +70,6 @@ public class IntType extends Type {
             return super.compare(that);
         } else {
         	return new BoolType();
-        }
-    }
-
-    @Override
-    public boolean equivalent(Type that) {
-        if (that == null) {
-            return false;
-        } else if (!(that instanceof IntType)) {
-            return false;
-        } else {
-            return true;
         }
     }
 }
