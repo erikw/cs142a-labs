@@ -20,7 +20,7 @@ public abstract class Type {
         } else if (typeStr.equals("void")) {
 			return new VoidType();
         } else {
-        	return new ErrorType("Unkown type: " + typeStr);
+        	return new ErrorType("Unknown type: " + typeStr);
         }
     }
     
@@ -100,6 +100,7 @@ public abstract class Type {
      * @param that The other operand.
      * @return Resulting type.
      */
+    // TODO who should override this?
     public Type compare(Type that) {
         return new ErrorType("Cannot compare " + this + " with " + that + ".");
     }

@@ -4,7 +4,6 @@ package ast;
  * Command for an array index.
  */
 public class Index extends Command implements Expression {
-
 	private Expression base;
 	private Expression amount;
 

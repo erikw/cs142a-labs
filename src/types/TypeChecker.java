@@ -1,7 +1,10 @@
 package types;
 
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+
+import crux.Symbol;
 import ast.*;
 
 /**
@@ -159,42 +162,58 @@ public class TypeChecker implements CommandVisitor {
 
     @Override
     public void visit(FunctionDefinition node) {
-        throw new RuntimeException("Implement this");
+        List<Symbol> args = node.arguments();
+        Symbol func = node.function();
+        int pos = 0;
+        for (Symbol arg : args) {
+			Type argType = arg.type();
+			if (argType instanceof ErrorType) {
+				put(node, argType);
+				put(node, new ErrorType("Function " + func.name() + " has an error in argument in position " + pos + ": " + ((ErrorType) argType).getMessage()));
+				return;
+			} else if (argType instanceof VoidType) {
+ 	 	 	 	put(node, new ErrorType("Function " + func.name() + " has a void argument in position " + pos + "."));
+				return;
+			}
+			++pos;
+        }
+        Type returnType = ((FuncType) func.type()).returnType();
+        put(node, returnType);
     }
 
     @Override
     public void visit(Comparison node) {
         throw new RuntimeException("Implement this");
     }
-    
+
     @Override
     public void visit(Addition node) {
         Type lhs = visitRetriveType(node.leftSide());
         Type rhs = visitRetriveType(node.rightSide());
 		put(node, lhs.add(rhs));
     }
-    
+
     @Override
     public void visit(Subtraction node) {
         Type lhs = visitRetriveType(node.leftSide());
         Type rhs = visitRetriveType(node.rightSide());
 		put(node, lhs.sub(rhs));
     }
-    
+
     @Override
     public void visit(Multiplication node) {
         Type lhs = visitRetriveType(node.leftSide());
         Type rhs = visitRetriveType(node.rightSide());
 		put(node, lhs.mul(rhs));
     }
-    
+
     @Override
     public void visit(Division node) {
         Type lhs = visitRetriveType(node.leftSide());
         Type rhs = visitRetriveType(node.rightSide());
 		put(node, lhs.div(rhs));
     }
-    
+
     @Override
     public void visit(LogicalAnd node) {
         Type lhs = visitRetriveType(node.leftSide());
@@ -213,7 +232,7 @@ public class TypeChecker implements CommandVisitor {
     public void visit(LogicalNot node) {
 		put(node, visitRetriveType(node.expression()));
     }
-    
+
     @Override
     public void visit(Dereference node) {
         put(node, visitRetriveType(node.expression()));
@@ -233,7 +252,11 @@ public class TypeChecker implements CommandVisitor {
 
     @Override
     public void visit(Call node) {
-        throw new RuntimeException("Implement this");
+    	Symbol func = node.function();
+    	FuncType funcType = (FuncType) func.type(); // TODO sigh so ugly, right?
+    	ExpressionList args = node.arguments();
+    	Type argTypes = visitRetriveType(args);
+		put(node, funcType.call(argTypes));
     }
 
     @Override

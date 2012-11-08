@@ -19,7 +19,6 @@ public class ArrayType extends Type {
     public ArrayType(int extent, Type base) {
         this.extent = extent;
         this.base = base;
-        throw new RuntimeException("implement operators");
     }
 
     /**
@@ -54,4 +53,17 @@ public class ArrayType extends Type {
         	return this.extent == aType.extent && base.equivalent(aType.base);
         }
     }
+
+    @Override
+    public Type index(Type that) {
+        // TODO that is instanceof integertype?
+        throw new RuntimeException("implement");
+        //return null;
+    }
+
+    // TODO can we assign an array? or will that be done through some mysterious addressof type?
+    //public Type assign(Type source) {
+        //return new ErrorType("Cannot assign " + source + " to " + this + ".");
+    //}
+
 }

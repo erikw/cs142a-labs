@@ -57,9 +57,13 @@ public class FuncType extends Type {
    public Type call(Type args) {
         if (!(args instanceof TypeList)) { // TODO is call invoked with TypeList?
             return super.call(args);
+        } else if (!((TypeList) args).equivalent(this.args)) {
+ //* "Function " + func.name() + " has a void argument in position " + pos + "."
+ //* "Function " + func.name() + " has an error in argument in position " + pos + ": " + error.getMessage()
+            //return ...error node;
+            return null; // Some type of error? if so, the same error strings as in error in funcdeclaration?
         } else {
-			// TODO
-			return null;
+			return ret;
         }
    }
 }

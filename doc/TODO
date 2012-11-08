@@ -1,3 +1,5 @@
 * Clean up unused imports.
 * change Stringbuffer to StringBuilder in sample code.
 * Try to avoid instanceof as in sample code and use type paramters.
+* Yeah, get rid of all (stupid) casts and instance of. They make me sick. The exist just because of the enforced design that I have to reverse engineer from test files...
+* priv test case for invalid paramters in function call?
