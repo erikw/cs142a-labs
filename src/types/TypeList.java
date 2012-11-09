@@ -24,7 +24,11 @@ public class TypeList extends Type implements Iterable<Type> {
      * @param initTypes Types to initilaize the list with.
      */
     public TypeList(List<Type> initTypes) {
-        list = new ArrayList<Type>(initTypes);
+    	if (initTypes == null) {
+        	list = new ArrayList<Type>();
+    	} else {
+        	list = new ArrayList<Type>(initTypes);
+    	}
     }
     
     /**

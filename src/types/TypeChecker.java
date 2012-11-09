@@ -117,7 +117,9 @@ public class TypeChecker implements CommandVisitor {
 
     @Override
     public void visit(ExpressionList node) {
-        throw new RuntimeException("Implement this");
+        for(Expression expr : node) {
+			expr.accept(this);
+        }
     }
 
     @Override
@@ -129,7 +131,9 @@ public class TypeChecker implements CommandVisitor {
 
     @Override
     public void visit(StatementList node) {
-        throw new RuntimeException("Implement this");
+        for (Statement stmt : node) {
+        	stmt.accept(this);
+        }
     }
 
     @Override
@@ -170,19 +174,22 @@ public class TypeChecker implements CommandVisitor {
         if (func.name().equals("main") && (args.size() !=0 || !(returnType instanceof VoidType))) {
 			put(node, new ErrorType("Function main has invalid signature."));
 			return;
+        } else {
+        	int pos = 0;
+        	for (Symbol arg : args) {
+				Type argType = arg.type();
+				if (argType instanceof ErrorType) {
+					put(node, new ErrorType("Function " + func.name() + " has an error in argument in position " + pos + ": " + ((ErrorType) argType).getMessage()));
+					return;
+				} else if (argType instanceof VoidType) {
+ 	 	 	 		put(node, new ErrorType("Function " + func.name() + " has a void argument in position " + pos + "."));
+					return;
+				}
+				++pos;
+        	}
         }
-        int pos = 0;
-        for (Symbol arg : args) {
-			Type argType = arg.type();
-			if (argType instanceof ErrorType) {
-				put(node, new ErrorType("Function " + func.name() + " has an error in argument in position " + pos + ": " + ((ErrorType) argType).getMessage()));
-				return;
-			} else if (argType instanceof VoidType) {
- 	 	 	 	put(node, new ErrorType("Function " + func.name() + " has a void argument in position " + pos + "."));
-				return;
-			}
-			++pos;
-        }
+        visit(node.body());
+        // TODO check so all paths return.
         put(node, returnType);
     }
 
@@ -261,6 +268,13 @@ public class TypeChecker implements CommandVisitor {
     	FuncType funcType = (FuncType) func.type(); // TODO sigh so ugly, right?
     	ExpressionList args = node.arguments();
     	Type argTypes = visitRetriveType(args);
+    	// TODO verify thath argTypes == func.type.argtypes
+    	// TODO also check that all paths return and correct type here?
+		if (argTypes == null) {
+			TypeList argList = new TypeList();
+			argList.append(new VoidType());
+			argTypes = argList;
+		}
 		put(node, funcType.call(argTypes));
     }
 
@@ -276,7 +290,7 @@ public class TypeChecker implements CommandVisitor {
 
     @Override
     public void visit(Return node) {
-        throw new RuntimeException("Implement this");
+        put(node, visitRetriveType(node.argument()));
     }
 
     @Override
