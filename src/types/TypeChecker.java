@@ -122,7 +122,9 @@ public class TypeChecker implements CommandVisitor {
 
     @Override
     public void visit(DeclarationList node) {
-        throw new RuntimeException("Implement this");
+        for (Declaration decl : node) {
+        	decl.accept(this);
+        }
     }
 
     @Override
@@ -162,13 +164,17 @@ public class TypeChecker implements CommandVisitor {
 
     @Override
     public void visit(FunctionDefinition node) {
-        List<Symbol> args = node.arguments();
         Symbol func = node.function();
+        List<Symbol> args = node.arguments();
+        Type returnType = ((FuncType) func.type()).returnType();
+        if (func.name().equals("main") && (args.size() !=0 || !(returnType instanceof VoidType))) {
+			put(node, new ErrorType("Function main has invalid signature."));
+			return;
+        }
         int pos = 0;
         for (Symbol arg : args) {
 			Type argType = arg.type();
 			if (argType instanceof ErrorType) {
-				put(node, argType);
 				put(node, new ErrorType("Function " + func.name() + " has an error in argument in position " + pos + ": " + ((ErrorType) argType).getMessage()));
 				return;
 			} else if (argType instanceof VoidType) {
@@ -177,7 +183,6 @@ public class TypeChecker implements CommandVisitor {
 			}
 			++pos;
         }
-        Type returnType = ((FuncType) func.type()).returnType();
         put(node, returnType);
     }
 
