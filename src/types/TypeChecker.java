@@ -1,5 +1,6 @@
 package types;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -16,6 +17,12 @@ public class TypeChecker implements CommandVisitor {
 
     /* Buffered error messages. */
     private StringBuilder errorBuffer;
+
+    /* Keep track of paths that needs a return. */
+    private boolean needsReturn;
+
+    /* A list of found return types for the current function. */
+    private List<Type> foundRetTypes;
 
     // TODO am I suppose to implement these some where?
     /* Useful error strings:
@@ -42,6 +49,7 @@ public class TypeChecker implements CommandVisitor {
     public TypeChecker() {
         typeMap = new HashMap<Command, Type>();
         errorBuffer = new StringBuilder();
+        foundRetTypes = new LinkedList<Type>();
     }
 
     /**
@@ -131,29 +139,39 @@ public class TypeChecker implements CommandVisitor {
 
     @Override
     public void visit(StatementList node) {
+        //entryNbrRets = foundRetTypes.size();
         for (Statement stmt : node) {
+        	needsReturn = true; // TODO should we always require return from all statements? and then check after loop thath !needsReturn
         	stmt.accept(this);
         }
+        if (needsReturn) {
+        	// fail
+        }
+        //if ((0 == foundRetTypes.size() == entryNbrRets) {
+        //if (foundRetTypes.size() == 0) {
+			// fail, implicit by our var still = true I guess.
+        //}
     }
 
     @Override
     public void visit(AddressOf node) {
-        throw new RuntimeException("Implement this");
+        Type type = node.symbol().type();
+        put(node, new AddressType(type));
     }
 
     @Override
     public void visit(LiteralBool node) {
-        throw new RuntimeException("Implement this");
+        put(node, new BoolType());
     }
 
     @Override
     public void visit(LiteralFloat node) {
-        throw new RuntimeException("Implement this");
+        put(node, new FloatType());
     }
 
     @Override
     public void visit(LiteralInt node) {
-        throw new RuntimeException("Implement this");
+        put(node, new IntType());
     }
 
     @Override
@@ -171,9 +189,12 @@ public class TypeChecker implements CommandVisitor {
         Symbol func = node.function();
         List<Symbol> args = node.arguments();
         Type returnType = ((FuncType) func.type()).returnType();
-        if (func.name().equals("main") && (args.size() !=0 || !(returnType instanceof VoidType))) {
-			put(node, new ErrorType("Function main has invalid signature."));
-			return;
+
+        if (func.name().equals("main")) {
+        	if (args.size() != 	0 || !(returnType instanceof VoidType)) {
+				put(node, new ErrorType("Function main has invalid signature."));
+				return;
+			}
         } else {
         	int pos = 0;
         	for (Symbol arg : args) {
@@ -188,9 +209,25 @@ public class TypeChecker implements CommandVisitor {
 				++pos;
         	}
         }
+
+        // TODO check so all paths return. 1) jack: register retrurns for statement, while, if and propagate up. 2) eric: recursive helper method. 3) SSA on blog, retval must be initialized by all paths in the end.
+        // what if a path ends with return; wo/ value? -- set it to voidType
+        // 
+		needsReturn = true;
+		foundRetTypes.clear();
         visit(node.body());
-        // TODO check so all paths return.
-        put(node, returnType);
+		if (!(returnType instanceof VoidType) && needsReturn) { 
+        	put(node, new ErrorType("Not all paths in function " + func.name() + " have a return."));
+		} else {
+        	// TODO check correct return type for all found return types. 
+        	// * what if a function returns a value but the signature is void-returning? -- autosolved
+        	for (Type foundRetType : foundRetTypes) {
+        		if (!foundRetType.equivalent(returnType)) {
+        				put(node, new ErrorType("Function " + func.name() + " returns " + foundRetType + " not " + returnType + "."));
+        		}
+        	}
+        	put(node, returnType);
+		}
     }
 
     @Override
@@ -268,8 +305,7 @@ public class TypeChecker implements CommandVisitor {
     	FuncType funcType = (FuncType) func.type(); // TODO sigh so ugly, right?
     	ExpressionList args = node.arguments();
     	Type argTypes = visitRetriveType(args);
-    	// TODO verify thath argTypes == func.type.argtypes
-    	// TODO also check that all paths return and correct type here?
+    	// TODO verify that argTypes == func->type->argtypes
 		if (argTypes == null) {
 			TypeList argList = new TypeList();
 			argList.append(new VoidType());
@@ -280,7 +316,28 @@ public class TypeChecker implements CommandVisitor {
 
     @Override
     public void visit(IfElseBranch node) {
-        throw new RuntimeException("Implement this");
+        Type condType = visitRetriveType(node.condition());
+        if (!condType.equivalent(new BoolType())) {
+     	 	 put(node, new ErrorType("IfElseBranch requires bool condition not " + condType + "."));
+     	 	 return;
+        }
+
+
+		// needstrue IF not both branches has return OR 
+		prevNbrRets = foundRetTypes.size();
+		visit(node.thenBlock());
+		boolean thenHasReturn = (foundRetTypes.size() > prevNbrRets);
+		//needsReturn = (foundRetTypes.size() == prevNbrRets); // TODO or only set to true when needed and let visit(Return) always set to false?
+		prevNbrRets = foundRetTypes.size();
+		visit(node.elseBlock());
+		boolean elseHasReturn = (foundRetTypes.size() > prevNbrRets); // TODO handle empty else block (stmtlist.size() == 0)
+
+		needsReturn = (thenHasReturn ^ elseHasReturn);
+		//if (foundRetTypes.size() > prevNbrRets) {
+			//needsReturn = true;
+		//}
+
+
     }
 
     @Override
@@ -290,7 +347,10 @@ public class TypeChecker implements CommandVisitor {
 
     @Override
     public void visit(Return node) {
-        put(node, visitRetriveType(node.argument()));
+    	Type retType = visitRetriveType(node.argument())
+    	foundRetTypes.add(retType);
+    	// TODO make sure that a simple "return;" puts a voidType in foundRetTypen, (in global map below as well?)
+        put(node, retType);
     }
 
     @Override

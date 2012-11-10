@@ -14,7 +14,6 @@ public class AddressType extends Type {
      */
     public AddressType(Type base) {
         this.base = base;
-        throw new RuntimeException("implement operators");
     }
 
     /**
@@ -42,11 +41,17 @@ public class AddressType extends Type {
         }
     }
 
+	@Override
     public Type assign(Type source) {
         if (!source.equivalent(base)) {
         	return super.assign(source);
         } else {
         	return new VoidType();  // TODO TA's slides says so...
         }
+    }
+
+	@Override
+    public Type deref() {
+        return base;
     }
 }

@@ -440,7 +440,6 @@ public class Parser {
 			ast.Expression amount = expression0();
 			expr = new ast.Index(amount.lineNumber(), amount.charPosition(), expr, amount);
 			expect(Token.Kind.CLOSE_BRACKET);
-			//symbol.setType(new AddressType(type... // TODO use AddressType here?
 		}
 		exitRule(NonTerminal.DESIGNATOR);
 		return expr;
