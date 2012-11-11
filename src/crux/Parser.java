@@ -147,7 +147,6 @@ public class Parser {
 			lineData += "  ";
 		}
 		lineData += nonTerminal.name();
-		//System.out.println("descending " + lineData);
 		parseTreeBuffer.append(lineData + "\n");
 		parseTreeRecursionDepth++;
 	}
@@ -255,9 +254,35 @@ public class Parser {
      * Initialize the symbolTable with predefined symbols.
      */
     private void initSymbolTable() {
-        for (String predefFunction : SymbolTable.PREDEF_FUNCS) {
-			symbolTable.insert(predefFunction);
-        }
+        //for (String predefFunction : SymbolTable.PREDEF_FUNCS) {
+			//symbolTable.insert(predefFunction);
+        //}
+        Symbol symbol;
+        TypeList args;
+
+        symbol= symbolTable.insert("readInt");
+        symbol.setType(new FuncType(new TypeList(), new IntType()));
+
+        symbol= symbolTable.insert("readFloat");
+        symbol.setType(new FuncType(new TypeList(), new FloatType()));
+        
+        symbol= symbolTable.insert("printBool");
+        args = new TypeList();
+        args.append(new BoolType());
+        symbol.setType(new FuncType(args, new VoidType()));
+
+        symbol= symbolTable.insert("printInt");
+        args = new TypeList();
+        args.append(new IntType());
+        symbol.setType(new FuncType(args, new VoidType()));
+
+        symbol= symbolTable.insert("printFloat");
+        args = new TypeList();
+        args.append(new FloatType());
+        symbol.setType(new FuncType(args, new VoidType()));
+
+        symbol= symbolTable.insert("println");
+        symbol.setType(new FuncType(new TypeList(), new VoidType()));
     }
 
     /**
@@ -276,7 +301,6 @@ public class Parser {
         }
     }
 
-// Helper Methods ==========================================
     /**
      * Enters a new scobe for symbols.
      */
