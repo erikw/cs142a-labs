@@ -56,8 +56,10 @@ public class TypeList extends Type implements Iterable<Type> {
     @Override
     public boolean equivalent(Type that) {
         if (that == null) {
+            System.out.println("that == null");
             return false;
         } else if (!(that instanceof TypeList)) {
+            System.out.println("that not an typelist");
             return false;
         } else {
         	List<Type> olist = ((TypeList) that).list;

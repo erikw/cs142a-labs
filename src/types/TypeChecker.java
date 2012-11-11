@@ -22,7 +22,10 @@ public class TypeChecker implements CommandVisitor {
     private boolean needsReturn;
 
     /* A list of found return types for the current function. */
-    private List<Type> foundRetTypes;
+    private Map<Return, Type> foundRetTypes;
+
+    /* A list found types in an expression list. */
+    private List<Type> exprTypes;
 
     // TODO am I suppose to implement these some where?
     /* Useful error strings:
@@ -49,7 +52,9 @@ public class TypeChecker implements CommandVisitor {
     public TypeChecker() {
         typeMap = new HashMap<Command, Type>();
         errorBuffer = new StringBuilder();
-        foundRetTypes = new LinkedList<Type>();
+        //foundRetTypes = new LinkedList<Type>();
+        foundRetTypes = new HashMap<Return, Type>();
+        exprTypes = new LinkedList<Type>();
     }
 
     /**
@@ -126,7 +131,8 @@ public class TypeChecker implements CommandVisitor {
     @Override
     public void visit(ExpressionList node) {
         for(Expression expr : node) {
-			expr.accept(this);
+			//expr.accept(this);
+			exprTypes.add(visitRetriveType(expr));
         }
     }
 
@@ -156,7 +162,8 @@ public class TypeChecker implements CommandVisitor {
     @Override
     public void visit(AddressOf node) {
         Type type = node.symbol().type();
-        put(node, new AddressType(type));
+        //put(node, new AddressType(type));
+        put(node, type);
     }
 
     @Override
@@ -221,11 +228,14 @@ public class TypeChecker implements CommandVisitor {
 		} else {
         	// TODO check correct return type for all found return types. 
         	// * what if a function returns a value but the signature is void-returning? -- autosolved
-        	for (Type foundRetType : foundRetTypes) {
-        		if (!foundRetType.equivalent(returnType)) {
-        				put(node, new ErrorType("Function " + func.name() + " returns " + foundRetType + " not " + returnType + "."));
-        		}
-        	}
+			//for (Type foundRetType : foundRetTypes) {
+			for (Return retNode : foundRetTypes.keySet()) {
+				//assert(foundRetType != null);
+				Type foundRetType = foundRetTypes.get(retNode);
+				if (!foundRetType.equivalent(returnType)) {
+						put(retNode, new ErrorType("Function " + func.name() + " returns " + returnType + " not " + foundRetType + "."));
+				}
+			}
         	put(node, returnType);
 		}
     }
@@ -304,14 +314,24 @@ public class TypeChecker implements CommandVisitor {
     	Symbol func = node.function();
     	FuncType funcType = (FuncType) func.type(); // TODO sigh so ugly, right?
     	ExpressionList args = node.arguments();
-    	Type argTypes = visitRetriveType(args);
-    	// TODO verify that argTypes == func->type->argtypes
-		if (argTypes == null) {
-			TypeList argList = new TypeList();
-			argList.append(new VoidType());
-			argTypes = argList;
-		}
-		put(node, funcType.call(argTypes));
+		exprTypes.clear();
+		args.accept(this);
+		TypeList callArgTypes = new TypeList(exprTypes);
+
+
+
+        //Type argTypes = visitRetriveType(args);
+        //// TODO verify that argTypes == func->type->argtypes
+		//if (argTypes == null) {
+			//System.out.println("Oh snap argtypes == null");
+			//TypeList argList = new TypeList();
+			//argList.append(new VoidType());
+			//argTypes = argList;
+		//}
+
+		//assert(funcType.call(argTypes) != null);
+		//System.out.println("in call node" + funcType.call(argTypes) );
+		put(node, funcType.call(callArgTypes));
     }
 
     @Override
@@ -324,7 +344,7 @@ public class TypeChecker implements CommandVisitor {
 
 
 		// needstrue IF not both branches has return OR 
-		prevNbrRets = foundRetTypes.size();
+		int prevNbrRets = foundRetTypes.size();
 		visit(node.thenBlock());
 		boolean thenHasReturn = (foundRetTypes.size() > prevNbrRets);
 		//needsReturn = (foundRetTypes.size() == prevNbrRets); // TODO or only set to true when needed and let visit(Return) always set to false?
@@ -347,10 +367,12 @@ public class TypeChecker implements CommandVisitor {
 
     @Override
     public void visit(Return node) {
-    	Type retType = visitRetriveType(node.argument())
-    	foundRetTypes.add(retType);
+    	Type retType = visitRetriveType(node.argument());
+        //assert(retType != null);
+    	foundRetTypes.put(node, retType);
     	// TODO make sure that a simple "return;" puts a voidType in foundRetTypen, (in global map below as well?)
         put(node, retType);
+        needsReturn = false;
     }
 
     @Override
