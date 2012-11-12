@@ -63,4 +63,13 @@ public class FloatType extends Type {
         	return new FloatType();
         }
     }
+
+    @Override
+    public Type compare(Type that) {
+        if (!(that instanceof FloatType)) {
+            return super.compare(that);
+        } else {
+        	return new BoolType();
+        }
+    }
 }
