@@ -194,7 +194,7 @@ public class TypeChecker implements CommandVisitor {
 
     @Override
     public void visit(ArrayDeclaration node) {
-        throw new RuntimeException("Implement this");
+        put(node, node.symbol().type());
     }
 
     @Override
@@ -316,7 +316,16 @@ public class TypeChecker implements CommandVisitor {
 
     	@Override
     	public void visit(Index node) {
-        	throw new RuntimeException("Implement this");
+        	Type amountType = visitRetriveType(node.amount());
+        	if (!amountType.equivalent(new IntType())) {
+				put(node, new ErrorType("Array index should be integer type not " + amountType)); // TODO custom error message.
+        	}
+        	Type baseType = visitRetriveType(node.base());
+            //if (baseType.equivalent(new IntType()) || baseType.equivalent(new FloatType()) || baseType.equivalent(new BoolType())) {
+                     //put(node, new ErrorType("Array " + arrayName + " has invalid base type " + baseType + "."));
+            //} else {
+        		put(node, baseType);
+            //}
     	}
 
     	@Override
