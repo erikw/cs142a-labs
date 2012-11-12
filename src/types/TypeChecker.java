@@ -185,7 +185,7 @@ public class TypeChecker implements CommandVisitor {
     @Override
     public void visit(VariableDeclaration node) {
     	Type varType = node.symbol().type();
-    	if (varType.equivalent(new IntType()) || varType.equivalent(new FloatType())) {
+    	if (varType.equivalent(new IntType()) || varType.equivalent(new FloatType()) || varType.equivalent(new BoolType())) {
 			put(node, varType); // TODO do we really need to put this?
     	} else {
      	 	put(node, new ErrorType("Variable " + node.symbol().name() + " has invalid type " + varType + "."));
@@ -301,7 +301,12 @@ public class TypeChecker implements CommandVisitor {
 
     	@Override
     	public void visit(LogicalNot node) {
-			put(node, visitRetriveType(node.expression()));
+			Type type = visitRetriveType(node.expression());
+			if (type.equivalent(new BoolType())) {
+				put(node, type);
+			} else {
+				put(node, new ErrorType("Cannot negate " + type + "."));
+			}
     	}
 
     	@Override
