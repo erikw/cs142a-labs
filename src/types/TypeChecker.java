@@ -381,7 +381,18 @@ public class TypeChecker implements CommandVisitor {
 
     	@Override
     	public void visit(WhileLoop node) {
-        	throw new RuntimeException("Implement this");
+        	Type condType = visitRetriveType(node.condition());
+        	if (!condType.equivalent(new BoolType())) {
+     	 		put(node, new ErrorType("WhileLoop requires bool condition not " + condType + "."));
+     	 		return;
+        	}
+
+
+			// needstrue IF not both branches has return OR 
+			int prevNbrRets = foundRetTypes.size();
+			visit(node.body());
+			boolean bodyHasReturn = (foundRetTypes.size() > prevNbrRets);
+			needsReturn = true; // TODO 
     	}
 
     	@Override
