@@ -694,14 +694,32 @@ public class Parser {
 		expect(Token.Kind.COLON);
 		Type type = type();
 		expect(Token.Kind.OPEN_BRACKET);
-		// TODO will this produce the correct order of the types or should it be reversed?
+
+		//// TODO will this produce the correct order of the types or should it be reversed?
+		//do {	
+			//Integer dimension = expectInteger(); // TODO handle null case
+			//type = new ArrayType(dimension, type);
+			//symbol.setType(type);
+			//expect(Token.Kind.CLOSE_BRACKET);
+		//} while (accept(Token.Kind.OPEN_BRACKET));
+		//expect(Token.Kind.SEMICOLON);
+
+		Stack<Integer> dimensions = new Stack<Integer>();
 		do {	
 			Integer dimension = expectInteger(); // TODO handle null case
-			type = new ArrayType(dimension, type);
-			symbol.setType(type);
+			dimensions.push(dimension);
 			expect(Token.Kind.CLOSE_BRACKET);
 		} while (accept(Token.Kind.OPEN_BRACKET));
 		expect(Token.Kind.SEMICOLON);
+
+		// Create array in correct order.
+		while(!dimensions.empty()) {
+			symbol.setType(type);
+			type = new ArrayType(dimensions.pop(), type); // TODO this must be wrong, last type will not be assigned, however testcases requreis it test13 [10,6]
+		}
+
+
+
 		exitRule(NonTerminal.ARRAY_DECLARATION);
 		return arrayDecl;
 	}

@@ -72,4 +72,9 @@ public class IntType extends Type {
         	return new BoolType();
         }
     }
+
+    // TODO would solve index problem so we dont have to take instanceof but index on int IS wrong.
+    //public Type index(Type that) {
+        //return this;
+    //}
 }

@@ -12,7 +12,7 @@ import ast.*;
  * A visitor that performed type checking on an AST.
  */
 public class TypeChecker implements CommandVisitor {
-    /* A map of types TODO */
+    /* A map of types found associated with a command. */
     private Map<Command, Type> typeMap;
 
     /* Buffered error messages. */
@@ -27,7 +27,7 @@ public class TypeChecker implements CommandVisitor {
     /* A list found types in an expression list. */
     private List<Type> exprTypes;
 
-    // TODO am I suppose to implement these some where?
+    // TODO make sure all of these error messages are implemented.
     /* Useful error strings:
      *
      * "Function " + func.name() + " has a void argument in position " + pos + "."
@@ -76,7 +76,7 @@ public class TypeChecker implements CommandVisitor {
     private void put(Command node, Type type) {
         if (type instanceof ErrorType) {
             reportError(node.lineNumber(), node.charPosition(), ((ErrorType)type).getMessage());
-        	typeMap.put(node, type);
+			typeMap.put(node, type);
         } else {
         	typeMap.put(node, type);
         }
@@ -194,7 +194,16 @@ public class TypeChecker implements CommandVisitor {
 
     @Override
     public void visit(ArrayDeclaration node) {
-        put(node, node.symbol().type());
+		put(node, node.symbol().type());
+
+		// TODO do base type checking here? how get the real base type? node can be array of array here
+        //Symbol symbol = node.symbol();
+        //Type baseType = symbol.type();
+		//if ((baseType.equivalent(new IntType()) || baseType.equivalent(new FloatType()) || baseType.equivalent(new BoolType()))) {
+            //put(node, baseType);
+        //} else {
+			//put(node, new ErrorType("Array " + symbol.name() + " has invalid base type " + baseType + "."));
+        //}
     }
 
     @Override
@@ -212,7 +221,7 @@ public class TypeChecker implements CommandVisitor {
         	int pos = 0;
         	for (Symbol arg : args) {
 				Type argType = arg.type();
-				if (argType instanceof ErrorType) {
+				if (argType instanceof ErrorType) { // TODO avoid instanceof? testoutput seems to requires it here
 					put(node, new ErrorType("Function " + func.name() + " has an error in argument in position " + pos + ": " + ((ErrorType) argType).getMessage()));
 					return;
 				} else if (argType instanceof VoidType) {
@@ -317,16 +326,26 @@ public class TypeChecker implements CommandVisitor {
     	@Override
     	public void visit(Index node) {
         	Type amountType = visitRetriveType(node.amount());
-        	if (!amountType.equivalent(new IntType())) {
-				put(node, new ErrorType("Array index should be integer type not " + amountType)); // TODO custom error message.
-        	}
         	Type baseType = visitRetriveType(node.base());
-            //if (baseType.equivalent(new IntType()) || baseType.equivalent(new FloatType()) || baseType.equivalent(new BoolType())) {
-                     //put(node, new ErrorType("Array " + arrayName + " has invalid base type " + baseType + "."));
-            //} else {
-        		put(node, baseType);
-            //}
-    	}
+            //System.out.println("Base type is " + baseType);
+			//if (!(baseType.equivalent(new IntType()) || baseType.equivalent(new FloatType()) || baseType.equivalent(new BoolType()))) {
+			////put(node, new ErrorType("Array " + arrayName + " has invalid base type " + baseType + "."));
+			//put(node, new ErrorType("Array UNKNOWN has invalid base type " + baseType + "."));
+			//} else {
+            //put(node, baseType);
+			//}
+			//if (baseType instanceof ArrayType) {
+			//Type resType = ((ArrayType) baseType).index(amountType);
+			Type resType = baseType.index(amountType);
+			put(node, resType);
+			//} else {
+			/// TODO where check base type?
+			//////if (!((baseType.equivalent(new IntType()) || baseType.equivalent(new FloatType()) || baseType.equivalent(new BoolType())))) {
+			//////put(node, new ErrorType("Array " + arrayName + " has invalid base type " + baseType + "."));
+			//put(node, new ErrorType("Array UNKNOWN has invalid base type " + baseType + ".")); // TODO how get array name?
+			//}
+
+    		}
 
     	@Override
     	public void visit(Assignment node) {
@@ -345,20 +364,6 @@ public class TypeChecker implements CommandVisitor {
 			exprTypes.clear();
 			args.accept(this);
 			TypeList callArgTypes = new TypeList(exprTypes);
-
-
-
-        	//Type argTypes = visitRetriveType(args);
-        	//// TODO verify that argTypes == func->type->argtypes
-			//if (argTypes == null) {
-			//System.out.println("Oh snap argtypes == null");
-			//TypeList argList = new TypeList();
-			//argList.append(new VoidType());
-			//argTypes = argList;
-			//}
-
-			//assert(funcType.call(argTypes) != null);
-			//System.out.println("in call node" + funcType.call(argTypes) );
 			put(node, funcType.call(callArgTypes));
     	}
 
@@ -409,11 +414,11 @@ public class TypeChecker implements CommandVisitor {
     		Type retType = visitRetriveType(node.argument());
         	//if (retType != null) { // Error nodes gives no type for put().
             //if (retType instanceof AddressType) {
-                //foundRetTypes.put(node, ((AddressType) retType).base()); // TODO ugly hack to pass test03
+            //foundRetTypes.put(node, ((AddressType) retType).base()); // TODO ugly hack to pass test03
             //} else {
-    			foundRetTypes.put(node, retType);
+    		foundRetTypes.put(node, retType);
             //}
-        	if (!(retType instanceof ErrorType)) { // TODO ugly hack to not get doublerror reporting, modded put() to record error since we need it above
+        	if (!(retType instanceof ErrorType)) { // TODO ugly hack to not get doublerror reporting, modded put() to record error since we need it above when checking foundRetTypes (retType above can be null and we need to propagade that error up there)
         		put(node, retType);
         	}
         	//}
@@ -424,4 +429,4 @@ public class TypeChecker implements CommandVisitor {
     	public void visit(ast.Error node) {
         	put(node, new ErrorType(node.message()));
     	}
-	}
+		}

@@ -55,10 +55,12 @@ public class ArrayType extends Type {
     }
 
     @Override
-    public Type index(Type that) {
-        // TODO that is instanceof integertype?
-        throw new RuntimeException("implement");
-        //return null;
+    public Type index(Type amountType) {
+        if (!amountType.equivalent(new IntType())) {
+			return new ErrorType("Array index should be integer type not " + amountType); // TODO custom error message.
+        } else {
+        	return base; // TODO correct?
+        }
     }
 
     // TODO can we assign an array? or will that be done through some mysterious addressof type?
