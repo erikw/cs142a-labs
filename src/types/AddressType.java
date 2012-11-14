@@ -55,11 +55,11 @@ public class AddressType extends Type {
         return base;
     }
 
-// TODO override index
+	// TODO eric:override index // TODO but that does not work since test13 [12,19] implies that AddressType.index() does not exists. OR it means that this method should detect that base is not array?
     @Override
     public Type index(Type amountType) {
-        if (!amountType.equivalent(new IntType())) {
-			return new ErrorType("Array index should be integer type not " + amountType); // TODO custom error message.
+        if (!amountType.equivalent(new IntType()) || !(base instanceof ArrayType)) { // TODO check fo not arraytype?
+			return super.index(amountType);
         } else {
         	return base;
         }

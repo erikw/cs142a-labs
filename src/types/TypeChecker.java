@@ -322,15 +322,7 @@ public class TypeChecker implements CommandVisitor {
     	public void visit(Index node) {
         	Type amountType = visitRetriveType(node.amount());
         	Type baseType = visitRetriveType(node.base());
-			System.out.println("Base type is \"" + baseType + "\" with amountType \"" + amountType + "\"");
-			//if (!(baseType.equivalent(new IntType()) || baseType.equivalent(new FloatType()) || baseType.equivalent(new BoolType()))) {
-			////put(node, new ErrorType("Array " + arrayName + " has invalid base type " + baseType + "."));
-			//put(node, new ErrorType("Array UNKNOWN has invalid base type " + baseType + "."));
-			//} else {
-            //put(node, baseType);
-			//}
-			//if (baseType instanceof ArrayType) {
-			//Type resType = ((ArrayType) baseType).index(amountType);
+			//System.out.println("In node \"" + node + "\" with Base type is \"" + baseType + "\" with amountType \"" + amountType + "\"");
 			Type resType = baseType.index(amountType);
 			put(node, resType);
 			// TODO eric: might have to checkif basetype is array? NO virtual dispatch, implement index in Addressof
@@ -402,7 +394,7 @@ public class TypeChecker implements CommandVisitor {
     	@Override
     	public void visit(Return node) {
     		Type retType = visitRetriveType(node.argument());
-			System.out.println("In node \"" + node + "\" and putting foundRetType \"" + retType  + "\"");
+			//System.out.println("In node \"" + node + "\" and putting foundRetType \"" + retType  + "\"");
 			foundRetTypes.put(node, retType);
 			if (!(retType instanceof ErrorType)) { // TODO ugly hack to not get doublerror reporting, modded put() to record error since we need it above when checking foundRetTypes (retType above can be null and we need to propagade that error up there) // TODO eric: should not be needed, he returned wrongErrorType here instead 
 				put(node, retType);

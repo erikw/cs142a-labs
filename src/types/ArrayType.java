@@ -57,7 +57,7 @@ public class ArrayType extends Type {
     @Override
     public Type index(Type amountType) {
         if (!amountType.equivalent(new IntType())) {
-			return new ErrorType("Array index should be integer type not " + amountType); // TODO custom error message.
+			return super.index(amountType);
         } else {
         	return base; // TODO correct?
         }
