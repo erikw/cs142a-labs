@@ -54,4 +54,60 @@ public class AddressType extends Type {
     public Type deref() {
         return base;
     }
+
+// TODO override index
+    @Override
+    public Type index(Type amountType) {
+        if (!amountType.equivalent(new IntType())) {
+			return new ErrorType("Array index should be integer type not " + amountType); // TODO custom error message.
+        } else {
+        	return base;
+        }
+    }
+
+
+
+	@Override
+    public Type add(Type that) {
+        return base.add(that);
+    }
+    
+	@Override
+    public Type sub(Type that) {
+        return base.sub(that);
+    }
+    
+	@Override
+    public Type mul(Type that) {
+        return base.mul(that);
+    }
+    
+	@Override
+    public Type div(Type that) {
+        return base.div(that);
+    }
+    
+	@Override
+    public Type and(Type that) {
+        return base.and(that);
+    }
+    
+	@Override
+    public Type or(Type that) {
+        return base.or(that);
+    }
+    
+	@Override
+    public Type not() {
+        return base.not();
+    }
+    
+	@Override
+    public Type compare(Type that) {
+        return base.compare(that);
+    }
+
+    // TOOD override assign?
+    //public Type assign(Type source) {
+    //}
 }

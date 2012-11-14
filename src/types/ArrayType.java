@@ -63,6 +63,11 @@ public class ArrayType extends Type {
         }
     }
 
+	@Override
+    public Type deref() { // TODO should array override this?
+        return base;
+    }
+
     // TODO can we assign an array? or will that be done through some mysterious addressof type?
     //public Type assign(Type source) {
         //return new ErrorType("Cannot assign " + source + " to " + this + ".");

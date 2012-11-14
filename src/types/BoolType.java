@@ -49,4 +49,14 @@ public class BoolType extends Type {
     public Type not() {
         return new BoolType();
     }
+
+	@Override
+    public Type deref() {
+        return new BoolType();
+    }
+
+    @Override
+    public Type index(Type amountType) { // TODO realy take index of bool type?
+    	return new BoolType();
+    }
 }    

@@ -714,8 +714,8 @@ public class Parser {
 
 		// Create array in correct order.
 		while(!dimensions.empty()) {
+			type = new ArrayType(dimensions.pop(), type);
 			symbol.setType(type);
-			type = new ArrayType(dimensions.pop(), type); // TODO this must be wrong, last type will not be assigned, however testcases requreis it test13 [10,6]
 		}
 
 

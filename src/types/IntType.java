@@ -77,4 +77,14 @@ public class IntType extends Type {
     //public Type index(Type that) {
         //return this;
     //}
+ 
+	@Override
+    public Type deref() {
+        return new IntType();
+    }
+
+    @Override
+    public Type index(Type amountType) { // TODO realy take index of int type?
+    	return new IntType();
+    }
 }

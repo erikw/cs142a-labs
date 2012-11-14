@@ -72,4 +72,14 @@ public class FloatType extends Type {
         	return new BoolType();
         }
     }
+
+	@Override
+    public Type deref() {
+        return new FloatType();
+    }
+
+    @Override
+    public Type index(Type amountType) { // TODO realy take index of float type?
+    	return new FloatType();
+    }
 }

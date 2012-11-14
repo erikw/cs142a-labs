@@ -24,9 +24,6 @@ public class TypeChecker implements CommandVisitor {
     /* A list of found return types for the current function. */
     private Map<Return, Type> foundRetTypes;
 
-    /* A list found types in an expression list. */
-    private List<Type> exprTypes;
-
     // TODO make sure all of these error messages are implemented.
     /* Useful error strings:
      *
@@ -54,7 +51,6 @@ public class TypeChecker implements CommandVisitor {
         errorBuffer = new StringBuilder();
         //foundRetTypes = new LinkedList<Type>();
         foundRetTypes = new HashMap<Return, Type>();
-        exprTypes = new LinkedList<Type>();
     }
 
     /**
@@ -76,10 +72,8 @@ public class TypeChecker implements CommandVisitor {
     private void put(Command node, Type type) {
         if (type instanceof ErrorType) {
             reportError(node.lineNumber(), node.charPosition(), ((ErrorType)type).getMessage());
-			typeMap.put(node, type);
-        } else {
-        	typeMap.put(node, type);
         }
+        typeMap.put(node, type);
     }
 
     /**
@@ -131,10 +125,11 @@ public class TypeChecker implements CommandVisitor {
 
     @Override
     public void visit(ExpressionList node) {
+		TypeList typeList = new TypeList();
         for(Expression expr : node) {
-			//expr.accept(this);
-			exprTypes.add(visitRetriveType(expr));
+			typeList.append(visitRetriveType(expr));
         }
+        put(node, typeList);
     }
 
     @Override
@@ -148,7 +143,7 @@ public class TypeChecker implements CommandVisitor {
     public void visit(StatementList node) {
         //entryNbrRets = foundRetTypes.size();
         for (Statement stmt : node) {
-        	needsReturn = true; // TODO should we always require return from all statements? and then check after loop thath !needsReturn
+        	needsReturn = true; // TODO should we always require return from all statements? and then check after loop that !needsReturn
         	stmt.accept(this);
         }
         if (needsReturn) {
@@ -163,8 +158,8 @@ public class TypeChecker implements CommandVisitor {
     @Override
     public void visit(AddressOf node) {
         Type type = node.symbol().type();
-		//put(node, new AddressType(type));
-		put(node, type);
+		put(node, new AddressType(type)); // TODO eric suggested this to be done but this breaks test03. Solved by implementig deref() in int, float and bool -- correct?
+		//put(node, type);
     }
 
     @Override
@@ -244,8 +239,8 @@ public class TypeChecker implements CommandVisitor {
         	// TODO check correct return type for all found return types. 
         	// * what if a function returns a value but the signature is void-returning? -- autosolved
 			//for (Type foundRetType : foundRetTypes) {
+			// TODO eric: check in body it self when encounter returntype if currentReturnType() is the same
 			for (Return retNode : foundRetTypes.keySet()) {
-				//assert(foundRetType != null);
 				Type foundRetType = foundRetTypes.get(retNode);
 				if (!foundRetType.equivalent(returnType)) {
 					put(retNode, new ErrorType("Function " + func.name() + " returns " + returnType + " not " + foundRetType + "."));
@@ -320,14 +315,14 @@ public class TypeChecker implements CommandVisitor {
 
     	@Override
     	public void visit(Dereference node) {
-        	put(node, visitRetriveType(node.expression()));
+        	put(node, visitRetriveType(node.expression()).deref());
     	}
 
     	@Override
     	public void visit(Index node) {
         	Type amountType = visitRetriveType(node.amount());
         	Type baseType = visitRetriveType(node.base());
-            //System.out.println("Base type is " + baseType);
+			System.out.println("Base type is \"" + baseType + "\" with amountType \"" + amountType + "\"");
 			//if (!(baseType.equivalent(new IntType()) || baseType.equivalent(new FloatType()) || baseType.equivalent(new BoolType()))) {
 			////put(node, new ErrorType("Array " + arrayName + " has invalid base type " + baseType + "."));
 			//put(node, new ErrorType("Array UNKNOWN has invalid base type " + baseType + "."));
@@ -338,6 +333,7 @@ public class TypeChecker implements CommandVisitor {
 			//Type resType = ((ArrayType) baseType).index(amountType);
 			Type resType = baseType.index(amountType);
 			put(node, resType);
+			// TODO eric: might have to checkif basetype is array? NO virtual dispatch, implement index in Addressof
 			//} else {
 			/// TODO where check base type?
 			//////if (!((baseType.equivalent(new IntType()) || baseType.equivalent(new FloatType()) || baseType.equivalent(new BoolType())))) {
@@ -350,20 +346,14 @@ public class TypeChecker implements CommandVisitor {
     	@Override
     	public void visit(Assignment node) {
         	Type srcType = visitRetriveType(node.source());
-            //Type destType = newvisitRetriveType(node.destination());
-        	Type destType = new AddressType(visitRetriveType(node.destination())); // TODO suppose to use address here or in visit(Addressof
-            //assert(destType instanceof IntType);
+			Type destType = visitRetriveType(node.destination());
         	put(node, destType.assign(srcType));
     	}
 
     	@Override
     	public void visit(Call node) {
-    		Symbol func = node.function();
-    		FuncType funcType = (FuncType) func.type(); // TODO sigh so ugly, right?
-    		ExpressionList args = node.arguments();
-			exprTypes.clear();
-			args.accept(this);
-			TypeList callArgTypes = new TypeList(exprTypes);
+    		Type funcType = node.function().type();
+			Type callArgTypes = visitRetriveType(node.arguments());
 			put(node, funcType.call(callArgTypes));
     	}
 
@@ -412,16 +402,11 @@ public class TypeChecker implements CommandVisitor {
     	@Override
     	public void visit(Return node) {
     		Type retType = visitRetriveType(node.argument());
-        	//if (retType != null) { // Error nodes gives no type for put().
-            //if (retType instanceof AddressType) {
-            //foundRetTypes.put(node, ((AddressType) retType).base()); // TODO ugly hack to pass test03
-            //} else {
-    		foundRetTypes.put(node, retType);
-            //}
-        	if (!(retType instanceof ErrorType)) { // TODO ugly hack to not get doublerror reporting, modded put() to record error since we need it above when checking foundRetTypes (retType above can be null and we need to propagade that error up there)
-        		put(node, retType);
-        	}
-        	//}
+			System.out.println("In node \"" + node + "\" and putting foundRetType \"" + retType  + "\"");
+			foundRetTypes.put(node, retType);
+			if (!(retType instanceof ErrorType)) { // TODO ugly hack to not get doublerror reporting, modded put() to record error since we need it above when checking foundRetTypes (retType above can be null and we need to propagade that error up there) // TODO eric: should not be needed, he returned wrongErrorType here instead 
+				put(node, retType);
+			} 
         	needsReturn = false;
     	}
 
