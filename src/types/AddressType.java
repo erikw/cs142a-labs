@@ -67,37 +67,37 @@ public class AddressType extends Type {
     public Type add(Type that) {
         return base.add(that);
     }
-    
+
 	@Override
     public Type sub(Type that) {
         return base.sub(that);
     }
-    
+
 	@Override
     public Type mul(Type that) {
         return base.mul(that);
     }
-    
+
 	@Override
     public Type div(Type that) {
         return base.div(that);
     }
-    
+
 	@Override
     public Type and(Type that) {
         return base.and(that);
     }
-    
+
 	@Override
     public Type or(Type that) {
         return base.or(that);
     }
-    
+
 	@Override
     public Type not() {
         return base.not();
     }
-    
+
 	@Override
     public Type compare(Type that) {
         return base.compare(that);

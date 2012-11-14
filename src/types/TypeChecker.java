@@ -24,6 +24,12 @@ public class TypeChecker implements CommandVisitor {
     /* A list of found return types for the current function. */
     private Map<Return, Type> foundRetTypes;
 
+	/* The symbol for the current function we're in. */
+	private Symbol curFuncSym;
+
+	/* The return type of the current function we're in. */
+	private Type curFuncRetType;
+
     // TODO make sure all of these error messages are implemented.
     /* Useful error strings:
      *
@@ -148,12 +154,9 @@ public class TypeChecker implements CommandVisitor {
         }
         if (needsReturn) {
         	// fail
+        	;
         }
-        //if ((0 == foundRetTypes.size() == entryNbrRets) {
-        //if (foundRetTypes.size() == 0) {
-		// fail, implicit by our var still = true I guess.
-        //}
-    	}
+    }
 
     @Override
     public void visit(AddressOf node) {
@@ -192,9 +195,9 @@ public class TypeChecker implements CommandVisitor {
         //Symbol symbol = node.symbol();
         //Type baseType = symbol.type();
 		//if ((baseType.equivalent(new IntType()) || baseType.equivalent(new FloatType()) || baseType.equivalent(new BoolType()))) {
-            //put(node, baseType);
+        //put(node, baseType);
         //} else {
-			//put(node, new ErrorType("Array " + symbol.name() + " has invalid base type " + baseType + "."));
+		//put(node, new ErrorType("Array " + symbol.name() + " has invalid base type " + baseType + "."));
         //}
     }
 
@@ -227,170 +230,174 @@ public class TypeChecker implements CommandVisitor {
         // TODO check so all paths return. 1) jack: register retrurns for statement, while, if and propagate up. 2) eric: recursive helper method. 3) SSA on blog, retval must be initialized by all paths in the end.
         // what if a path ends with return; wo/ value? -- set it to voidType
         // 
-		needsReturn = true;
+        // TODO wrong rettype should be printed before noallpathsreturn if both occurs? SOL: report typemismatch when it occurs.
+		needsReturn = true; 
+		curFuncSym = func;
+		curFuncRetType = returnType;
 		foundRetTypes.clear();
         visit(node.body());
 		if (!(returnType instanceof VoidType) && needsReturn) { 
         	put(node, new ErrorType("Not all paths in function " + func.name() + " have a return."));
+		} 
+		//else {
+		//// TODO eric: check in body it self when encounter returntype if currentReturnType() is the same
+		//for (Return retNode : foundRetTypes.keySet()) {
+		//Type foundRetType = foundRetTypes.get(retNode);
+		//if (!foundRetType.equivalent(returnType)) {
+		//put(retNode, new ErrorType("Function " + func.name() + " returns " + returnType + " not " + foundRetType + "."));
+		//}
+		//}
+        //put(node, returnType);
+		//}
+		put(node, returnType);
+    }
+
+    @Override
+    public void visit(Comparison node) {
+    	Type lhs = visitRetriveType(node.leftSide());
+    	Type rhs = visitRetriveType(node.rightSide());
+        put(node, lhs.compare(rhs));
+    }
+
+    @Override
+    public void visit(Addition node) {
+        Type lhs = visitRetriveType(node.leftSide());
+        Type rhs = visitRetriveType(node.rightSide());
+        if (lhs != null && rhs != null) {
+        	Type res = lhs.add(rhs);
+        	//System.out.println("Addresult: " + res);
+			put(node, res);
+        }
+    }
+
+    @Override
+    public void visit(Subtraction node) {
+        Type lhs = visitRetriveType(node.leftSide());
+        Type rhs = visitRetriveType(node.rightSide());
+		put(node, lhs.sub(rhs));
+    }
+
+    @Override
+    public void visit(Multiplication node) {
+        Type lhs = visitRetriveType(node.leftSide());
+        Type rhs = visitRetriveType(node.rightSide());
+		put(node, lhs.mul(rhs));
+    }
+
+    @Override
+    public void visit(Division node) {
+        Type lhs = visitRetriveType(node.leftSide());
+        Type rhs = visitRetriveType(node.rightSide());
+		put(node, lhs.div(rhs));
+    }
+
+    @Override
+    public void visit(LogicalAnd node) {
+        Type lhs = visitRetriveType(node.leftSide());
+        Type rhs = visitRetriveType(node.rightSide());
+		put(node, lhs.and(rhs));
+    }
+
+    @Override
+    public void visit(LogicalOr node) {
+        Type lhs = visitRetriveType(node.leftSide());
+        Type rhs = visitRetriveType(node.rightSide());
+		put(node, lhs.or(rhs));
+    }
+
+    @Override
+    public void visit(LogicalNot node) {
+		Type type = visitRetriveType(node.expression());
+		if (type.equivalent(new BoolType())) {
+			put(node, type);
 		} else {
-			// TODO eric: check in body it self when encounter returntype if currentReturnType() is the same
-			for (Return retNode : foundRetTypes.keySet()) {
-				Type foundRetType = foundRetTypes.get(retNode);
-				if (!foundRetType.equivalent(returnType)) {
-					put(retNode, new ErrorType("Function " + func.name() + " returns " + returnType + " not " + foundRetType + "."));
-				}
-			}
-        	put(node, returnType);
-			}
-    	}
+			put(node, new ErrorType("Cannot negate " + type + "."));
+		}
+    }
 
-    	@Override
-    	public void visit(Comparison node) {
-    		Type lhs = visitRetriveType(node.leftSide());
-    		Type rhs = visitRetriveType(node.rightSide());
-        	put(node, lhs.compare(rhs));
-    	}
+    @Override
+    public void visit(Dereference node) {
+        put(node, visitRetriveType(node.expression()).deref());
+    }
 
-    	@Override
-    	public void visit(Addition node) {
-        	Type lhs = visitRetriveType(node.leftSide());
-        	Type rhs = visitRetriveType(node.rightSide());
-        	if (lhs != null && rhs != null) {
-        		Type res = lhs.add(rhs);
-        		//System.out.println("Addresult: " + res);
-				put(node, res);
-        	}
-    	}
+    @Override
+    public void visit(Index node) {
+        Type amountType = visitRetriveType(node.amount());
+        Type baseType = visitRetriveType(node.base());
+		Type resType = baseType.index(amountType);
+		put(node, resType);
+    }
 
-    	@Override
-    	public void visit(Subtraction node) {
-        	Type lhs = visitRetriveType(node.leftSide());
-        	Type rhs = visitRetriveType(node.rightSide());
-			put(node, lhs.sub(rhs));
-    	}
+    @Override
+    public void visit(Assignment node) {
+        Type srcType = visitRetriveType(node.source());
+		Type destType = visitRetriveType(node.destination());
+        put(node, destType.assign(srcType));
+    }
 
-    	@Override
-    	public void visit(Multiplication node) {
-        	Type lhs = visitRetriveType(node.leftSide());
-        	Type rhs = visitRetriveType(node.rightSide());
-			put(node, lhs.mul(rhs));
-    	}
+    @Override
+    public void visit(Call node) {
+    	Type funcType = node.function().type();
+		Type callArgTypes = visitRetriveType(node.arguments());
+		put(node, funcType.call(callArgTypes));
+    }
 
-    	@Override
-    	public void visit(Division node) {
-        	Type lhs = visitRetriveType(node.leftSide());
-        	Type rhs = visitRetriveType(node.rightSide());
-			put(node, lhs.div(rhs));
-    	}
-
-    	@Override
-    	public void visit(LogicalAnd node) {
-        	Type lhs = visitRetriveType(node.leftSide());
-        	Type rhs = visitRetriveType(node.rightSide());
-			put(node, lhs.and(rhs));
-    	}
-
-    	@Override
-    	public void visit(LogicalOr node) {
-        	Type lhs = visitRetriveType(node.leftSide());
-        	Type rhs = visitRetriveType(node.rightSide());
-			put(node, lhs.or(rhs));
-    	}
-
-    	@Override
-    	public void visit(LogicalNot node) {
-			Type type = visitRetriveType(node.expression());
-			if (type.equivalent(new BoolType())) {
-				put(node, type);
-			} else {
-				put(node, new ErrorType("Cannot negate " + type + "."));
-			}
-    	}
-
-    	@Override
-    	public void visit(Dereference node) {
-        	put(node, visitRetriveType(node.expression()).deref());
-    	}
-
-    	@Override
-    	public void visit(Index node) {
-        	Type amountType = visitRetriveType(node.amount());
-        	Type baseType = visitRetriveType(node.base());
-			Type resType = baseType.index(amountType);
-			put(node, resType);
-    	}
-
-    	@Override
-    	public void visit(Assignment node) {
-        	Type srcType = visitRetriveType(node.source());
-			Type destType = visitRetriveType(node.destination());
-        	put(node, destType.assign(srcType));
-    	}
-
-    	@Override
-    	public void visit(Call node) {
-    		Type funcType = node.function().type();
-			Type callArgTypes = visitRetriveType(node.arguments());
-			put(node, funcType.call(callArgTypes));
-    	}
-
-    	@Override
-    	public void visit(IfElseBranch node) {
-        	Type condType = visitRetriveType(node.condition());
-        	if (!condType.equivalent(new BoolType())) {
-     	 		put(node, new ErrorType("IfElseBranch requires bool condition not " + condType + "."));
-     	 		return;
-        	}
+    @Override
+    public void visit(IfElseBranch node) {
+        Type condType = visitRetriveType(node.condition());
+        if (!condType.equivalent(new BoolType())) {
+     	 	put(node, new ErrorType("IfElseBranch requires bool condition not " + condType + "."));
+     	 	return;
+        }
 
 
-			// needstrue IF not both branches has return OR 
-			int prevNbrRets = foundRetTypes.size();
-			visit(node.thenBlock());
-			boolean thenHasReturn = (foundRetTypes.size() > prevNbrRets);
-			//needsReturn = (foundRetTypes.size() == prevNbrRets); // TODO or only set to true when needed and let visit(Return) always set to false?
-			prevNbrRets = foundRetTypes.size();
-			visit(node.elseBlock());
-			boolean elseHasReturn = (foundRetTypes.size() > prevNbrRets); // TODO handle empty else block (stmtlist.size() == 0)
+		// needstrue IF not both branches has return OR 
+		int prevNbrRets = foundRetTypes.size();
+		visit(node.thenBlock());
+		boolean thenHasReturn = (foundRetTypes.size() > prevNbrRets);
+		//needsReturn = (foundRetTypes.size() == prevNbrRets); // TODO or only set to true when needed and let visit(Return) always set to false?
+		prevNbrRets = foundRetTypes.size();
+		visit(node.elseBlock());
+		boolean elseHasReturn = (foundRetTypes.size() > prevNbrRets); // TODO handle empty else block (stmtlist.size() == 0)
 
-			needsReturn = (thenHasReturn ^ elseHasReturn);
-			//if (foundRetTypes.size() > prevNbrRets) {
-			//needsReturn = true;
-			//}
-
-
-    	}
-
-    	@Override
-    	public void visit(WhileLoop node) {
-        	Type condType = visitRetriveType(node.condition());
-        	if (!condType.equivalent(new BoolType())) {
-     	 		put(node, new ErrorType("WhileLoop requires bool condition not " + condType + "."));
-     	 		return;
-        	}
+		needsReturn = (thenHasReturn ^ elseHasReturn);
+		//if (foundRetTypes.size() > prevNbrRets) {
+		//needsReturn = true;
+		//}
 
 
-			// needstrue IF not both branches has return OR 
-			int prevNbrRets = foundRetTypes.size();
-			visit(node.body());
-			boolean bodyHasReturn = (foundRetTypes.size() > prevNbrRets);
-			needsReturn = true; // TODO 
-    	}
+    }
 
-    	@Override
-    	public void visit(Return node) {
-    		Type retType = visitRetriveType(node.argument());
-			//System.out.println("In node \"" + node + "\" and putting foundRetType \"" + retType  + "\"");
-			foundRetTypes.put(node, retType);
-			if (!(retType instanceof ErrorType)) {
-				// TODO ugly hack to not get doublerror reporting,
-				// TODO eric: should not be needed, he returned wrongErrorType here instead 
-				put(node, retType);
-			} 
-        	needsReturn = false;
-    	}
+    @Override
+    public void visit(WhileLoop node) {
+        Type condType = visitRetriveType(node.condition());
+        if (!condType.equivalent(new BoolType())) {
+     	 	put(node, new ErrorType("WhileLoop requires bool condition not " + condType + "."));
+     	 	return;
+        }
 
-    	@Override
-    	public void visit(ast.Error node) {
-        	put(node, new ErrorType(node.message()));
-    	}
-	}
+
+		// needstrue IF not both branches has return OR 
+		int prevNbrRets = foundRetTypes.size();
+		visit(node.body());
+		boolean bodyHasReturn = (foundRetTypes.size() > prevNbrRets);
+		needsReturn = true; // TODO 
+    }
+
+    @Override
+    public void visit(Return node) {
+    	Type retType = visitRetriveType(node.argument());
+		foundRetTypes.put(node, retType);
+		if (!retType.equivalent(curFuncRetType)) {
+			put(node, new ErrorType("Function " + curFuncSym.name() + " returns " + curFuncRetType + " not " + retType + "."));
+		} else {
+			put(node, retType);
+		}
+        needsReturn = false;
+    }
+
+    @Override
+    public void visit(ast.Error node) {
+        put(node, new ErrorType(node.message()));
+    }
+}

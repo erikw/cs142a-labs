@@ -8,10 +8,10 @@ import java.util.List;
  * A list of types, Composite pattern.
  */
 public class TypeList extends Type implements Iterable<Type> {
-    
+
     /* The types in this list. */
     private List<Type> list;
-    
+
     /**
      * Construct a new type list.
      */
@@ -30,7 +30,7 @@ public class TypeList extends Type implements Iterable<Type> {
         	list = new ArrayList<Type>(initTypes);
     	}
     }
-    
+
     /**
      * Append a given type to the list.
      * @param type The type to append to this type list.
@@ -38,7 +38,7 @@ public class TypeList extends Type implements Iterable<Type> {
     public void append(Type type) {
         list.add(type);
     }
-    
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -52,7 +52,7 @@ public class TypeList extends Type implements Iterable<Type> {
         sb.append(")");
         return sb.toString();
     }
-    
+
     @Override
     public boolean equivalent(Type that) {
         if (that == null) {
@@ -63,11 +63,11 @@ public class TypeList extends Type implements Iterable<Type> {
             return false;
         } else {
         	List<Type> olist = ((TypeList) that).list;
-        	
+
         	if (list.size() != olist.size()) {
             	return false;
         	}
-        	
+
         	for (int i = 0; i < list.size(); ++i) {
             	if (!list.get(i).equivalent(olist.get(i)))
                 	return false;
@@ -75,7 +75,7 @@ public class TypeList extends Type implements Iterable<Type> {
         	return true;
         }
     }
-    
+
     @Override
     public Iterator<Type> iterator() {
         return list.iterator();

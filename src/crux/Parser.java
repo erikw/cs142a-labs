@@ -36,7 +36,7 @@ public class Parser {
 	/* The current token that's being processed. */
 	private Token currentToken;
 
-// Parser ==========================================
+	// Parser ==========================================
 
 	/**
 	 * Construct a new parser using a specified scanner.
@@ -246,14 +246,14 @@ public class Parser {
 		return Integer.valueOf(num);
 	}
 
-// SymbolTable Management ==========================
+	// SymbolTable Management ==========================
 
     /**
      * Initialize the symbolTable with predefined symbols.
      */
     private void initSymbolTable() {
         //for (String predefFunction : SymbolTable.PREDEF_FUNCS) {
-			//symbolTable.insert(predefFunction);
+		//symbolTable.insert(predefFunction);
         //}
         Symbol symbol;
         TypeList args;
@@ -263,7 +263,7 @@ public class Parser {
 
         symbol= symbolTable.insert("readFloat");
         symbol.setType(new FuncType(new TypeList(), new FloatType()));
-        
+
         symbol= symbolTable.insert("printBool");
         args = new TypeList();
         args.append(new BoolType());
@@ -919,8 +919,8 @@ public class Parser {
 	}
 
 
-// Typing System ===================================
-    
+	// Typing System ===================================
+
     /**
      * Try to look up a type from a string.
      * @param typeStr The string to lookup.

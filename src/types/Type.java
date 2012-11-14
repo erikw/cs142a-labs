@@ -6,7 +6,7 @@ import crux.Symbol;
  * Abstract base type representing the types the can exist in a crux program.
  */
 public abstract class Type {
-    
+
     /**
      * Get the type indicated by the type string.
      * @param typeStr The string indicating the type.
@@ -25,7 +25,7 @@ public abstract class Type {
         	return new ErrorType("Unknown type: " + typeStr);
         }
     }
-    
+
     /**
      * Add this type to that.
      * Default implementation that is supposed to be overridden by types that should support this operation.
@@ -35,7 +35,7 @@ public abstract class Type {
     public Type add(Type that) {
         return new ErrorType("Cannot add " + this + " with " + that + ".");
     }
-    
+
     /**
      * Substract this type to that.
      * Default implementation that is supposed to be overridden by types that should support this operation.
@@ -45,7 +45,7 @@ public abstract class Type {
     public Type sub(Type that) {
         return new ErrorType("Cannot subtract " + that + " from " + this + ".");
     }
-    
+
     /**
      * Multiply this type to that.
      * Default implementation that is supposed to be overridden by types that should support this operation.
@@ -55,7 +55,7 @@ public abstract class Type {
     public Type mul(Type that) {
         return new ErrorType("Cannot multiply " + this + " with " + that + ".");
     }
-    
+
     /**
      * Divide this type to that.
      * Default implementation that is supposed to be overridden by types that should support this operation.
@@ -65,7 +65,7 @@ public abstract class Type {
     public Type div(Type that) {
         return new ErrorType("Cannot divide " + this + " by " + that + ".");
     }
-    
+
     /**
      * Logical and this type to that.
      * Default implementation that is supposed to be overridden by types that should support this operation.
@@ -75,7 +75,7 @@ public abstract class Type {
     public Type and(Type that) {
         return new ErrorType("Cannot compute " + this + " and " + that + ".");
     }
-    
+
     /**
      * Logical or this type to that.
      * Default implementation that is supposed to be overridden by types that should support this operation.
@@ -85,7 +85,7 @@ public abstract class Type {
     public Type or(Type that) {
         return new ErrorType("Cannot compute " + this + " or " + that + ".");
     }
-    
+
     /**
      * Logical not this type to that.
      * Default implementation that is supposed to be overridden by types that should support this operation.
@@ -95,7 +95,7 @@ public abstract class Type {
     public Type not() {
         return new ErrorType("Cannot negate " + this + ".");
     }
-    
+
     /**
      * Compare this type to that.
      * Default implementation that is supposed to be overridden by types that should support this operation.
@@ -105,7 +105,7 @@ public abstract class Type {
     public Type compare(Type that) {
         return new ErrorType("Cannot compare " + this + " with " + that + ".");
     }
-    
+
     /**
      * Dereference this type.
      * Default implementation that is supposed to be overridden by types that should support this operation.
@@ -114,7 +114,7 @@ public abstract class Type {
     public Type deref() {
         return new ErrorType("Cannot dereference " + this);
     }
-    
+
     /**
      * Take index of this type.
      * Default implementation that is supposed to be overridden by types that should support this operation.
@@ -123,7 +123,7 @@ public abstract class Type {
     public Type index(Type that) {
         return new ErrorType("Cannot index " + this + " with " + that + ".");
     }
-    
+
     /**
      * Call this type.
      * Default implementation that is supposed to be overridden by types that should support this operation.
@@ -132,7 +132,7 @@ public abstract class Type {
     public Type call(Type args) {
         return new ErrorType("Cannot call " + this + " using " + args + ".");
     }
-    
+
     /**
      * Assign this type.
      * Default implementation that is supposed to be overridden by types that should support this operation.
@@ -141,7 +141,7 @@ public abstract class Type {
     public Type assign(Type source) {
         return new ErrorType("Cannot assign " + source + " to " + this + ".");
     }
-    
+
     /**
      * Perform a structural equivalence test.
      * @param The other type to compare with.
@@ -156,6 +156,6 @@ public abstract class Type {
      * @return Resulting type.
      */
     public Type declare(Symbol symbol) {
-       return new ErrorType("Variable " + symbol.name() + " has invalid type " + this + ".");
+       	return new ErrorType("Variable " + symbol.name() + " has invalid type " + this + ".");
     }
 }

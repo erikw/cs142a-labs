@@ -4,3 +4,4 @@
 * Private test case: test not all path returns rigorously.
 * Make sure main is last function or does grammar allready fix that, test06
 * q: should wrong error types be reported as well as "not all paths returns"?
+* Clean up TypeChecker code.

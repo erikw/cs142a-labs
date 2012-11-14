@@ -6,18 +6,18 @@ import crux.Symbol;
  * Type representing a floating point.
  */
 public class FloatType extends Type {
-    
+
     /**
      * Construct a new floating point type.
      */
     public FloatType() {
     }
-    
+
     @Override
     public String toString() {
         return "float";
     }
-       
+
     @Override
     public boolean equivalent(Type that) {
         if (that == null) {
