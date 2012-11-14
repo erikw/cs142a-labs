@@ -160,20 +160,12 @@ public abstract class Type {
     }
 
 	/**
-	 * Get the base type of this type (meaning full for arrays).
+	 * Get the base type of this type.
      * Default implementation that is supposed to be overridden by types that should support this operation.
+     * @param symbol The symbol for which we wants the base type of.
      * @return The base type.
 	 */
-	public Type baseType() {
-       	return new ErrorType("Can not take inner type of " + this + ".");
-	}
-
-	/**
-	 * Deterine if the current type is a valid array base type.
-     * Default implementation that is supposed to be overridden by types that should support this operation.
-	 * @return Indication of the validness for this type as an array base type.
-	 */
-	public boolean isValidBaseType() {
-		return false;
+	public Type baseType(Symbol symbol) {
+		return new ErrorType("Array " + symbol.name() + " has invalid base type " + this + ".");
 	}
 }

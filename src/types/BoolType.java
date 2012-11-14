@@ -67,7 +67,7 @@ public class BoolType extends Type {
     }
 
 	@Override
-	public boolean isValidBaseType() {
-		return true;
+	public Type baseType(Symbol symbol) {
+		return this;
 	}
 }    

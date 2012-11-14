@@ -90,7 +90,7 @@ public class FloatType extends Type {
     }
 
 	@Override
-	public boolean isValidBaseType() {
-		return true;
+	public Type baseType(Symbol symbol) {
+		return this;
 	}
 }

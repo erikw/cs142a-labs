@@ -1,5 +1,7 @@
 package types;
 
+import crux.Symbol;
+
 /**
  * Type representing an array.
  */
@@ -69,7 +71,8 @@ public class ArrayType extends Type {
 	}
 
 	@Override
-	public Type baseType() {
-		return (base instanceof ArrayType) ? base.baseType() : base;
+	public Type baseType(Symbol symbol) {
+		//return (base instanceof ArrayType) ? base.baseType(symbol) : base;
+		return base.baseType(symbol);
 	}
 }

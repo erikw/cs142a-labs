@@ -190,12 +190,7 @@ public class TypeChecker implements CommandVisitor {
     public void visit(ArrayDeclaration node) {
 		Symbol symbol = node.symbol();
 		Type type = symbol.type();
-		Type innerType =  type.baseType();
-		if (innerType.isValidBaseType()) {
-			put(node, type);
-		} else {
-			put(node, new ErrorType("Array " + symbol.name() + " has invalid base type " + innerType + "."));
-		}
+		put(node, type.baseType(symbol));
     }
 
     @Override
@@ -224,10 +219,7 @@ public class TypeChecker implements CommandVisitor {
         	}
         }
 
-        // TODO check so all paths return. 1) jack: register retrurns for statement, while, if and propagate up. 2) eric: recursive helper method. 3) SSA on blog, retval must be initialized by all paths in the end.
-        // what if a path ends with return; wo/ value? -- set it to voidType
-        // 
-        // TODO wrong rettype should be printed before noallpathsreturn if both occurs? SOL: report typemismatch when it occurs.
+        // TODO check so all paths return. 1) jack: register retrurns for statement, while, if and propagate up. 2) eric: recursive helper method. 3) SSA on blog, retval must be initialized by all paths in the end.  // what if a path ends with return; wo/ value? -- set it to voidType
 		needsReturn = true; 
 		curFuncSym = func;
 		curFuncRetType = returnType;
@@ -236,16 +228,6 @@ public class TypeChecker implements CommandVisitor {
 		if (!(returnType instanceof VoidType) && needsReturn) { 
         	put(node, new ErrorType("Not all paths in function " + func.name() + " have a return."));
 		} 
-		//else {
-		//// TODO eric: check in body it self when encounter returntype if currentReturnType() is the same
-		//for (Return retNode : foundRetTypes.keySet()) {
-		//Type foundRetType = foundRetTypes.get(retNode);
-		//if (!foundRetType.equivalent(returnType)) {
-		//put(retNode, new ErrorType("Function " + func.name() + " returns " + returnType + " not " + foundRetType + "."));
-		//}
-		//}
-        //put(node, returnType);
-		//}
 		put(node, returnType);
     }
 
