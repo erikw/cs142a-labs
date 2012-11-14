@@ -381,7 +381,9 @@ public class TypeChecker implements CommandVisitor {
     		Type retType = visitRetriveType(node.argument());
 			//System.out.println("In node \"" + node + "\" and putting foundRetType \"" + retType  + "\"");
 			foundRetTypes.put(node, retType);
-			if (!(retType instanceof ErrorType)) { // TODO ugly hack to not get doublerror reporting, modded put() to record error since we need it above when checking foundRetTypes (retType above can be null and we need to propagade that error up there) // TODO eric: should not be needed, he returned wrongErrorType here instead 
+			if (!(retType instanceof ErrorType)) {
+				// TODO ugly hack to not get doublerror reporting,
+				// TODO eric: should not be needed, he returned wrongErrorType here instead 
 				put(node, retType);
 			} 
         	needsReturn = false;

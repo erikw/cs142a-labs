@@ -237,15 +237,13 @@ public class Parser {
 
 	/**
 	 * Expect an integer token.
-	 * @return An integer or null;
+	 * @return An integer.
+	 * @throws QuitParseException if an integer could not be fetched.
 	 */
 	private Integer expectInteger() {
 		String num = currentToken.lexeme();
-		if (expect(Token.Kind.INTEGER)) {
-		    return Integer.valueOf(num);
-		} else {
-			return null;
-		}
+		expect(Token.Kind.INTEGER);
+		return Integer.valueOf(num);
 	}
 
 // SymbolTable Management ==========================
@@ -697,7 +695,7 @@ public class Parser {
 
 		Stack<Integer> dimensions = new Stack<Integer>();
 		do {	
-			Integer dimension = expectInteger(); // TODO handle null case
+			Integer dimension = expectInteger();
 			dimensions.push(dimension);
 			expect(Token.Kind.CLOSE_BRACKET);
 		} while (accept(Token.Kind.OPEN_BRACKET));
