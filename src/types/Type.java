@@ -1,5 +1,7 @@
 package types;
 
+import crux.Symbol;
+
 /**
  * Abstract base type representing the types the can exist in a crux program.
  */
@@ -146,4 +148,14 @@ public abstract class Type {
      * @return Indication of equivalence.
      */
     public abstract boolean equivalent(Type that);
+
+    /**
+     * Declare a variable of this type.
+     * Default implementation that is supposed to be overridden by types that should support this operation.
+     * @param The symbol assosicated with the declaration.
+     * @return Resulting type.
+     */
+    public Type declare(Symbol symbol) {
+       return new ErrorType("Variable " + symbol.name() + " has invalid type " + this + ".");
+    }
 }

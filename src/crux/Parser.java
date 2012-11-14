@@ -695,15 +695,6 @@ public class Parser {
 		Type type = type();
 		expect(Token.Kind.OPEN_BRACKET);
 
-		//// TODO will this produce the correct order of the types or should it be reversed?
-		//do {	
-			//Integer dimension = expectInteger(); // TODO handle null case
-			//type = new ArrayType(dimension, type);
-			//symbol.setType(type);
-			//expect(Token.Kind.CLOSE_BRACKET);
-		//} while (accept(Token.Kind.OPEN_BRACKET));
-		//expect(Token.Kind.SEMICOLON);
-
 		Stack<Integer> dimensions = new Stack<Integer>();
 		do {	
 			Integer dimension = expectInteger(); // TODO handle null case
@@ -711,14 +702,11 @@ public class Parser {
 			expect(Token.Kind.CLOSE_BRACKET);
 		} while (accept(Token.Kind.OPEN_BRACKET));
 		expect(Token.Kind.SEMICOLON);
-
 		// Create array in correct order.
 		while(!dimensions.empty()) {
 			type = new ArrayType(dimensions.pop(), type);
 			symbol.setType(type);
 		}
-
-
 
 		exitRule(NonTerminal.ARRAY_DECLARATION);
 		return arrayDecl;

@@ -1,5 +1,7 @@
 package types;
 
+import crux.Symbol;
+
 /**
  * Type representing a boolean type.
  */
@@ -51,12 +53,16 @@ public class BoolType extends Type {
     }
 
 	@Override
-    public Type deref() {
-        return new BoolType();
-    }
+	public Type assign(Type source) {
+		if (!equivalent(source)) {
+			return super.assign(source);
+		} else {
+			return new VoidType();
+		}
+	}
 
-    @Override
-    public Type index(Type amountType) { // TODO realy take index of bool type?
-    	return new BoolType();
+	@Override
+    public Type declare(Symbol symbol) {
+       	return new BoolType();
     }
 }    

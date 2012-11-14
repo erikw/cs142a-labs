@@ -158,8 +158,7 @@ public class TypeChecker implements CommandVisitor {
     @Override
     public void visit(AddressOf node) {
         Type type = node.symbol().type();
-		put(node, new AddressType(type)); // TODO eric suggested this to be done but this breaks test03. Solved by implementig deref() in int, float and bool -- correct?
-		//put(node, type);
+		put(node, new AddressType(type));
     }
 
     @Override
@@ -179,12 +178,14 @@ public class TypeChecker implements CommandVisitor {
 
     @Override
     public void visit(VariableDeclaration node) {
-    	Type varType = node.symbol().type();
-    	if (varType.equivalent(new IntType()) || varType.equivalent(new FloatType()) || varType.equivalent(new BoolType())) {
-			put(node, varType); // TODO do we really need to put this?
-    	} else {
-     	 	put(node, new ErrorType("Variable " + node.symbol().name() + " has invalid type " + varType + "."));
-    	}
+    	Symbol symbol = node.symbol();
+    	Type varType = symbol.type();
+        //if (varType.equivalent(new IntType()) || varType.equivalent(new FloatType()) || varType.equivalent(new BoolType())) { // TODO do we need these ugly checks? should be able to avoid this with virtual dispatch
+			//put(node, varType); // TODO do we really need to put this?
+        //} else {
+              //put(node, new ErrorType("Variable " + node.symbol().name() + " has invalid type " + varType + "."));
+        //}
+        put(node, varType.declare(symbol));
     }
 
     @Override

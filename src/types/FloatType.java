@@ -1,5 +1,7 @@
 package types;
 
+import crux.Symbol;
+
 /**
  * Type representing a floating point.
  */
@@ -74,12 +76,16 @@ public class FloatType extends Type {
     }
 
 	@Override
-    public Type deref() {
-        return new FloatType();
-    }
+	public Type assign(Type source) {
+		if (!equivalent(source)) {
+			return super.assign(source);
+		} else {
+			return new VoidType();
+		}
+	}
 
-    @Override
-    public Type index(Type amountType) { // TODO realy take index of float type?
-    	return new FloatType();
+	@Override
+    public Type declare(Symbol symbol) {
+       	return new FloatType();
     }
 }

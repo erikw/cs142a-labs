@@ -6,3 +6,4 @@
 * make sure main is last function or does grammar allready fix that, test06
 * grep -nri "implement this" src/
 * Save memeory by returning 'this' from Types and not new objecs IFF the returned types are not used as keys in a map some where.
+* q: should wrong error types be reported as well as "not all paths returns"?

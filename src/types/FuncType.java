@@ -55,7 +55,7 @@ public class FuncType extends Type {
 
    @Override
    public Type call(Type args) {
-        if (!(args instanceof TypeList)) { // TODO is call invoked with TypeList?
+        if (!(args instanceof TypeList)) {
             return super.call(args);
         } else if (!((TypeList) args).equivalent(this.args)) {
         	return new ErrorType("Cannot call " + this + " using " + args + ".");

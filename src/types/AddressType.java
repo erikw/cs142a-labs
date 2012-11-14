@@ -3,7 +3,6 @@ package types;
 /**
  * Type representing address of.
  */
-// TODO when should this be used?
 public class AddressType extends Type {
     /* The base address. */
     private Type base;
@@ -46,7 +45,7 @@ public class AddressType extends Type {
         if (!source.equivalent(base)) {
         	return super.assign(source);
         } else {
-        	return new VoidType();  // TODO TA's slides says so...
+        	return new VoidType();
         }
     }
 
@@ -55,17 +54,15 @@ public class AddressType extends Type {
         return base;
     }
 
-	// TODO eric:override index // TODO but that does not work since test13 [12,19] implies that AddressType.index() does not exists. OR it means that this method should detect that base is not array?
     @Override
     public Type index(Type amountType) {
-        if (!amountType.equivalent(new IntType()) || !(base instanceof ArrayType)) { // TODO check fo not arraytype?
+        if (!amountType.equivalent(new IntType()) || !(base instanceof ArrayType)) {
 			return super.index(amountType);
         } else {
-        	return base;
+			//return new AddressType(base);
+			return new AddressType(base.index(amountType));
         }
     }
-
-
 
 	@Override
     public Type add(Type that) {
@@ -106,8 +103,4 @@ public class AddressType extends Type {
     public Type compare(Type that) {
         return base.compare(that);
     }
-
-    // TOOD override assign?
-    //public Type assign(Type source) {
-    //}
 }

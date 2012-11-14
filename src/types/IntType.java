@@ -1,5 +1,7 @@
 package types;
 
+import crux.Symbol;
+
 /**
  * Type representing an interer.
  */
@@ -73,18 +75,17 @@ public class IntType extends Type {
         }
     }
 
-    // TODO would solve index problem so we dont have to take instanceof but index on int IS wrong.
-    //public Type index(Type that) {
-        //return this;
-    //}
- 
 	@Override
-    public Type deref() {
-        return new IntType();
-    }
+	public Type assign(Type source) {
+		if (!equivalent(source)) {
+			return super.assign(source);
+		} else {
+			return new VoidType();
+		}
+	}
 
-    @Override
-    public Type index(Type amountType) { // TODO realy take index of int type?
-    	return new IntType();
+	@Override
+    public Type declare(Symbol symbol) {
+       	return new IntType();
     }
 }
