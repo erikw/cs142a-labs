@@ -29,6 +29,6 @@ public class VoidType extends Type {
 
 	@Override
     public Type deref() {
-        return new VoidType();
+        return this;
     }
 }

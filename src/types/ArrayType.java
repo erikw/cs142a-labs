@@ -64,11 +64,6 @@ public class ArrayType extends Type {
     }
 
 	@Override
-    public Type deref() { // TODO should array override this?
-        return base;
-    }
-
-	@Override
 	public Type assign(Type source) {
 		return base.assign(source);
 	}

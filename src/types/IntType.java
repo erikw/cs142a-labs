@@ -34,7 +34,7 @@ public class IntType extends Type {
         if (!(that instanceof IntType)) {
             return super.add(that);
         } else {
-        	return new IntType(); // TODO return this to not create unnecessary objects?
+        	return this;
         }
     }
 
@@ -43,7 +43,7 @@ public class IntType extends Type {
         if (!(that instanceof IntType)) {
             return super.sub(that);
         } else {
-        	return new IntType();
+        	return this;
         }
     }
 
@@ -53,7 +53,7 @@ public class IntType extends Type {
             return super.mul(that);
 
         } else {
-        	return new IntType();
+        	return this;
         }
     }
 
@@ -62,7 +62,7 @@ public class IntType extends Type {
         if (!(that instanceof IntType)) {
             return super.div(that);
         } else {
-        	return new IntType();
+        	return this;
         }
     }
 
@@ -86,6 +86,6 @@ public class IntType extends Type {
 
 	@Override
     public Type declare(Symbol symbol) {
-       	return new IntType();
+       	return this;
     }
 }

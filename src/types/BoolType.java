@@ -34,7 +34,7 @@ public class BoolType extends Type {
         if (!(that instanceof BoolType)) {
             return super.and(that);
         } else {
-        	return new BoolType();
+        	return this;
         }
     }
 
@@ -43,13 +43,13 @@ public class BoolType extends Type {
         if (!(that instanceof BoolType)) {
             return super.or(that);
         } else {
-        	return new BoolType();
+        	return this;
         }
     }
 
 	@Override
     public Type not() {
-        return new BoolType();
+        return this;
     }
 
 	@Override
@@ -63,6 +63,6 @@ public class BoolType extends Type {
 
 	@Override
     public Type declare(Symbol symbol) {
-       	return new BoolType();
+       	return this;
     }
 }    

@@ -59,7 +59,6 @@ public class AddressType extends Type {
         if (!amountType.equivalent(new IntType()) || !(base instanceof ArrayType)) {
 			return super.index(amountType);
         } else {
-			//return new AddressType(base);
 			return new AddressType(base.index(amountType));
         }
     }

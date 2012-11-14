@@ -180,16 +180,12 @@ public class TypeChecker implements CommandVisitor {
     public void visit(VariableDeclaration node) {
     	Symbol symbol = node.symbol();
     	Type varType = symbol.type();
-        //if (varType.equivalent(new IntType()) || varType.equivalent(new FloatType()) || varType.equivalent(new BoolType())) { // TODO do we need these ugly checks? should be able to avoid this with virtual dispatch
-			//put(node, varType); // TODO do we really need to put this?
-        //} else {
-              //put(node, new ErrorType("Variable " + node.symbol().name() + " has invalid type " + varType + "."));
-        //}
         put(node, varType.declare(symbol));
     }
 
     @Override
     public void visit(ArrayDeclaration node) {
+		//System.out.println("In node \"" + node + "\" with Base type is \"" + node.symbol().type() + "\"");
 		put(node, node.symbol().type());
 
 		// TODO do base type checking here? how get the real base type? node can be array of array here
@@ -217,7 +213,7 @@ public class TypeChecker implements CommandVisitor {
         	int pos = 0;
         	for (Symbol arg : args) {
 				Type argType = arg.type();
-				if (argType instanceof ErrorType) { // TODO avoid instanceof? testoutput seems to requires it here
+				if (argType instanceof ErrorType) {
 					put(node, new ErrorType("Function " + func.name() + " has an error in argument in position " + pos + ": " + ((ErrorType) argType).getMessage()));
 					return;
 				} else if (argType instanceof VoidType) {
@@ -237,9 +233,6 @@ public class TypeChecker implements CommandVisitor {
 		if (!(returnType instanceof VoidType) && needsReturn) { 
         	put(node, new ErrorType("Not all paths in function " + func.name() + " have a return."));
 		} else {
-        	// TODO check correct return type for all found return types. 
-        	// * what if a function returns a value but the signature is void-returning? -- autosolved
-			//for (Type foundRetType : foundRetTypes) {
 			// TODO eric: check in body it self when encounter returntype if currentReturnType() is the same
 			for (Return retNode : foundRetTypes.keySet()) {
 				Type foundRetType = foundRetTypes.get(retNode);
@@ -323,18 +316,9 @@ public class TypeChecker implements CommandVisitor {
     	public void visit(Index node) {
         	Type amountType = visitRetriveType(node.amount());
         	Type baseType = visitRetriveType(node.base());
-			//System.out.println("In node \"" + node + "\" with Base type is \"" + baseType + "\" with amountType \"" + amountType + "\"");
 			Type resType = baseType.index(amountType);
 			put(node, resType);
-			// TODO eric: might have to checkif basetype is array? NO virtual dispatch, implement index in Addressof
-			//} else {
-			/// TODO where check base type?
-			//////if (!((baseType.equivalent(new IntType()) || baseType.equivalent(new FloatType()) || baseType.equivalent(new BoolType())))) {
-			//////put(node, new ErrorType("Array " + arrayName + " has invalid base type " + baseType + "."));
-			//put(node, new ErrorType("Array UNKNOWN has invalid base type " + baseType + ".")); // TODO how get array name?
-			//}
-
-    		}
+    	}
 
     	@Override
     	public void visit(Assignment node) {
@@ -407,4 +391,4 @@ public class TypeChecker implements CommandVisitor {
     	public void visit(ast.Error node) {
         	put(node, new ErrorType(node.message()));
     	}
-		}
+	}

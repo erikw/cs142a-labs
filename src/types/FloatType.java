@@ -34,7 +34,7 @@ public class FloatType extends Type {
         if (!(that instanceof FloatType)) {
             return super.add(that);
         } else {
-        	return new FloatType();
+        	return this;
         }
     }
 
@@ -43,7 +43,7 @@ public class FloatType extends Type {
         if (!(that instanceof FloatType)) {
             return super.sub(that);
         } else {
-        	return new FloatType();
+        	return this;
         }
     }
 
@@ -53,7 +53,7 @@ public class FloatType extends Type {
             return super.mul(that);
 
         } else {
-        	return new FloatType();
+        	return this;
         }
     }
 
@@ -62,7 +62,7 @@ public class FloatType extends Type {
         if (!(that instanceof FloatType)) {
             return super.div(that);
         } else {
-        	return new FloatType();
+        	return this;
         }
     }
 
@@ -86,6 +86,6 @@ public class FloatType extends Type {
 
 	@Override
     public Type declare(Symbol symbol) {
-       	return new FloatType();
+       	return this;
     }
 }
