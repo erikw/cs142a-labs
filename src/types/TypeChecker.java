@@ -30,7 +30,6 @@ public class TypeChecker implements CommandVisitor {
 	/* The return type of the current function we're in. */
 	private Type curFuncRetType;
 
-    // TODO make sure all of these error messages are implemented.
     /* Useful error strings:
      *
      * "Function " + func.name() + " has a void argument in position " + pos + "."
@@ -55,8 +54,7 @@ public class TypeChecker implements CommandVisitor {
     public TypeChecker() {
         typeMap = new HashMap<Command, Type>();
         errorBuffer = new StringBuilder();
-        //foundRetTypes = new LinkedList<Type>();
-        foundRetTypes = new HashMap<Return, Type>();
+        foundRetTypes = new HashMap<Return, Type>(); // TODO will suffice with integer count now?
     }
 
     /**
@@ -124,7 +122,7 @@ public class TypeChecker implements CommandVisitor {
      */
     private Type visitRetriveType(Visitable node) {
 		node.accept(this);
-		return getType((Command) node); // TODO not good to cast...
+		return getType((Command) node);
     }
 
 	// Visitor methods ===================================
@@ -219,7 +217,6 @@ public class TypeChecker implements CommandVisitor {
         	}
         }
 
-        // TODO check so all paths return. 1) jack: register retrurns for statement, while, if and propagate up. 2) eric: recursive helper method. 3) SSA on blog, retval must be initialized by all paths in the end.  // what if a path ends with return; wo/ value? -- set it to voidType
 		needsReturn = true; 
 		curFuncSym = func;
 		curFuncRetType = returnType;
@@ -244,7 +241,6 @@ public class TypeChecker implements CommandVisitor {
         Type rhs = visitRetriveType(node.rightSide());
         if (lhs != null && rhs != null) {
         	Type res = lhs.add(rhs);
-        	//System.out.println("Addresult: " + res);
 			put(node, res);
         }
     }
@@ -343,8 +339,6 @@ public class TypeChecker implements CommandVisitor {
 		//if (foundRetTypes.size() > prevNbrRets) {
 		//needsReturn = true;
 		//}
-
-
     }
 
     @Override
@@ -354,7 +348,6 @@ public class TypeChecker implements CommandVisitor {
      	 	put(node, new ErrorType("WhileLoop requires bool condition not " + condType + "."));
      	 	return;
         }
-
 
 		// needstrue IF not both branches has return OR 
 		int prevNbrRets = foundRetTypes.size();

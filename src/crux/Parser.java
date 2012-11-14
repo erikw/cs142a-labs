@@ -79,9 +79,6 @@ public class Parser {
 		return currentToken.charPosition();
 	}
 
-
-
-
 	/**
 	 * Report an error for an unexpected nonterminal.
 	 * @param nt The expected non terminal.
@@ -93,8 +90,6 @@ public class Parser {
 		//String message = "SyntaxError(" + lineNumber() + "," + charPosition() + ")[Expected one of " + nt.firstSet() + " but got " + currentToken.kind() + ".]";
 		String message = "SyntaxError(" + lineNumber() + "," + charPosition() + ")[Expected a token from " + nt.name() + " but got " + currentToken.kind() + ".]";
 		errorBuffer.append(message + "\n");
-		//errorBuffer.append("lexeme = \"" + currentToken + "\"\n"); // Delete this when done. Test program probably don't expect this error report to exist.
-		//errorBuffer.append(parseTreeBuffer.toString() + '\n'); // Delete this when done. Test program probably don't expect this error report to exist.
 		return message;
 	}
 
@@ -107,14 +102,12 @@ public class Parser {
 	private String reportSyntaxError(Token.Kind kind) {
 		String message = "SyntaxError(" + lineNumber() + "," + charPosition() + ")[Expected " + kind + " but got " + currentToken.kind() + ".]";
 		errorBuffer.append(message + "\n");
-		//errorBuffer.append("lexeme = \"" + currentToken + "\"\n"); // Delete this when done. Test program probably don't expect this error report to exist.
-		//errorBuffer.append(parseTreeBuffer.toString() + '\n'); // Delete this when done. Test program probably don't expect this error report to exist.
 		return message;
 	}
 
 	/**
 	 * Get the error report
-	 * @return An erro repport.
+	 * @return An error repport.
 	 */
 	public String errorReport() {
 		return errorBuffer.toString();
@@ -217,7 +210,6 @@ public class Parser {
 		}
 		String errorMessage = reportSyntaxError(kind);
 		throw new QuitParseException(errorMessage);
-		//return false;
 	}
 
 	/* Examine if the current token is in the first set of the given non terminal.
@@ -232,7 +224,6 @@ public class Parser {
 		}
 		String errorMessage = reportSyntaxError(nt);
 		throw new QuitParseException(errorMessage);
-		//return false;
 	}
 
 	/**
@@ -405,7 +396,6 @@ public class Parser {
         }
         String errorMessage = reportSyntaxError(kind);
         throw new QuitParseException(errorMessage);
-        //return ErrorToken(errorMessage);
     }
 
     /**
@@ -421,7 +411,6 @@ public class Parser {
         }
         String errorMessage = reportSyntaxError(nt);
         throw new QuitParseException(errorMessage);
-        //return ErrorToken(errorMessage);
     }
 
 	/**

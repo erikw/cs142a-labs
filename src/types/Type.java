@@ -22,7 +22,8 @@ public abstract class Type {
         } else if (typeStr.equals("void")) {
 			return new VoidType();
         } else {
-        	return new ErrorType("Unknown type: " + typeStr);
+            //return new ErrorType("Unknown type: " + typeStr);
+        	return new ErrorType("Unkown type: " + typeStr); // Public test files has this miss spelling.
         }
     }
 

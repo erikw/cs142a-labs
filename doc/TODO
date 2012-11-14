@@ -1,7 +1,4 @@
 * Clean up unused imports.
-* Try to avoid instanceof as in sample code and use type paramters. SOL: try virtual dispatch.
-* Private test case: invalid paramters in function call?
-* Private test case: test not all path returns rigorously.
-* Make sure main is last function or does grammar allready fix that, test06
-* q: should wrong error types be reported as well as "not all paths returns"?
 * Clean up TypeChecker code.
+* `grep -nri todo src/`
+* Private test case: test not all path returns rigorously.
