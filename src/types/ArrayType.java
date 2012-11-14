@@ -67,4 +67,9 @@ public class ArrayType extends Type {
 	public Type assign(Type source) {
 		return base.assign(source);
 	}
+
+	@Override
+	public Type baseType() {
+		return (base instanceof ArrayType) ? base.baseType() : base;
+	}
 }

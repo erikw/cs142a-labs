@@ -188,17 +188,14 @@ public class TypeChecker implements CommandVisitor {
 
     @Override
     public void visit(ArrayDeclaration node) {
-		//System.out.println("In node \"" + node + "\" with Base type is \"" + node.symbol().type() + "\"");
-		put(node, node.symbol().type());
-
-		// TODO do base type checking here? how get the real base type? node can be array of array here
-        //Symbol symbol = node.symbol();
-        //Type baseType = symbol.type();
-		//if ((baseType.equivalent(new IntType()) || baseType.equivalent(new FloatType()) || baseType.equivalent(new BoolType()))) {
-        //put(node, baseType);
-        //} else {
-		//put(node, new ErrorType("Array " + symbol.name() + " has invalid base type " + baseType + "."));
-        //}
+		Symbol symbol = node.symbol();
+		Type type = symbol.type();
+		Type innerType =  type.baseType();
+		if (innerType.isValidBaseType()) {
+			put(node, type);
+		} else {
+			put(node, new ErrorType("Array " + symbol.name() + " has invalid base type " + innerType + "."));
+		}
     }
 
     @Override

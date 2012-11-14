@@ -158,4 +158,22 @@ public abstract class Type {
     public Type declare(Symbol symbol) {
        	return new ErrorType("Variable " + symbol.name() + " has invalid type " + this + ".");
     }
+
+	/**
+	 * Get the base type of this type (meaning full for arrays).
+     * Default implementation that is supposed to be overridden by types that should support this operation.
+     * @return The base type.
+	 */
+	public Type baseType() {
+       	return new ErrorType("Can not take inner type of " + this + ".");
+	}
+
+	/**
+	 * Deterine if the current type is a valid array base type.
+     * Default implementation that is supposed to be overridden by types that should support this operation.
+	 * @return Indication of the validness for this type as an array base type.
+	 */
+	public boolean isValidBaseType() {
+		return false;
+	}
 }
