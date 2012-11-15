@@ -216,7 +216,6 @@ public class TypeChecker implements CommandVisitor {
         	}
         }
 
-		needsReturn = true; 
 		curFuncSym = func;
 		curFuncRetType = returnType;
 		nbrFoundReturns = 0;
@@ -325,6 +324,7 @@ public class TypeChecker implements CommandVisitor {
      	 	return;
         }
 
+		needsReturn = true;
 		int prevNbrRets = nbrFoundReturns;
 		visit(node.thenBlock());
 		boolean thenNeedsReturn = needsReturn ;
@@ -333,7 +333,8 @@ public class TypeChecker implements CommandVisitor {
 		visit(node.elseBlock());
 		boolean elseNeedsReturn = needsReturn ;
 
-		needsReturn = (thenNeedsReturn ^ elseNeedsReturn);
+		needsReturn = (thenNeedsReturn ^ elseNeedsReturn) || (thenNeedsReturn && elseNeedsReturn);
+		//System.out.println("IfElseBranch, thenNeedsReturn = " + needsReturn);
     }
 
     @Override

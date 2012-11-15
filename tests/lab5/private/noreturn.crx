@@ -125,6 +125,76 @@ func validReturn6(a:int) : int {
   }
 }
 
-// TODO add case with two returns after each other, the second one is dead code but should not interrupt.
-// TODO test ifelse with empty else stmtblock
-// TODO test return; while(true) {} should not destroy success
+func missingReturn10(a:int) : int {
+  while(true) {
+    if (true) {
+    } else {
+      return a;
+    }
+  }
+}
+
+func validReturn7(a:int) : int {
+  if (true) {
+    return a;
+    return a;
+    return a;
+    return a;
+  } else {
+    while (true) {
+      return a;
+      var b : int;
+      let b = 3;
+      return b;
+      return b;
+      return b;
+      return b;
+    }
+      return a;
+      return a;
+      return a;
+      return a;
+      return a;
+  }
+  return a;
+  return a;
+  return a;
+  return a;
+}
+
+func validReturn8(a:int) : int {
+  if (true) {
+    let a = 3;
+  } else {
+  }
+
+  if (false) {
+    return a;
+  } else {
+    return a;
+  }
+}
+
+func missingReturn11(a:int) : int {
+  if (true) {
+    return a;
+  } else {
+  }
+
+  if (false) {
+  } else {
+    return a;
+  }
+}
+
+func missingReturn12(a:int) : int {
+  if (true) {
+    let a = 8;
+  } else {
+  }
+
+  if (false) {
+  } else {
+    return a;
+  }
+}

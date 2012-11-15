@@ -8,4 +8,7 @@ TypeError(77,1)[Not all paths in function missingReturn6 have a return.]
 TypeError(87,1)[Not all paths in function missingReturn7 have a return.]
 TypeError(101,1)[Not all paths in function missingReturn8 have a return.]
 TypeError(108,1)[Not all paths in function missingReturn9 have a return.]
+TypeError(128,1)[Not all paths in function missingReturn10 have a return.]
+TypeError(178,1)[Not all paths in function missingReturn11 have a return.]
+TypeError(190,1)[Not all paths in function missingReturn12 have a return.]
 
