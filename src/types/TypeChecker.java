@@ -18,11 +18,11 @@ public class TypeChecker implements CommandVisitor {
     /* Buffered error messages. */
     private StringBuilder errorBuffer;
 
-    /* Keep track of paths that needs a return. */
+    /* Set to true if the current execution path needs a return statement. */
     private boolean needsReturn;
 
     /* A list of found return types for the current function. */
-    private Map<Return, Type> foundRetTypes;
+    private int nbrFoundReturns;
 
 	/* The symbol for the current function we're in. */
 	private Symbol curFuncSym;
@@ -54,7 +54,6 @@ public class TypeChecker implements CommandVisitor {
     public TypeChecker() {
         typeMap = new HashMap<Command, Type>();
         errorBuffer = new StringBuilder();
-        foundRetTypes = new HashMap<Return, Type>(); // TODO will suffice with integer count now?
     }
 
     /**
@@ -145,15 +144,15 @@ public class TypeChecker implements CommandVisitor {
 
     @Override
     public void visit(StatementList node) {
-        //entryNbrRets = foundRetTypes.size();
+        needsReturn = true;
+        boolean foundReturn = false;
         for (Statement stmt : node) {
-        	needsReturn = true; // TODO should we always require return from all statements? and then check after loop that !needsReturn
         	stmt.accept(this);
+        	if (!needsReturn) {
+        		foundReturn = true;
+        	}
         }
-        if (needsReturn) {
-        	// fail
-        	;
-        }
+        needsReturn = !foundReturn;
     }
 
     @Override
@@ -220,12 +219,13 @@ public class TypeChecker implements CommandVisitor {
 		needsReturn = true; 
 		curFuncSym = func;
 		curFuncRetType = returnType;
-		foundRetTypes.clear();
+		nbrFoundReturns = 0;
         visit(node.body());
 		if (!(returnType instanceof VoidType) && needsReturn) { 
         	put(node, new ErrorType("Not all paths in function " + func.name() + " have a return."));
-		} 
-		put(node, returnType);
+		} else {
+			put(node, returnType);
+		}
     }
 
     @Override
@@ -325,20 +325,15 @@ public class TypeChecker implements CommandVisitor {
      	 	return;
         }
 
-
-		// needstrue IF not both branches has return OR 
-		int prevNbrRets = foundRetTypes.size();
+		int prevNbrRets = nbrFoundReturns;
 		visit(node.thenBlock());
-		boolean thenHasReturn = (foundRetTypes.size() > prevNbrRets);
-		//needsReturn = (foundRetTypes.size() == prevNbrRets); // TODO or only set to true when needed and let visit(Return) always set to false?
-		prevNbrRets = foundRetTypes.size();
+		boolean thenNeedsReturn = needsReturn ;
+		prevNbrRets = nbrFoundReturns;
+		needsReturn = true;
 		visit(node.elseBlock());
-		boolean elseHasReturn = (foundRetTypes.size() > prevNbrRets); // TODO handle empty else block (stmtlist.size() == 0)
+		boolean elseNeedsReturn = needsReturn ;
 
-		needsReturn = (thenHasReturn ^ elseHasReturn);
-		//if (foundRetTypes.size() > prevNbrRets) {
-		//needsReturn = true;
-		//}
+		needsReturn = (thenNeedsReturn ^ elseNeedsReturn);
     }
 
     @Override
@@ -349,17 +344,16 @@ public class TypeChecker implements CommandVisitor {
      	 	return;
         }
 
-		// needstrue IF not both branches has return OR 
-		int prevNbrRets = foundRetTypes.size();
+		int prevNbrRets = nbrFoundReturns;
+		needsReturn = true;
 		visit(node.body());
-		boolean bodyHasReturn = (foundRetTypes.size() > prevNbrRets);
-		needsReturn = true; // TODO 
+		needsReturn = needsReturn || (nbrFoundReturns > prevNbrRets);
     }
 
     @Override
     public void visit(Return node) {
     	Type retType = visitRetriveType(node.argument());
-		foundRetTypes.put(node, retType);
+		++nbrFoundReturns;
 		if (!retType.equivalent(curFuncRetType)) {
 			put(node, new ErrorType("Function " + curFuncSym.name() + " returns " + curFuncRetType + " not " + retType + "."));
 		} else {

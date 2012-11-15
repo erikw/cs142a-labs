@@ -1,0 +1,11 @@
+Error type-checking file.
+TypeError(16,1)[Not all paths in function missingReturn1 have a return.]
+TypeError(22,1)[Not all paths in function missingReturn2 have a return.]
+TypeError(30,1)[Not all paths in function missingReturn3 have a return.]
+TypeError(45,1)[Not all paths in function missingReturn4 have a return.]
+TypeError(66,1)[Not all paths in function missingReturn5 have a return.]
+TypeError(77,1)[Not all paths in function missingReturn6 have a return.]
+TypeError(87,1)[Not all paths in function missingReturn7 have a return.]
+TypeError(101,1)[Not all paths in function missingReturn8 have a return.]
+TypeError(108,1)[Not all paths in function missingReturn9 have a return.]
+
