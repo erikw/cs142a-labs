@@ -1,4 +1,1 @@
 * Clean up unused imports.
-* Clean up TypeChecker code.
-* `grep -nri todo src/`
-* Private test case: test not all path returns rigorously.

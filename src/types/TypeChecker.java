@@ -334,7 +334,6 @@ public class TypeChecker implements CommandVisitor {
 		boolean elseNeedsReturn = needsReturn ;
 
 		needsReturn = (thenNeedsReturn ^ elseNeedsReturn) || (thenNeedsReturn && elseNeedsReturn);
-		//System.out.println("IfElseBranch, thenNeedsReturn = " + needsReturn);
     }
 
     @Override
