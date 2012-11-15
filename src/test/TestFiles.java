@@ -132,6 +132,12 @@ public class TestFiles {
 		testFilesIn("lab4/private");
 	}
 
+	@Test
+	public void testLab4PrivateSecret() {
+		compiler.setLab(crux.Compiler.Lab.LAB4);
+		testFilesIn("lab4/private_secret");
+	}
+
 	// Lab 5 tests.
 	@Test
 	public void testLab5Public() {
