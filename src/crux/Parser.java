@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.Stack;
 
 import ast.Command;
+import types.*;
 
 /**
  * Syntactic parser that reads a stream of tokens and builds a parse tree.
@@ -20,13 +21,13 @@ public class Parser {
 	private int parseTreeRecursionDepth = 0;
 
 	/* The string representation of our parse tree. */
-	private StringBuffer parseTreeBuffer = new StringBuffer();
+	private StringBuilder parseTreeBuffer = new StringBuilder();
 
     /* The symbol table. */
     private SymbolTable symbolTable;
 
 	/* Buffer for error messages. */
-	private StringBuffer errorBuffer = new StringBuffer();
+	private StringBuilder errorBuffer = new StringBuilder();
 
 
 	/* Scanner to fecth tokens from. */
@@ -35,7 +36,7 @@ public class Parser {
 	/* The current token that's being processed. */
 	private Token currentToken;
 
-// Parser ==========================================
+	// Parser ==========================================
 
 	/**
 	 * Construct a new parser using a specified scanner.
@@ -78,9 +79,6 @@ public class Parser {
 		return currentToken.charPosition();
 	}
 
-
-
-
 	/**
 	 * Report an error for an unexpected nonterminal.
 	 * @param nt The expected non terminal.
@@ -92,8 +90,6 @@ public class Parser {
 		//String message = "SyntaxError(" + lineNumber() + "," + charPosition() + ")[Expected one of " + nt.firstSet() + " but got " + currentToken.kind() + ".]";
 		String message = "SyntaxError(" + lineNumber() + "," + charPosition() + ")[Expected a token from " + nt.name() + " but got " + currentToken.kind() + ".]";
 		errorBuffer.append(message + "\n");
-		//errorBuffer.append("lexeme = \"" + currentToken + "\"\n"); // Delete this when done. Test program probably don't expect this error report to exist.
-		//errorBuffer.append(parseTreeBuffer.toString() + '\n'); // Delete this when done. Test program probably don't expect this error report to exist.
 		return message;
 	}
 
@@ -106,14 +102,12 @@ public class Parser {
 	private String reportSyntaxError(Token.Kind kind) {
 		String message = "SyntaxError(" + lineNumber() + "," + charPosition() + ")[Expected " + kind + " but got " + currentToken.kind() + ".]";
 		errorBuffer.append(message + "\n");
-		//errorBuffer.append("lexeme = \"" + currentToken + "\"\n"); // Delete this when done. Test program probably don't expect this error report to exist.
-		//errorBuffer.append(parseTreeBuffer.toString() + '\n'); // Delete this when done. Test program probably don't expect this error report to exist.
 		return message;
 	}
 
 	/**
 	 * Get the error report
-	 * @return An erro repport.
+	 * @return An error repport.
 	 */
 	public String errorReport() {
 		return errorBuffer.toString();
@@ -146,7 +140,6 @@ public class Parser {
 			lineData += "  ";
 		}
 		lineData += nonTerminal.name();
-		//System.out.println("descending " + lineData);
 		parseTreeBuffer.append(lineData + "\n");
 		parseTreeRecursionDepth++;
 	}
@@ -217,7 +210,6 @@ public class Parser {
 		}
 		String errorMessage = reportSyntaxError(kind);
 		throw new QuitParseException(errorMessage);
-		//return false;
 	}
 
 	/* Examine if the current token is in the first set of the given non terminal.
@@ -232,19 +224,54 @@ public class Parser {
 		}
 		String errorMessage = reportSyntaxError(nt);
 		throw new QuitParseException(errorMessage);
-		//return false;
 	}
 
+	/**
+	 * Expect an integer token.
+	 * @return An integer.
+	 * @throws QuitParseException if an integer could not be fetched.
+	 */
+	private Integer expectInteger() {
+		String num = currentToken.lexeme();
+		expect(Token.Kind.INTEGER);
+		return Integer.valueOf(num);
+	}
 
-// SymbolTable Management ==========================
+	// SymbolTable Management ==========================
 
     /**
      * Initialize the symbolTable with predefined symbols.
      */
     private void initSymbolTable() {
-        for (String predefFunction : SymbolTable.PREDEF_FUNCS) {
-			symbolTable.insert(predefFunction);
-        }
+        //for (String predefFunction : SymbolTable.PREDEF_FUNCS) {
+		//symbolTable.insert(predefFunction);
+        //}
+        Symbol symbol;
+        TypeList args;
+
+        symbol= symbolTable.insert("readInt");
+        symbol.setType(new FuncType(new TypeList(), new IntType()));
+
+        symbol= symbolTable.insert("readFloat");
+        symbol.setType(new FuncType(new TypeList(), new FloatType()));
+
+        symbol= symbolTable.insert("printBool");
+        args = new TypeList();
+        args.append(new BoolType());
+        symbol.setType(new FuncType(args, new VoidType()));
+
+        symbol= symbolTable.insert("printInt");
+        args = new TypeList();
+        args.append(new IntType());
+        symbol.setType(new FuncType(args, new VoidType()));
+
+        symbol= symbolTable.insert("printFloat");
+        args = new TypeList();
+        args.append(new FloatType());
+        symbol.setType(new FuncType(args, new VoidType()));
+
+        symbol= symbolTable.insert("println");
+        symbol.setType(new FuncType(new TypeList(), new VoidType()));
     }
 
     /**
@@ -263,7 +290,6 @@ public class Parser {
         }
     }
 
-// Helper Methods ==========================================
     /**
      * Enters a new scobe for symbols.
      */
@@ -370,7 +396,6 @@ public class Parser {
         }
         String errorMessage = reportSyntaxError(kind);
         throw new QuitParseException(errorMessage);
-        //return ErrorToken(errorMessage);
     }
 
     /**
@@ -386,7 +411,6 @@ public class Parser {
         }
         String errorMessage = reportSyntaxError(nt);
         throw new QuitParseException(errorMessage);
-        //return ErrorToken(errorMessage);
     }
 
 	/**
@@ -398,6 +422,7 @@ public class Parser {
 			super(errorMessage);
 		}
 	}
+
 
 	//  Grammar rules ==========================
 
@@ -435,11 +460,12 @@ public class Parser {
 	 * Production for rule:
 	 * type := IDENTIFIER .
 	 */
-	public void type() {
+	public Type type() {
 		enterRule(NonTerminal.TYPE);
-		// TODO in a future lab, check that the identifier is one of {void, bool, int, float}? should these be in the symbol table.
-		expect(Token.Kind.IDENTIFIER);
+		Token typeToken = expectRetrieve(Token.Kind.IDENTIFIER);
+		Type type = tryResolveType(typeToken.lexeme());
 		exitRule(NonTerminal.TYPE);
+		return type;
 	}
 
 	/**
@@ -600,7 +626,8 @@ public class Parser {
 		Token identifier = expectRetrieve(Token.Kind.IDENTIFIER);
 		Symbol symbol = tryDeclareSymbol(identifier);
 		expect(Token.Kind.COLON);
-		type();
+		Type type = type();
+		symbol.setType(type);
 		exitRule(NonTerminal.PARAMETER);
 		return symbol;
 	}
@@ -634,7 +661,8 @@ public class Parser {
 		Symbol symbol = tryDeclareSymbol(identifier);
 		ast.VariableDeclaration varDecl = new ast.VariableDeclaration(var.lineNumber(), var.charPosition(), symbol);
 		expect(Token.Kind.COLON);
-		type();
+		Type type = type();
+		symbol.setType(type);
 		expect(Token.Kind.SEMICOLON);
 		exitRule(NonTerminal.VARIABLE_DECLARATION);
 		return varDecl;
@@ -651,15 +679,22 @@ public class Parser {
 		Symbol symbol = tryDeclareSymbol(identifier);
 		ast.ArrayDeclaration arrayDecl = new ast.ArrayDeclaration(array.lineNumber(), array.charPosition(), symbol);
 		expect(Token.Kind.COLON);
-		type();
+		Type type = type();
 		expect(Token.Kind.OPEN_BRACKET);
-		expect(Token.Kind.INTEGER);
-		expect(Token.Kind.CLOSE_BRACKET);
-		while (accept(Token.Kind.OPEN_BRACKET)) {
-			expect(Token.Kind.INTEGER);
+
+		Stack<Integer> dimensions = new Stack<Integer>();
+		do {	
+			Integer dimension = expectInteger();
+			dimensions.push(dimension);
 			expect(Token.Kind.CLOSE_BRACKET);
-		}
+		} while (accept(Token.Kind.OPEN_BRACKET));
 		expect(Token.Kind.SEMICOLON);
+		// Create array in correct order.
+		while(!dimensions.empty()) {
+			type = new ArrayType(dimensions.pop(), type);
+			symbol.setType(type);
+		}
+
 		exitRule(NonTerminal.ARRAY_DECLARATION);
 		return arrayDecl;
 	}
@@ -676,9 +711,11 @@ public class Parser {
 		expect(Token.Kind.OPEN_PAREN);
 		enterScope();
 		List<Symbol> args = parameter_list();
+		TypeList argTypes = new TypeList(collectTypes(args));
 		expect(Token.Kind.CLOSE_PAREN);
 		expect(Token.Kind.COLON);
-		type();
+		Type returnType = type();
+		symbol.setType(new FuncType(argTypes, returnType));
 		ast.StatementList body = statement_block();
 		ast.FunctionDefinition funcDecl = new ast.FunctionDefinition(func.lineNumber(), func.charPosition(), symbol, args, body);
 		exitScope();
@@ -869,4 +906,29 @@ public class Parser {
 		exitRule(NonTerminal.PROGRAM);
 		return declarationList;
 	}
+
+
+	// Typing System ===================================
+
+    /**
+     * Try to look up a type from a string.
+     * @param typeStr The string to lookup.
+     * @return the found type or ErrorType.
+     */
+    private Type tryResolveType(String typeStr) {
+        return Type.getBaseType(typeStr);
+    }
+
+	/**
+	 * Collect all types in a list of symbols.
+	 * @param symbols The symbols to collect types from.
+	 * @return A list of found types.
+	 */
+    private List<Type> collectTypes(List<Symbol> symbols) {
+		List<Type> types = new LinkedList<Type>();
+		for (Symbol symbol : symbols) {
+			types.add(symbol.type());
+		}
+    	return types;
+    }
 }

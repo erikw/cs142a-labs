@@ -1,0 +1,6 @@
+Error type-checking file.
+TypeError(12,12)[Cannot compare bool with bool.]
+TypeError(12,3)[Function compareBool returns bool not ErrorType(Cannot compare bool with bool.).]
+TypeError(16,12)[Cannot compare int with float.]
+TypeError(16,3)[Function compareIntFloat returns bool not ErrorType(Cannot compare int with float.).]
+

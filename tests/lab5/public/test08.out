@@ -1,0 +1,6 @@
+Error type-checking file.
+TypeError(4,12)[Cannot compute int and int.]
+TypeError(4,3)[Function andInt returns bool not ErrorType(Cannot compute int and int.).]
+TypeError(8,12)[Cannot compute float and float.]
+TypeError(8,3)[Function andFloat returns bool not ErrorType(Cannot compute float and float.).]
+

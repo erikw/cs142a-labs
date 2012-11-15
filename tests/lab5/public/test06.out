@@ -1,0 +1,13 @@
+Error type-checking file.
+TypeError(12,12)[Cannot add bool with bool.]
+TypeError(12,3)[Function addBools returns bool not ErrorType(Cannot add bool with bool.).]
+TypeError(16,12)[Cannot add int with bool.]
+TypeError(16,3)[Function addIntBool returns void not ErrorType(Cannot add int with bool.).]
+TypeError(20,12)[Cannot add int with float.]
+TypeError(20,3)[Function addIntFloat returns void not ErrorType(Cannot add int with float.).]
+TypeError(29,21)[Cannot add int with bool.]
+TypeError(29,29)[Cannot add ErrorType(Cannot add int with bool.) with int.]
+TypeError(29,33)[Cannot add ErrorType(Cannot add ErrorType(Cannot add int with bool.) with int.) with int.]
+TypeError(29,37)[Cannot add ErrorType(Cannot add ErrorType(Cannot add ErrorType(Cannot add int with bool.) with int.) with int.) with int.]
+TypeError(29,3)[Cannot assign ErrorType(Cannot add ErrorType(Cannot add ErrorType(Cannot add ErrorType(Cannot add int with bool.) with int.) with int.) with int.) to Address(int).]
+

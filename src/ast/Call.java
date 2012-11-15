@@ -6,7 +6,6 @@ import crux.Symbol;
  * Command for a function call.
  */
 public class Call extends Command implements Statement, Expression {
-	
 	private Symbol func;
 	private ExpressionList args;
 

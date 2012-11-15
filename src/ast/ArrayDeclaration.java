@@ -5,7 +5,7 @@ import crux.Symbol;
 /**
  * Command for array declaration.
  */
-public class ArrayDeclaration extends Command implements Declaration, Statement {
+public class ArrayDeclaration extends Command implements Declaration {
 
 	private Symbol symbol;
 

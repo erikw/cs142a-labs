@@ -4,7 +4,6 @@ package ast;
  * Visitor interface for visitng command nodes.
  */
 public interface CommandVisitor {
-
 	public void visit(ExpressionList node);
 	public void visit(DeclarationList node);
 	public void visit(StatementList node);

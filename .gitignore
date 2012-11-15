@@ -1,4 +1,4 @@
 bin/
 doc/gen
 tags
-*.swp
+*.sw[op]

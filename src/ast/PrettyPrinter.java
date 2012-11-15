@@ -8,7 +8,7 @@ public class PrettyPrinter implements CommandVisitor {
 	private int depth = 0;
 
 	/* the buffer to build the string in. */
-	private StringBuffer sb = new StringBuffer();
+	private StringBuilder sb = new StringBuilder();
 	
 	/**
 	 * Print an object with correct indentation.

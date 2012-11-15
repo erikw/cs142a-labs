@@ -1,0 +1,5 @@
+// test main has invalid signature
+
+func main() : int {
+  return 7;
+}

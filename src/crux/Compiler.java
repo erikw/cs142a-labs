@@ -31,7 +31,7 @@ public class Compiler {
 	public static enum Lab { LAB1, LAB2, LAB3, LAB4, LAB5, LAB6 };
 
 	/* Default lab if not specified. */
-	private static final Lab DEFAULT_LAB = Lab.LAB4;
+	private static final Lab DEFAULT_LAB = Lab.LAB5;
 
 	/* A mapping from integers to enum constants. */
 	private static final Map<Integer, Compiler.Lab> labLookup = new HashMap<Integer, Compiler.Lab>() {
@@ -78,6 +78,7 @@ public class Compiler {
 	public void compile(String cruxFile) {
         Scanner scanner = null;
         Parser parser;
+        ast.Command syntaxTree;
         try {
             scanner = new Scanner(new FileReader(cruxFile));
         } catch (IOException e) {
@@ -115,7 +116,7 @@ public class Compiler {
 				break;
 			case LAB4:
         		parser = new Parser(scanner);
-        		ast.Command syntaxTree = parser.parse();
+        		syntaxTree = parser.parse();
         		if (parser.hasError()) {
             		System.out.println("Error parsing file " + cruxFile);
             		System.out.println(parser.errorReport());
@@ -124,6 +125,23 @@ public class Compiler {
         		ast.PrettyPrinter prettyPrinter = new ast.PrettyPrinter();
         		syntaxTree.accept(prettyPrinter);
         		System.out.println(prettyPrinter.toString());
+        		break;
+			case LAB5:
+        		parser = new Parser(scanner);
+        		syntaxTree = parser.parse();
+        		if (parser.hasError()) {
+            		System.out.println("Error parsing file.");
+            		System.out.println(parser.errorReport());
+            		System.exit(-3);
+        		}
+        		types.TypeChecker typeChecker = new types.TypeChecker();
+        		typeChecker.check(syntaxTree);
+        		if (typeChecker.hasError()) {
+            		System.out.println("Error type-checking file.");
+            		System.out.println(typeChecker.errorReport());
+            		System.exit(-4);
+        		}
+        		System.out.println("Crux Program has no type errors.");
         		break;
 			default:
 				System.err.println("What lab are you working on?");

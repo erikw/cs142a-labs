@@ -1,0 +1,200 @@
+// test functions with value must have return
+
+func validReturn1(a:int) : int {
+  return a;
+}
+
+func validReturn2(a:int) : int {
+  if (true) {
+    let a = 3;
+  } else {
+    return a;
+  }
+  return 4;
+}
+
+func missingReturn1(a:int) : int {
+  if (true) {
+    return a;
+  }
+}
+
+func missingReturn2(a:int) : int {
+  if (true) {
+    return a;
+  } else {
+    let a = 3;
+  }
+}
+
+func missingReturn3(a:int) : int {
+  if (false) {
+    let a = 3;
+  } else {
+    return a;
+  }
+}
+
+func validReturn3(a:int) : int {
+  while (false) {
+    return a;
+  }
+  return a;
+}
+
+func missingReturn4(a:int) : int {
+  while(true) {
+    return a;
+  }
+}
+
+func main() : void {
+  ::printInt(8);
+}
+
+func validReturn4(a:int) : int {
+  if (true) {
+    return a;
+  } else {
+    let a = 3;
+    return a;
+    var b : int;
+    let b = 3;
+  }
+}
+
+func missingReturn5(a:int) : int {
+  if (false) {
+    let a = 3;
+    while(false) {
+      return 3;
+    }
+  } else {
+    return a;
+  }
+}
+
+func missingReturn6(a:int) : int {
+  while(true) {
+    if (false) {
+      let a = 3;
+    } else {
+      return a;
+    }
+  }
+}
+
+func missingReturn7(a:int) : int {
+      var b : int;
+      let b = 3;
+}
+
+
+func validReturn5(a:int) : int {
+  if (true) {
+    return a;
+  } else {
+  }
+  return a;
+}
+
+func missingReturn8(a:int) : int {
+  if (true) {
+    return a;
+  } else {
+  }
+}
+
+func missingReturn9(a:int) : int {
+  while(true) {
+    if (true) {
+      return a;
+    } else {
+    }
+  }
+}
+
+func validReturn6(a:int) : int {
+  if (true) {
+    return a;
+  } else {
+  }
+  return a;
+  while(true) {
+    return a;
+  }
+}
+
+func missingReturn10(a:int) : int {
+  while(true) {
+    if (true) {
+    } else {
+      return a;
+    }
+  }
+}
+
+func validReturn7(a:int) : int {
+  if (true) {
+    return a;
+    return a;
+    return a;
+    return a;
+  } else {
+    while (true) {
+      return a;
+      var b : int;
+      let b = 3;
+      return b;
+      return b;
+      return b;
+      return b;
+    }
+      return a;
+      return a;
+      return a;
+      return a;
+      return a;
+  }
+  return a;
+  return a;
+  return a;
+  return a;
+}
+
+func validReturn8(a:int) : int {
+  if (true) {
+    let a = 3;
+  } else {
+  }
+
+  if (false) {
+    return a;
+  } else {
+    return a;
+  }
+}
+
+func missingReturn11(a:int) : int {
+  if (true) {
+    return a;
+  } else {
+  }
+
+  if (false) {
+  } else {
+    return a;
+  }
+}
+
+func missingReturn12(a:int) : int {
+  if (true) {
+    let a = 8;
+  } else {
+  }
+
+  if (false) {
+  } else {
+    return a;
+  }
+}

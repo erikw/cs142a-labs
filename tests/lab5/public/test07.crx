@@ -1,0 +1,21 @@
+// test comparison
+
+func compareInt(a:int, b:int) : bool {
+  return a > b;
+}
+
+func compareFloat(a:float, b:float) : bool {
+  return a > b;
+}
+
+func compareBool(a:bool, b:bool) : bool {
+  return a > b;
+}
+
+func compareIntFloat(a:int, b:float) : bool {
+  return a > b;
+}
+
+func main() : void {
+  ::printBool(false);
+}

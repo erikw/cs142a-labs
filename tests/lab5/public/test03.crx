@@ -1,0 +1,14 @@
+// test return type matches function
+
+func myInt(a:int) : int {
+  return a;
+}
+
+func myIntError(a:float) : int {
+  return a;
+}
+
+func main() : void {
+  ::myInt(7);
+  ::myIntError(7.0);
+}

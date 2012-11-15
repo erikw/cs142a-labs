@@ -1,0 +1,3 @@
+Error type-checking file.
+TypeError(3,1)[Function foo has a void argument in position 0.]
+
