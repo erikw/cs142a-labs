@@ -1,0 +1,31 @@
+// test shadowing of variable
+
+var a : int;
+
+func shadowWithParam(a : int) : void {
+  let a = 7;
+  ::printInt(a);
+  ::println();
+}
+
+func shadowWithLocal() : void {
+  var a:int;
+  let a = 9;
+  ::printInt(a);
+  ::println();
+}
+
+func main() : void {
+  let a = 5;
+  ::printInt(a);
+  ::println();
+
+  ::shadowWithParam(8);
+  ::printInt(a);
+  ::println();
+
+  ::shadowWithLocal();
+  ::printInt(a);
+  ::println();
+}
+

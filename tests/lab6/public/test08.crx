@@ -1,0 +1,17 @@
+// test statement with non-void type
+
+func myInt(a:int) : int {
+  ::printInt(a);
+  return a;
+}
+
+func myPrint() : void {
+  ::myInt(7);
+  ::myInt(8);
+  ::myInt(9);
+}
+
+func main() : void {
+  ::myPrint();
+}
+  

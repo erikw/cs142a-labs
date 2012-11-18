@@ -1,0 +1,7 @@
+// test local variable
+
+func main() : void {
+  var a : int;
+  let a = 42;
+  ::printInt(a);
+}

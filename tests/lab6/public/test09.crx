@@ -1,0 +1,7 @@
+// test addition
+
+func main() : void {
+  ::printInt(1+2);
+  ::println();
+  ::printFloat( 0.5-0.125);
+}

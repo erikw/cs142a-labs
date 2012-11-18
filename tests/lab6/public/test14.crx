@@ -1,0 +1,13 @@
+// test floating point comparison
+
+func ble(a:float, b:float) : bool {
+  return a <= b;
+}
+
+func main() : void {
+  ::printBool(::ble(1.0, 2.0));
+  ::println();
+  ::printBool(::ble(2.0, 1.0));
+  ::println();
+  ::printBool(::ble(1.0, 1.0));
+}

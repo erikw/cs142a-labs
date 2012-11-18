@@ -1,0 +1,17 @@
+// test global array access
+var canary_begin : int;
+array x : int[3];
+var canary_end : int;
+
+func main() : void {
+  let canary_begin = 0;
+  let canary_end = 0;
+  let x[0] = 222;
+  let x[1] = 333;
+  let x[2] = 444;
+  ::printInt(canary_begin);
+  ::printInt(x[0]);
+  ::printInt(x[1]);
+  ::printInt(x[2]);
+  ::printInt(canary_end);
+}

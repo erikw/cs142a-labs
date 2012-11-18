@@ -1,0 +1,10 @@
+// test if-else: false condition, no return in else branch
+
+func main() : void {
+  if (false) {
+    ::printInt(1);
+  } else {
+    ::printInt(0);
+  }
+  ::printInt(0-1);
+}

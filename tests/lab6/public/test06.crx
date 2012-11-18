@@ -1,0 +1,32 @@
+// test calling functions
+
+func myPrintZero() : void {
+  ::printInt(0);
+}
+
+func myPrintOne(a:int) : void {
+  ::printInt(a);
+}
+
+func myPrintTwo(a:int, b:int) : void {
+  ::printInt(a);
+  ::printInt(b);
+}
+
+func myPrintThree(a:int, b:int, c:int) : void {
+  ::printInt(a);
+  ::printInt(b);
+  ::printInt(c);
+}
+
+func main() : void {
+  ::myPrintZero();
+  ::println();
+  ::myPrintOne(1);
+  ::println();
+  ::myPrintTwo(1,2);
+  ::println();
+  ::myPrintThree(1,2,3);
+  ::println();
+}
+

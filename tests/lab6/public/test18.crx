@@ -1,0 +1,22 @@
+// test local array
+
+func main() : void {
+  var canary_begin:int;
+  array a : int[3];
+  var canary_end:int;
+
+  let canary_begin = 0;
+  let canary_end = 0;
+  let a[0] = 222;
+  let a[1] = 333;
+  let a[2] = 444;
+  ::printInt(canary_begin);
+  ::println();
+  ::printInt(a[0]);
+  ::println();
+  ::printInt(a[1]);
+  ::println();
+  ::printInt(a[2]);
+  ::println();
+  ::printInt(canary_end);
+}
