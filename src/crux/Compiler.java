@@ -35,8 +35,7 @@ public class Compiler {
 
 	/* A mapping from integers to enum constants. */
 	private static final Map<Integer, Compiler.Lab> labLookup = new HashMap<Integer, Compiler.Lab>() {
-		private static final long serialVersionUID = 1L;
-		{
+		private static final long serialVersionUID = 1L; {
 			put(1, Compiler.Lab.LAB1);
 			put(2, Compiler.Lab.LAB2);
 			put(3, Compiler.Lab.LAB3);

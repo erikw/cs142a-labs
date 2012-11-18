@@ -5,39 +5,52 @@ import java.util.regex.Pattern;
 import ast.*;
 import types.*;
 
+/**
+ * A visitor that generated MIPS assembly code.
+ */
 public class CodeGen implements ast.CommandVisitor {
     
+    /* Collected error messages. */
     private StringBuffer errorBuffer = new StringBuffer();
-    private TypeChecker tc;
+
+    /* The type checker. */
+    private TypeChecker typeChecker;
+
+    /* The program we're building. */
     private Program program;
+
+    /* The curretn activation record. */
     private ActivationRecord currentFunction;
 
-    public CodeGen(TypeChecker tc)
-    {
-        this.tc = tc;
+    /**
+     * Construct a new code generator using the given type checker.
+     * @param TypeChecker The type checker to use.
+     */
+    public CodeGen(TypeChecker typeChecker) {
+        this.typeChecker = typeChecker;
         this.program = new Program();
     }
     
-    public boolean hasError()
-    {
+    /**
+     * Query for errors.
+     * @return Indication of the precense of errors.
+     */
+    public boolean hasError() {
         return errorBuffer.length() != 0;
     }
     
-    public String errorReport()
-    {
+    public String errorReport() {
         return errorBuffer.toString();
     }
 
-    private class CodeGenException extends RuntimeException
-    {
+    private class CodeGenException extends RuntimeException {
         private static final long serialVersionUID = 1L;
         public CodeGenException(String errorMessage) {
             super(errorMessage);
         }
     }
     
-    public boolean generate(Command ast)
-    {
+    public boolean generate(Command ast) {
         try {
             currentFunction = ActivationRecord.newGlobalFrame();
             ast.accept(this);
@@ -47,8 +60,7 @@ public class CodeGen implements ast.CommandVisitor {
         }
     }
     
-    public Program getProgram()
-    {
+    public Program getProgram() {
         return program;
     }
 
