@@ -31,7 +31,7 @@ public class Compiler {
 	public static enum Lab { LAB1, LAB2, LAB3, LAB4, LAB5, LAB6 };
 
 	/* Default lab if not specified. */
-	private static final Lab DEFAULT_LAB = Lab.LAB5;
+	private static final Lab DEFAULT_LAB = Lab.LAB6;
 
 	/* A mapping from integers to enum constants. */
 	private static final Map<Integer, Compiler.Lab> labLookup = new HashMap<Integer, Compiler.Lab>() {
@@ -73,16 +73,16 @@ public class Compiler {
 
 	/**
 	 * Compile the file give.
-	 * @param cruxFile The file to compile.
+	 * @param sourceFilename The file to compile.
 	 */
-	public void compile(String cruxFile) {
+	public void compile(String sourceFilename) {
         Scanner scanner = null;
         Parser parser;
         ast.Command syntaxTree;
         try {
-            scanner = new Scanner(new FileReader(cruxFile));
+            scanner = new Scanner(new FileReader(sourceFilename));
         } catch (IOException e) {
-            System.err.println("Error accessing the source file: \"" + cruxFile + "\"");
+            System.err.println("Error accessing the source file: \"" + sourceFilename + "\"");
 			System.exit(-2);
         }
 		switch (currentLab) {
@@ -118,7 +118,7 @@ public class Compiler {
         		parser = new Parser(scanner);
         		syntaxTree = parser.parse();
         		if (parser.hasError()) {
-            		System.out.println("Error parsing file " + cruxFile);
+            		System.out.println("Error parsing file " + sourceFilename);
             		System.out.println(parser.errorReport());
             		System.exit(-3);
 				}
@@ -127,6 +127,7 @@ public class Compiler {
         		System.out.println(prettyPrinter.toString());
         		break;
 			case LAB5:
+			case LAB6:
         		parser = new Parser(scanner);
         		syntaxTree = parser.parse();
         		if (parser.hasError()) {
@@ -141,7 +142,33 @@ public class Compiler {
             		System.out.println(typeChecker.errorReport());
             		System.exit(-4);
         		}
-        		System.out.println("Crux Program has no type errors.");
+        		switch(currentLab) {
+					case LAB5:
+        				System.out.println("Crux Program has no type errors.");
+        				break;
+        			case LAB6:
+        				mips.CodeGen codeGen = new mips.CodeGen(typeChecker);
+        				codeGen.generate(syntaxTree);
+        				if (codeGen.hasError()) {
+            				System.out.println("Error generating code for file " + sourceFilename);
+            				System.out.println(codeGen.errorReport());
+            				System.exit(-5);
+        				}
+
+        				String asmFilename = sourceFilename.replace(".crx", ".asm");
+        				try {
+            				mips.Program prog = codeGen.getProgram();
+            				File asmFile = new File(asmFilename);
+            				PrintStream ps = new PrintStream(asmFile);
+            				prog.print(ps);
+            				ps.close();
+        				} catch (IOException e) {
+            				e.printStackTrace();
+            				System.err.println("Error writing assembly file: \"" + asmFilename + "\"");
+            				System.exit(-6);
+        				}
+        				break;
+        		}
         		break;
 			default:
 				System.err.println("What lab are you working on?");
