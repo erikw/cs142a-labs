@@ -4,114 +4,172 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Vector;
 
+/**
+ * Models a generated MIPS program.
+ */
 public class Program {
+	/* The code segment. */
     private Vector<String> codeSegment;
+
+    /* The data segment. */
     private Vector<String> dataSegment;
-    
+
+    /* Number of lables used. */
     private int labelCounter;
-    
+
+    /**
+     * Construct a new program.
+     */
     public Program() {
         labelCounter = -1;
         codeSegment = new Vector<String>();
         dataSegment = new Vector<String>();
     }
-    
-    // Returns a unique label
+
+    /**
+     * Make a new unique label.
+     * @return A unique label.
+     */
     public String newLabel() {
-        labelCounter++;
-        return "label." + labelCounter;
+        return "label." + ++labelCounter;
     }
-    
-    // Insert an instruction into the code segment
-    // Returns the position of the instruction in the stream
+
+    /**
+     * Insert an instruction into the code segment.
+     * @param instr The instruction to add.
+     * @return the position of the instruction in the stream.
+     */
     public int appendInstruction(String instr) {
         codeSegment.add(instr);
         return codeSegment.size() - 1;
     }
-    
-    // Replaces the instruction at position pos
+
+    /**
+     * Replaces the instruction at position pos with a another instruction.
+     * @param pos The position in the code segment.
+     * @param instr The instruction to replace with.
+     */
     public void replaceInstruction(int pos, String instr) {
         codeSegment.set(pos, instr);
     }
-    
-    // Inserts an instruction at position pos
-    // All instructions after pos are shifted down
+
+    /**
+     * Inserts an instruction at position pos.
+     * All instructions after pos are shifted down.
+     * @param pos The position in the code segment.
+     * @param instr The instruction to insert.
+     */
     public void insertInstruction(int pos, String instr) {
-        codeSegment.add(pos, instr);
+     	codeSegment.add(pos, instr);
     }
-    
-    // Append item to data segment
+
+    /**
+     * Append item to data segment.
+     * @param data Item to append.
+     */
     public void appendData(String data) {
-        dataSegment.add(data);
+    	dataSegment.add(data);
     }
-    
-    // Push an integer register on the stack
+
+    /**
+     * Push an integer register on the stack.
+     * @param reg TODO
+     */
     public void pushInt(String reg) {
-        throw new RuntimeException("Implement pushing int register value to stack");
+    	throw new RuntimeException("Implement pushing int register value to stack");
     }
-    
-    // Push a single precision floating point register on the stack
+
+    /**
+     * Push a single precision floating point register on the stack.
+     * @param reg TODO
+     */
     public void pushFloat(String reg) {
-        throw new RuntimeException("Implement pushing float register value to stack");
+    	throw new RuntimeException("Implement pushing float register value to stack");
     }
-    
-    // Pop an integer from the stack into register reg
+
+    /**
+     * Pop an integer from the stack into register reg.
+     * @param TODO
+     */
     public void popInt(String reg) {
-        throw new RuntimeException("Implement popping int from stack to register");
+    	throw new RuntimeException("Implement popping int from stack to register");
     }
-    
-    // Pop a floating point value from the stack into register reg
+
+    /**
+     * Pop a floating point value from the stack into register reg.
+     * @param reg
+     */
     public void popFloat(String reg) {
-        throw new RuntimeException("Implement popping floating point from stack to register");
+    	throw new RuntimeException("Implement popping floating point from stack to register");
     }
-    
-    // Insert a function prologue at position pos
+
+    /**
+     * Insert a function prologue at position pos.
+     * @param pos The position.
+     * @param frameSize TODO
+     */
     public void insertPrologue(int pos, int frameSize) {
-        ArrayList<String> prologue = new ArrayList<String>();
-        throw new RuntimeException("Implement creation of function prologue");
-        codeSegment.addAll(pos, prologue);
+    	ArrayList<String> prologue = new ArrayList<String>();
+    	throw new RuntimeException("Implement creation of function prologue");
+    	codeSegment.addAll(pos, prologue);
     }
-    
-    // Append a function epilogue
+
+    /**
+     * Append a function epilogue.
+     * @param frameSize TODO
+     */
     public void appendEpilogue(int frameSize) {
-        throw new RuntimeException("Implement creation of function epilogue");
+    	throw new RuntimeException("Implement creation of function epilogue");
     }
 
-    // Insert code that terminates the program
+    /**
+     * Insert code that terminates the program.
+     */
     public void appendExitSequence() {
-        codeSegment.add("li    $v0, 10");
-        codeSegment.add("syscall");
+    	codeSegment.add("li    $v0, 10");
+    	codeSegment.add("syscall");
     }
-    
-    //Print the program to the provided stream
+
+    /**
+     * Print the program to the provided stream.
+     * @param s The stream to print to.
+     */
     public void print(PrintStream s) {
-        s.println(".data                         # BEGIN Data Segment");
-        for (String data : dataSegment)
-            s.println(data);
-        s.println("data.newline:      .asciiz       \"\\n\"");
-        s.println("data.floatquery:   .asciiz       \"float?\"");
-        s.println("data.intquery:     .asciiz       \"int?\"");
-        s.println("data.trueString:   .asciiz       \"true\"");
-        s.println("data.falseString:  .asciiz       \"false\"");
-        s.println("                              # END Data Segment");
+    	s.println(".data                         # BEGIN Data Segment");
+    	for (String data : dataSegment) {
+    		s.println(data);
+    	}
+    	s.println("data.newline:      .asciiz       \"\\n\"");
+    	s.println("data.floatquery:   .asciiz       \"float?\"");
+    	s.println("data.intquery:     .asciiz       \"int?\"");
+    	s.println("data.trueString:   .asciiz       \"true\"");
+    	s.println("data.falseString:  .asciiz       \"false\"");
+    	s.println("                              # END Data Segment");
 
-        s.println(".text                         # BEGIN Code Segment");
-        // provide the built-in functions
-        funcPrintBool(s);
-        funcPrintFloat(s);
-        funcPrintInt(s);
-        funcPrintln(s);
-        funcReadFloat(s);
-        funcReadInt(s);
+    	s.println(".text                         # BEGIN Code Segment");
+		// provide the built-in functions
+		funcPrintBool(s);
+		funcPrintFloat(s);
+		funcPrintInt(s);
+		funcPrintln(s);
+		funcReadFloat(s);
+		funcReadInt(s);
 
-        s.println(".text                         # BEGIN Crux Program");
-        // write out the crux program
-        for (String code : codeSegment)
-            s.println(code);
-        s.println("                              # END Code Segment");
+		s.println(".text                         # BEGIN Crux Program");
+		// write out the crux program
+		for (String code : codeSegment) {
+    		s.println(code);
+		}
+    	s.println("                              # END Code Segment");
     }
-    
-    // Prints the current stack value, assuming it's an int
+
+
+	// Syscall documentation: http://courses.missouristate.edu/kenvollmar/mars/help/syscallhelp.html
+
+    /**
+     * Prints the current stack value, assuming it's an int.
+     * @param s The stream to print to.
+     */
     public void funcPrintInt(PrintStream s) {
         s.println("func.printInt:");
         s.println("lw   $a0, 0($sp)");
@@ -119,8 +177,11 @@ public class Program {
         s.println("syscall");
         s.println("jr $ra");
     }
-    
-    // Prints the current stack value assuming it's a bool
+
+    /**
+     * Prints the current stack value assuming it's a bool.
+     * @param s The stream to print to.
+     */
     public void funcPrintBool(PrintStream s) {
         s.println("func.printBool:");
         s.println("lw $a0, 0($sp)");
@@ -134,8 +195,11 @@ public class Program {
         s.println("syscall");
         s.println("jr $ra");
     }
-    
-    // Prints the current stack value assuming it's a float
+
+    /**
+     * Prints the current stack value assuming it's a float.
+     * @param s The stream to print to.
+     */
     private void funcPrintFloat(PrintStream s) {
         s.println("func.printFloat:");
         s.println("l.s  $f12, 0($sp)");
@@ -143,8 +207,11 @@ public class Program {
         s.println("syscall");
         s.println("jr $ra");
     }
-    
-    // Prints a newline
+
+    /**
+     * Prints a newline
+     * @param s The stream to print to.
+     */
     private void funcPrintln(PrintStream s) {
         s.println("func.println:");
         s.println("la   $a0, data.newline");
@@ -152,8 +219,11 @@ public class Program {
         s.println("syscall");
         s.println("jr $ra");
     }
-    
-    // Reads an int onto the stack
+
+    /**
+     * Reads an int onto the stack.
+     * @param s The stream to print to.
+     */
     private void funcReadInt(PrintStream s) {
         s.println("func.readInt:");
         s.println("la   $a0, data.intquery");
@@ -163,8 +233,11 @@ public class Program {
         s.println("syscall");
         s.println("jr $ra");
     }
-    
-    // Reads a float onto the stack
+
+    /**
+     * Reads a float onto the stack.
+     * @param s The stream to print to.
+     */
     private void funcReadFloat(PrintStream s) {
         s.println("func.readFloat:");
         s.println("la   $a0, data.floatquery");

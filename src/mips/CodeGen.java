@@ -9,9 +9,9 @@ import types.*;
  * A visitor that generated MIPS assembly code.
  */
 public class CodeGen implements ast.CommandVisitor {
-    
+
     /* Collected error messages. */
-    private StringBuffer errorBuffer = new StringBuffer();
+    private StringBuilder errorBuffer = new StringBuffer();
 
     /* The type checker. */
     private TypeChecker typeChecker;
@@ -19,7 +19,7 @@ public class CodeGen implements ast.CommandVisitor {
     /* The program we're building. */
     private Program program;
 
-    /* The curretn activation record. */
+    /* The current activation record. */
     private ActivationRecord currentFunction;
 
     /**
@@ -30,7 +30,7 @@ public class CodeGen implements ast.CommandVisitor {
         this.typeChecker = typeChecker;
         this.program = new Program();
     }
-    
+
     /**
      * Query for errors.
      * @return Indication of the precense of errors.
@@ -38,31 +38,56 @@ public class CodeGen implements ast.CommandVisitor {
     public boolean hasError() {
         return errorBuffer.length() != 0;
     }
-    
+
+    /**
+     * Get an error report.
+     * @return An error report.
+     */
     public String errorReport() {
         return errorBuffer.toString();
     }
 
+	/**
+	 * Exception representing an error in the code generation.
+	 */
     private class CodeGenException extends RuntimeException {
         private static final long serialVersionUID = 1L;
+
+        /**
+         * Construct an error with an message.
+         * @param errorMessage The error message.
+         */
         public CodeGenException(String errorMessage) {
             super(errorMessage);
         }
     }
-    
+
+    /**
+     * Generate assemly program on an AST
+     * @param ast The AST to generate code from.
+     * @return Success indication.
+     */
     public boolean generate(Command ast) {
+        boolean error = false;
         try {
             currentFunction = ActivationRecord.newGlobalFrame();
             ast.accept(this);
-            return !hasError();
+            error = !hasError();
         } catch (CodeGenException e) {
-            return false;
+            error = true;
         }
+        return !error;
     }
-    
+
+    /**
+     * Get the generated program representation.
+     * @return The program.
+     */
     public Program getProgram() {
         return program;
     }
+
+	// Visitor methods ===================================
 
     @Override
     public void visit(Command node) {
@@ -163,7 +188,7 @@ public class CodeGen implements ast.CommandVisitor {
     public void visit(LogicalOr node) {
         throw new RuntimeException("Implement this");
     }
-    
+
     @Override
     public void visit(LogicalNot node) {
         throw new RuntimeException("Implement this");
