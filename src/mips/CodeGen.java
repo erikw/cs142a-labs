@@ -11,7 +11,7 @@ import types.*;
 public class CodeGen implements ast.CommandVisitor {
 
     /* Collected error messages. */
-    private StringBuilder errorBuffer = new StringBuffer();
+    private StringBuilder errorBuffer = new StringBuilder();
 
     /* The type checker. */
     private TypeChecker typeChecker;
@@ -89,22 +89,18 @@ public class CodeGen implements ast.CommandVisitor {
 
 	// Visitor methods ===================================
 
-    @Override
     public void visit(Command node) {
         throw new RuntimeException("Implement this");
     }
 
-    @Override
     public void visit(Expression node) {
         throw new RuntimeException("Implement this");
     }
 
-    @Override
     public void visit(Declaration node) {
         throw new RuntimeException("Implement this");
     }
 
-    @Override
     public void visit(Statement node) {
         throw new RuntimeException("Implement this");
     }
@@ -125,7 +121,7 @@ public class CodeGen implements ast.CommandVisitor {
     }
 
     @Override
-    public void visit(ReadSymbol node) {
+    public void visit(AddressOf node) {
         throw new RuntimeException("Implement this");
     }
 
@@ -236,7 +232,7 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(ast.Error node) {
-        String message = "CodeGen cannot compile a " + node);
+        String message = "CodeGen cannot compile a " + node;
         errorBuffer.append(message);
         throw new CodeGenException(message);
     }

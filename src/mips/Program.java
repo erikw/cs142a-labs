@@ -110,8 +110,8 @@ public class Program {
      */
     public void insertPrologue(int pos, int frameSize) {
     	ArrayList<String> prologue = new ArrayList<String>();
-    	throw new RuntimeException("Implement creation of function prologue");
     	codeSegment.addAll(pos, prologue);
+    	throw new RuntimeException("Implement creation of function prologue");
     }
 
     /**
