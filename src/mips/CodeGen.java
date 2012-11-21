@@ -89,22 +89,6 @@ public class CodeGen implements ast.CommandVisitor {
 
 	// Visitor methods ===================================
 
-    public void visit(Command node) {
-        throw new RuntimeException("Implement this");
-    }
-
-    public void visit(Expression node) {
-        throw new RuntimeException("Implement this");
-    }
-
-    public void visit(Declaration node) {
-        throw new RuntimeException("Implement this");
-    }
-
-    public void visit(Statement node) {
-        throw new RuntimeException("Implement this");
-    }
-
     @Override
     public void visit(ExpressionList node) {
         throw new RuntimeException("Implement this");

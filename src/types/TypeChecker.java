@@ -21,7 +21,7 @@ public class TypeChecker implements CommandVisitor {
     /* Set to true if the current execution path needs a return statement. */
     private boolean needsReturn;
 
-    /* A list of found return types for the current function. */
+    /* A count of the number of returns that has been found in the current function body. */
     private int nbrFoundReturns;
 
 	/* The symbol for the current function we're in. */
