@@ -1,8 +1,9 @@
 // test 2D array
 
+array x:int[3][5];
+  
 func main() : void {
   var canary_begin:int;
-  array x:int[3][5];
   var canary_end:int;
   var outer:int;
   var inner:int;

@@ -1,8 +1,9 @@
 // test using array cell as index in assignment
 
+array a:int[3];
+array b:int[10];
+  
 func main() : void {
-  array a:int[3];
-  array b:int[10];
 
   let b[5] = 2;
   let a[b[5]] = 100;
