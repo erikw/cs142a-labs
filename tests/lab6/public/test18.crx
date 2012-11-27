@@ -19,9 +19,9 @@ func main() : void {
   ::println();
   let counter = 0;
   while (counter < 3) {
-	  ::printFloat(a[counter]);
-	  ::println();
-	  let counter = counter + 1;
+    ::printFloat(a[counter]);
+    ::println();
+    let counter = counter + 1;
   }
   ::printInt(canary_end);
 }
