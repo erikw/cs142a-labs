@@ -164,15 +164,6 @@ class GlobalFrame extends ActivationRecord {
         return "cruxdata." + name;
     }
 
-	/**
-	 * Generate a unique name in the crux namespace for functions to not conflict with MIPS built ins.
-	 * @param name The input name.
-	 * @return A mangled version of input.
-	 */
-    private String mangleDataname(String name) {
-        return "cruxfunc." + name;
-    }
-
     @Override
     public void add(Program prog, ast.VariableDeclaration var) {
         throw new RuntimeException("implement adding variable to global data space");

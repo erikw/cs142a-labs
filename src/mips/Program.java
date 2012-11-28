@@ -68,6 +68,7 @@ public class Program {
      * Append item to data segment.
      * @param data Item to append.
      */
+    // TODO who uses?
     public void appendData(String data) {
     	dataSegment.add(data);
     }
@@ -114,34 +115,53 @@ public class Program {
      * have to insert the prologue after we have that information.
      * @param pos The position to insert prologue at.
      * @param frameSize The size of the local variables in the function body.
+     * @param isMain If this is a prologue for the main function.
      */
-    public void insertPrologue(int pos, int frameSize) {
-    	debugComment("Function (Callee) Prologue.");
+    public void insertPrologue(int pos, int frameSize, boolean isMain) {
     	ArrayList<String> prologue = new ArrayList<String>();
-    	debugComment("Bookkeeping.");
-    	prologue.add("subu $sp, $sp, 8");
-    	prologue.add("sw $fp, 0($sp)");
-    	prologue.add("sw $ra, 4($sp)");
-    	prologue.add("addi $fp, $sp, 8");
-    	debugComment("Reserve space for function local vars.");
-    	prologue.add("subu $sp, $sp, " + frameSize);
+    	if (!isMain) {
+    		prologue.add("# Function (Callee) Prologue.");
+    		prologue.add("# Bookkeeping.");
+    		prologue.add("subu $sp, $sp, 8");
+    		prologue.add("sw $fp, 0($sp)");
+    		prologue.add("sw $ra, 4($sp)");
+    		prologue.add("addi $fp, $sp, 8");
+    	}
+    	if (frameSize > 0 ) {
+    		debugComment("Reserve space for function local vars.");
+    		prologue.add("subu $sp, $sp, " + frameSize);
+    	}
     	codeSegment.addAll(pos, prologue);
     }
 
     /**
      * Append a function epilogue.
      * @param frameSize The size of the function local section.
+     * @param isMain If this is a prologue for the main function.
      */
-    public void appendEpilogue(int frameSize) {
+    public void appendEpilogue(int frameSize, boolean isMain) {
     	debugComment("Function (Callee) Epilogue.");
-    	throw new RuntimeException("Implement creation of function epilogue");
+    	if (frameSize > 0) {
+    		debugComment("Erasing function local variables.");
+    		appendInstruction("addu $sp, $sp, " + frameSize);
+    	}
+    	if (isMain) {
+    		appendExitSequence();
+    	} else {
+    		debugComment("Restore caller's state.");
+    		appendInstruction("lw $ra, 4($sp)");
+    		appendInstruction("lw $fp, 0($sp)");
+    		appendInstruction("addu $sp, $sp, 8" );
+
+    		appendInstruction("jr $ra");
+    	}
     }
 
     /**
      * Insert code that terminates the program.
      */
     public void appendExitSequence() {
-    	codeSegment.add("li    $v0, 10");
+    	codeSegment.add("li $v0, 10");
     	codeSegment.add("syscall");
     }
 

@@ -138,7 +138,6 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(LiteralBool node) {
-        // TODO no pushBool, use ints for bools?
         int intVal = -1;
         switch (node.value()) {
 		case TRUE:
@@ -158,7 +157,9 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(LiteralInt node) {
-        throw new RuntimeException("Implement this");
+    	int value = node.value();
+		program.appendInstruction("addi $t0, $0, " + value);
+		program.pushInt("$t0");
     }
 
     @Override
@@ -173,20 +174,29 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(FunctionDefinition node) {
+		String funcName = node.symbol().name();
+		boolean isMain = funcName.equals("main");
         currentFunction = new ActivationRecord(node, currentFunction);
-		program.debugComment("FunctionDefinition starts here.");
-		int startPos = program.insertInstruction(namespaceFunc(node.function().name()) + ":");
-	 	// TODO Callee Execution
+		program.debugComment("Function definition  starts here.");
+		if (!isMain) {
+			funcName = namespaceFunc(node.function().name());
+		}
+		int startPos = program.appendInstruction(funcName + ":");
 		program.debugComment("Function body begins here.");
 		node.body().accept(this);
-		program.insertPrologue(startPos, currentFunction.stackSize());
+		program.insertPrologue((startPos + 1), currentFunction.stackSize(), isMain);
 
 		// TODO Callee Epilogue
-		program.appendEpilogue(
+		program.appendEpilogue(currentFunction.stackSize(), isMain);
 
+
+		Type retType  = ((FuncType) node.function().type()).returnType();
+		if (!retType.equivalent(new VoidType())) {
+			program.debugComment("Saving return value.");
+			program.appendInstruction("lw $v0, 0($sp)");
+		}
 
     	currentFunction = currentFunction.parent();
-        throw new RuntimeException("Implement this");
     }
 
     @Override
@@ -247,20 +257,32 @@ public class CodeGen implements ast.CommandVisitor {
     @Override
     public void visit(Call node) {
         program.debugComment("Caller Setup");
-        program.debugComment("Evaluate function arguments.");
         ExpressionList args = node.arguments();
-        for (Expression expr : args) {
-			expr.accept(this);
+        int argFrameSize = 0;
+        if (args.size() > 0) {
+        	program.debugComment("Evaluate function arguments.");
+        	int frameSizeBefore = currentFunction.stackSize();
+        	for (Expression expr : args) {
+				expr.accept(this);
+        	}
+        	argFrameSize = currentFunction.stackSize() - frameSizeBefore;
         }
-        String funcName = namespaceFunc(node.function().name());
+
+        String funcName =  node.function().name();
+        if (!funcName.matches("print(Bool|Float|Int|ln)|read(Float|Int)")) {
+        	funcName = namespaceFunc(funcName);
+        } else {
+        	funcName = "func." + funcName;
+        }
         program.appendInstruction("jal " + funcName);
 
-        program.debugComment("Caller Teardown");
-        FuncType func = (FuncType) node.function().type(); // TODO ugly
-        // TODO how get size of real stored? -- all seems to be 4B long but it it really good to assume that?
-        program.debugComment("Cleaning up used function args.");
- 		program.appendInstruction("addi $sp, $sp, " + (numBytes(???) * args.size()));
+        program.debugComment("Caller Teardown.");
+        if (argFrameSize > 0) {
+        	program.debugComment("Cleaning up used function args.");
+ 			program.appendInstruction("addi $sp, $sp, " + argFrameSize);
+        }
 
+		FuncType func = (FuncType) node.function().type();
  		if (!func.returnType().equivalent(new VoidType())) {
         	program.debugComment("Pop-push'n return value.");
 			program.appendInstruction("subu $sp, $sp, 4");

@@ -158,13 +158,13 @@ public class TestFiles {
 	@Test
 	public void testLab6Public() {
 		compiler.setLab(crux.Compiler.Lab.LAB6);
-		testFilesIn("lab6/public");
+		testMIPSFilesIn("lab6/public");
 	}
 
 	@Test
 	public void testLab6Private() {
 		compiler.setLab(crux.Compiler.Lab.LAB6);
-		testFilesIn("lab6/private");
+		testMIPSFilesIn("lab6/private");
 	}
 
 	// =========== Helper functions.
@@ -279,12 +279,13 @@ public class TestFiles {
 		String expected = slurpFile(outFileName);
 
 		// run spim
+		String asmFileName = cruxFileName.replace(".crx", ".asm");
 		Runtime env = Runtime.getRuntime();
 		Process spim = null;
 		RandomAccessFile inFile = null;
 		byte[] spimInput = null;
 		try {
-			spim = env.exec("spim -file " + cruxFileName);
+			spim = env.exec("spim -file " + asmFileName);
 			inFile = new RandomAccessFile(inFileName, "r");
 			spimInput =  new byte[(int) inFile.length()];
 			inFile.read(spimInput);
@@ -307,7 +308,9 @@ public class TestFiles {
 			fail(ie.getMessage());
 		}
 
-		String actual = slurpStream(spimInStr);
+		String actual = slurpStream(spimInStr, 5);
+		actual += "\n"; // TODO why do we need this?
+		actual = actual.replaceAll("\\r", ""); // So tests can be run under Windoze.
 
 		if (!expected.equals(actual)) {
 			StringBuilder errBuilder = new StringBuilder();
@@ -321,7 +324,7 @@ public class TestFiles {
 			}
 			try {
 				if (spimErrStr.available() != 0) {
-					String errString = slurpStream(spimErrStr);
+					String errString = slurpStream(spimErrStr, 0);
 					errBuilder.append("Spim gave this on stderr" + errString);
 				}
 			} catch (IOException ioe) {
@@ -337,10 +340,14 @@ public class TestFiles {
 	/**
 	 * Read the contents from a stream to a string
 	 * @param inStream The stream to read from.
+	 * @param skipLines Number of lines to skip.
 	 * @return The read string.
 	 */
-	public String slurpStream(InputStream inStream) {
+	public String slurpStream(InputStream inStream, int skipLines) {
 		Scanner scanner = new Scanner(inStream);
+		for (int i = 0; scanner.hasNextLine() && (i < skipLines); ++i) {
+			scanner.nextLine();
+		}
 		return scanner.useDelimiter("\\Z").next();
 	}
 
