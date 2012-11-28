@@ -21,10 +21,10 @@ public class ActivationRecord {
     /* TODO */
     private int stackSize;
 
-    /* TODO */
+    /* Maps a local symbol to its offset (negative) from the frame pointer.  */
     private HashMap<Symbol, Integer> locals;
 
-    /* TODO */
+    /* Maps an argument symbol to its offset (positive) from the frame pointer. */
     private HashMap<Symbol, Integer> arguments;
 
     /**
@@ -117,7 +117,12 @@ public class ActivationRecord {
 	 * @param var The variable declaration to add.
 	 */
     public void add(Program prog, ast.VariableDeclaration var) {
-        throw new RuntimeException("implement adding variable to local function space");
+		throw new RuntimeException("implement adding variable to local function space");
+	   	// TODO are we suppose to put the relatieve offset from SP/FP in the map?
+	   //stackSize += type.sizeof();
+	   //StringBuilder instr = new StringBuilder();
+	   //instr.append("subu $sp, $sp, " + type.sizeof())
+	   //prog.appendInstruction(instr.toString()); // TODO replace previous subu with subu stacksize?
     }
 
 	/**

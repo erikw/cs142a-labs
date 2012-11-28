@@ -10,6 +10,11 @@ import types.*;
  */
 public class CodeGen implements ast.CommandVisitor {
 
+	/* Set this to true to also emitt debugging comments describint the 
+	 * assemly code generated. */
+	// TODO set to false before hand in.
+	private static final DEBUG = true;
+
     /* Collected error messages. */
     private StringBuilder errorBuffer = new StringBuilder();
 
@@ -63,7 +68,7 @@ public class CodeGen implements ast.CommandVisitor {
     }
 
     /**
-     * Generate assemly program on an AST
+     * Generate assemly program on an AST.
      * @param ast The AST to generate code from.
      * @return Success indication.
      */
@@ -73,7 +78,7 @@ public class CodeGen implements ast.CommandVisitor {
             currentFunction = ActivationRecord.newGlobalFrame();
             ast.accept(this);
             error = !hasError();
-        } catch (CodeGenException e) {
+        } catch (CodeGenException cge) {
             error = true;
         }
         return !error;
@@ -96,12 +101,16 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(DeclarationList node) {
-        throw new RuntimeException("Implement this");
+        for (Declaration decl : node) {
+        	decl.accept(this);
+        }
     }
 
     @Override
     public void visit(StatementList node) {
-        throw new RuntimeException("Implement this");
+        for (Statement stmt : node) {
+        	stmt.accept(this);
+        }
     }
 
     @Override
@@ -126,16 +135,25 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(VariableDeclaration node) {
-        throw new RuntimeException("Implement this");
+		currentFunction.add(program, node);
     }
 
     @Override
     public void visit(ArrayDeclaration node) {
-        throw new RuntimeException("Implement this");
+		currentFunction.add(program, node);
     }
 
     @Override
     public void visit(FunctionDefinition node) {
+        currentFunction = new ActivationRecord(node, currentFunction);
+        // TODO handle function args
+	 	// TODO Callee Prologue
+	 	// TODO Callee Execution
+		// TODO print function label here?
+		 node.body().accept(this);
+
+		 // TODO Callee Epilogue
+    	currentFunction = currentFunction.parent();
         throw new RuntimeException("Implement this");
     }
 
@@ -196,7 +214,28 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(Call node) {
-        throw new RuntimeException("Implement this");
+        program.debugComment("Caller Setup");
+        program.debugComment("Evaluate function arguments.")
+        ExpressionList args = node.arguments();
+        for (Expression expr : args) {
+			expr.accept(this);
+        }
+        String funcName = "crux_fun_" + node.function().name(); // TODO use program.newlabel or what is that for?
+        program.appendInstruction("jal " + funcName);
+       
+        program.debugComment("Caller Teardown");
+        // TODO Caller Teardown, pop off args
+        FuncType func = (FuncThpe) node.function().type(); // TODO ugly
+		int nbrArgs = func.arguments().size();
+		//int nbrArgs = args.size();
+        // TODO are actual args stored or pointers to them? how get size of real stored?
+ 		program.appendInstruction("addi $sp, $sp, " + (4 * nbrArgs))
+ 
+ 		if (!func.returnType().equivalent(new VoidType())) {
+        	program.debugComment("Pop-push return value.");
+			program.appendInstruction("subu $sp, $sp, 4");
+			program.appendInstruction("sw $v0, 0($sp)");
+ 		}
     }
 
     @Override

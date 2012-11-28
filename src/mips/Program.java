@@ -30,6 +30,7 @@ public class Program {
      * Make a new unique label.
      * @return A unique label.
      */
+    // TODO who uses?
     public String newLabel() {
         return "label." + ++labelCounter;
     }
@@ -106,7 +107,7 @@ public class Program {
     /**
      * Insert a function prologue at position pos.
      * @param pos The position.
-     * @param frameSize TODO
+     * @param frameSize TODO we want to do this in after hand? when we know how many locals we need or something?
      */
     public void insertPrologue(int pos, int frameSize) {
     	ArrayList<String> prologue = new ArrayList<String>();
@@ -247,5 +248,13 @@ public class Program {
         s.println("syscall");
         s.println("mfc1 $v0, $f0");
         s.println("jr $ra");
+    }
+
+	/**
+	 * Print a describing comment to the code section.
+	 * @param comment The comment to append.
+	 */
+    public void debugComment(String comment) {
+		appendInstruction("# " + comment);
     }
 }
