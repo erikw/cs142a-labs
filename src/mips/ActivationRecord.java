@@ -1,5 +1,6 @@
 package mips;
 
+import java.util.Map;
 import java.util.HashMap;
 
 import crux.Symbol;
@@ -9,23 +10,23 @@ import types.*;
  * Models an activation record.
  */
 public class ActivationRecord {
-    /* TODO */
+    /* Size of the book keeping variables on the very top of the stack frame. */
     private static int fixedFrameSize = 2*4;
 
-    /* TODO */
+    /* The function defintion for the function using this activation record. */
     private ast.FunctionDefinition func;
 
     /* Reference to the parent record. */
     private ActivationRecord parent;
 
-    /* TODO */
+    /* Size of the local variables segment in the stack.*/
     private int stackSize;
 
     /* Maps a local symbol to its offset (negative) from the frame pointer.  */
-    private HashMap<Symbol, Integer> locals;
+    private Map<Symbol, Integer> locals;
 
     /* Maps an argument symbol to its offset (positive) from the frame pointer. */
-    private HashMap<Symbol, Integer> arguments;
+    private Map<Symbol, Integer> arguments;
 
     /**
      * Get a new global activation frame.
@@ -78,10 +79,10 @@ public class ActivationRecord {
         this.stackSize = 0;
         this.locals = new HashMap<Symbol, Integer>();
 
-        // map this function's parameters
+        // Map this function's parameters.
         this.arguments = new HashMap<Symbol, Integer>();
         int offset = 0;
-        for (int i=fd.arguments().size()-1; i>=0; --i) {
+        for (int i = (fd.arguments().size() - 1); i >= 0; --i) {
             Symbol arg = fd.arguments().get(i);
             arguments.put(arg, offset);
             offset += numBytes(arg.type());
@@ -105,7 +106,8 @@ public class ActivationRecord {
     }
 
 	/**
-	 * TODO
+	 * Get the size of the stack used by function local variables.
+	 * @return The stack size.
 	 */
     public int stackSize() {
         return stackSize;
@@ -135,9 +137,9 @@ public class ActivationRecord {
     }
 
 	/**
-	 * Get the address of a local or paramter symbol.
+	 * Get the address of a local or paramter symbol. // TODO what if symbol is in global space, shold we not ask parent?
 	 * @param prog The program to get from.
-	 * @param reg TODO res is put here?
+	 * @param reg The register where the address is to be stored.
 	 * @param sym the symbol to get address of.
 	 */
     public void getAddress(Program prog, String reg, Symbol sym) {
@@ -154,13 +156,21 @@ class GlobalFrame extends ActivationRecord {
     }
 
 	/**
-	 * Generate a unique name in the crux namespace to not conflict with MIPS built ins.
+	 * Generate a unique name in the crux namespace for data to not conflict with MIPS built ins.
 	 * @param name The input name.
 	 * @return A mangled version of input.
 	 */
-    // TODO need a func for Funcnames as well?
     private String mangleDataname(String name) {
         return "cruxdata." + name;
+    }
+
+	/**
+	 * Generate a unique name in the crux namespace for functions to not conflict with MIPS built ins.
+	 * @param name The input name.
+	 * @return A mangled version of input.
+	 */
+    private String mangleDataname(String name) {
+        return "cruxfunc." + name;
     }
 
     @Override

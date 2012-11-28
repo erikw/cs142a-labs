@@ -10,10 +10,10 @@ import types.*;
  */
 public class CodeGen implements ast.CommandVisitor {
 
-	/* Set this to true to also emitt debugging comments describint the 
+	/* Set this to true to also emitt debugging comments describint the
 	 * assemly code generated. */
 	// TODO set to false before hand in.
-	private static final DEBUG = true;
+	public static final boolean DEBUG = true;
 
     /* Collected error messages. */
     private StringBuilder errorBuffer = new StringBuilder();
@@ -92,6 +92,24 @@ public class CodeGen implements ast.CommandVisitor {
         return program;
     }
 
+	/**
+	 * Generate a unique name in the crux namespace for functions to not conflict with MIPS built ins.
+	 * @param name The input name.
+	 * @return A mangled version of input.
+	 */
+    private String newFunLabel(String name) {
+        return "cruxfunc." + name;
+    }
+
+	/**
+	 * Generate a unique name in the crux namespace for functions to not conflict with MIPS built ins.
+	 * @param name The input name.
+	 * @return A mangled version of input.
+	 */
+    private String namespaceFunc(String name) {
+        return "cruxfunc." + name;
+    }
+
 	// Visitor methods ===================================
 
     @Override
@@ -120,7 +138,17 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(LiteralBool node) {
-        throw new RuntimeException("Implement this");
+        // TODO no pushBool, use ints for bools?
+        int intVal = -1;
+        switch (node.value()) {
+		case TRUE:
+			  intVal = 1;
+			  break;
+		case FALSE:
+			  intVal = 0;
+        }
+		program.appendInstruction("addi $t0, $0, " + intVal);
+		program.pushInt("$t0");
     }
 
     @Override
@@ -146,13 +174,17 @@ public class CodeGen implements ast.CommandVisitor {
     @Override
     public void visit(FunctionDefinition node) {
         currentFunction = new ActivationRecord(node, currentFunction);
-        // TODO handle function args
-	 	// TODO Callee Prologue
+		program.debugComment("FunctionDefinition starts here.");
+		int startPos = program.insertInstruction(namespaceFunc(node.function().name()) + ":");
 	 	// TODO Callee Execution
-		// TODO print function label here?
-		 node.body().accept(this);
+		program.debugComment("Function body begins here.");
+		node.body().accept(this);
+		program.insertPrologue(startPos, currentFunction.stackSize());
 
-		 // TODO Callee Epilogue
+		// TODO Callee Epilogue
+		program.appendEpilogue(
+
+
     	currentFunction = currentFunction.parent();
         throw new RuntimeException("Implement this");
     }
@@ -215,24 +247,22 @@ public class CodeGen implements ast.CommandVisitor {
     @Override
     public void visit(Call node) {
         program.debugComment("Caller Setup");
-        program.debugComment("Evaluate function arguments.")
+        program.debugComment("Evaluate function arguments.");
         ExpressionList args = node.arguments();
         for (Expression expr : args) {
 			expr.accept(this);
         }
-        String funcName = "crux_fun_" + node.function().name(); // TODO use program.newlabel or what is that for?
+        String funcName = namespaceFunc(node.function().name());
         program.appendInstruction("jal " + funcName);
-       
+
         program.debugComment("Caller Teardown");
-        // TODO Caller Teardown, pop off args
-        FuncType func = (FuncThpe) node.function().type(); // TODO ugly
-		int nbrArgs = func.arguments().size();
-		//int nbrArgs = args.size();
-        // TODO are actual args stored or pointers to them? how get size of real stored?
- 		program.appendInstruction("addi $sp, $sp, " + (4 * nbrArgs))
- 
+        FuncType func = (FuncType) node.function().type(); // TODO ugly
+        // TODO how get size of real stored? -- all seems to be 4B long but it it really good to assume that?
+        program.debugComment("Cleaning up used function args.");
+ 		program.appendInstruction("addi $sp, $sp, " + (numBytes(???) * args.size()));
+
  		if (!func.returnType().equivalent(new VoidType())) {
-        	program.debugComment("Pop-push return value.");
+        	program.debugComment("Pop-push'n return value.");
 			program.appendInstruction("subu $sp, $sp, 4");
 			program.appendInstruction("sw $v0, 0($sp)");
  		}
@@ -245,6 +275,7 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(WhileLoop node) {
+        program.debugComment("Pop-push return value.");
         throw new RuntimeException("Implement this");
     }
 
@@ -259,4 +290,5 @@ public class CodeGen implements ast.CommandVisitor {
         errorBuffer.append(message);
         throw new CodeGenException(message);
     }
+
 }

@@ -27,10 +27,9 @@ public class Program {
     }
 
     /**
-     * Make a new unique label.
+     * Make a new unique label that can be used e.g. for conditional jumps.
      * @return A unique label.
      */
-    // TODO who uses?
     public String newLabel() {
         return "label." + ++labelCounter;
     }
@@ -60,6 +59,7 @@ public class Program {
      * @param pos The position in the code segment.
      * @param instr The instruction to insert.
      */
+    // TODO when do we need to insert at a position?
     public void insertInstruction(int pos, String instr) {
      	codeSegment.add(pos, instr);
     }
@@ -74,15 +74,17 @@ public class Program {
 
     /**
      * Push an integer register on the stack.
-     * @param reg TODO
+     * @param reg The register to push value from.
      */
     public void pushInt(String reg) {
-    	throw new RuntimeException("Implement pushing int register value to stack");
+        debugComment("Pushing int register to stack.");
+        appendInstruction("subu $sp, $sp, 4");
+        appendInstruction("sw " + reg + ", 0($sp)");
     }
 
     /**
      * Push a single precision floating point register on the stack.
-     * @param reg TODO
+     * @param reg The register to push value from.
      */
     public void pushFloat(String reg) {
     	throw new RuntimeException("Implement pushing float register value to stack");
@@ -90,7 +92,7 @@ public class Program {
 
     /**
      * Pop an integer from the stack into register reg.
-     * @param TODO
+     * @param Register to pop value to.
      */
     public void popInt(String reg) {
     	throw new RuntimeException("Implement popping int from stack to register");
@@ -98,7 +100,7 @@ public class Program {
 
     /**
      * Pop a floating point value from the stack into register reg.
-     * @param reg
+     * @param Register to pop value to.
      */
     public void popFloat(String reg) {
     	throw new RuntimeException("Implement popping floating point from stack to register");
@@ -106,20 +108,32 @@ public class Program {
 
     /**
      * Insert a function prologue at position pos.
-     * @param pos The position.
-     * @param frameSize TODO we want to do this in after hand? when we know how many locals we need or something?
+     *
+     * When we evaluate a function definiton we don't know the size of the 
+     * local variables before we have visited the function body. Therefore we 
+     * have to insert the prologue after we have that information.
+     * @param pos The position to insert prologue at.
+     * @param frameSize The size of the local variables in the function body.
      */
     public void insertPrologue(int pos, int frameSize) {
+    	debugComment("Function (Callee) Prologue.");
     	ArrayList<String> prologue = new ArrayList<String>();
+    	debugComment("Bookkeeping.");
+    	prologue.add("subu $sp, $sp, 8");
+    	prologue.add("sw $fp, 0($sp)");
+    	prologue.add("sw $ra, 4($sp)");
+    	prologue.add("addi $fp, $sp, 8");
+    	debugComment("Reserve space for function local vars.");
+    	prologue.add("subu $sp, $sp, " + frameSize);
     	codeSegment.addAll(pos, prologue);
-    	throw new RuntimeException("Implement creation of function prologue");
     }
 
     /**
      * Append a function epilogue.
-     * @param frameSize TODO
+     * @param frameSize The size of the function local section.
      */
     public void appendEpilogue(int frameSize) {
+    	debugComment("Function (Callee) Epilogue.");
     	throw new RuntimeException("Implement creation of function epilogue");
     }
 
@@ -255,6 +269,8 @@ public class Program {
 	 * @param comment The comment to append.
 	 */
     public void debugComment(String comment) {
-		appendInstruction("# " + comment);
+		if (CodeGen.DEBUG) {
+			appendInstruction("# " + comment);
+		}
     }
 }
