@@ -70,4 +70,9 @@ public class BoolType extends Type {
 	public Type baseType(Symbol symbol) {
 		return this;
 	}
+
+	@Override
+	public int numBytes() {
+		return 4; 
+	}
 }    

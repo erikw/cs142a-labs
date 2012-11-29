@@ -42,20 +42,20 @@ public class ActivationRecord {
      * @return The size in bytes.
      * @throws RuntimeException if the type constraints does not hold.
      */
-    protected static int numBytes(Type type) {
-        if (type instanceof IntType) {
-            return 4;
-        } else if (type instanceof FloatType) {
-            return 4;
-        } else if (type instanceof ArrayType) {
-            ArrayType aType = (ArrayType)type;
-            return aType.extent() * numBytes(aType.base());
-         } else if (type instanceof BoolType) {
-             return 4;
-        } else {
-        	throw new RuntimeException("No size known for " + type);
-        }
-    }
+    //protected static int numBytes(Type type) {
+        //if (type instanceof IntType) {
+            //return 4;
+        //} else if (type instanceof FloatType) {
+            //return 4;
+        //} else if (type instanceof ArrayType) {
+            //ArrayType aType = (ArrayType)type;
+            //return aType.extent() * numBytes(aType.base());
+         //} else if (type instanceof BoolType) {
+             //return 4;
+        //} else {
+            //throw new RuntimeException("No size known for " + type);
+        //}
+    //}
 
     /**
      * Construct a new activation record with default values on members.
@@ -85,7 +85,7 @@ public class ActivationRecord {
         for (int i = (fd.arguments().size() - 1); i >= 0; --i) {
             Symbol arg = fd.arguments().get(i);
             arguments.put(arg, offset);
-            offset += numBytes(arg.type());
+            offset += arg.type().numBytes();
         }
     }
 
@@ -143,7 +143,14 @@ public class ActivationRecord {
 	 * @param sym the symbol to get address of.
 	 */
     public void getAddress(Program prog, String reg, Symbol sym) {
-        throw new RuntimeException("implement accessing address of local or parameter symbol");
+    	if (locals.containsKey(sym)) {
+    		int offset = locals.get(sym);
+        	prog.appendInstruction("addi " + reg + ", $fp, " + offset);
+    	} else if (parent != null) {
+			parent.getAddress(prog, reg, sym);
+    	} else {
+        	throw new RuntimeException("This error should not be possible here, can not find symbol you're looking for.");
+    	}
     }
 }
 
@@ -152,8 +159,8 @@ public class ActivationRecord {
  */
 class GlobalFrame extends ActivationRecord {
 
-    public GlobalFrame() {
-    }
+    //public GlobalFrame() {
+    //}
 
 	/**
 	 * Generate a unique name in the crux namespace for data to not conflict with MIPS built ins.
@@ -166,7 +173,7 @@ class GlobalFrame extends ActivationRecord {
 
     @Override
     public void add(Program prog, ast.VariableDeclaration var) {
-        throw new RuntimeException("implement adding variable to global data space");
+		prog.appendData(mangleDataname(var.symbol().name()) + ": .space " + var.symbol().type().numBytes());
     }    
 
     @Override
@@ -176,6 +183,6 @@ class GlobalFrame extends ActivationRecord {
 
     @Override
     public void getAddress(Program prog, String reg, Symbol sym) {
-        throw new RuntimeException("implement accessing address of global symbol");
+        prog.appendInstruction("la " + reg + ", " + mangleDataname(sym.name()));
     }
 }

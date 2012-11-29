@@ -169,4 +169,13 @@ public abstract class Type {
 	public Type baseType(Symbol symbol) {
 		return new ErrorType("Array " + symbol.name() + " has invalid base type " + this + ".");
 	}
+
+	/**
+	 * Get the number of bytes for this type.
+     * Default implementation that is supposed to be overridden by types that should support this operation.
+     * @return Number of types.
+	 */
+	public int numBytes() {
+        throw new RuntimeException("No size known for " + this);
+	}
 }

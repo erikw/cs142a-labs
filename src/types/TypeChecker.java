@@ -291,6 +291,7 @@ public class TypeChecker implements CommandVisitor {
 
     @Override
     public void visit(Dereference node) {
+        //System.out.println("derf type is: " + visitRetriveType(node.expression()).deref());
         put(node, visitRetriveType(node.expression()).deref());
     }
 

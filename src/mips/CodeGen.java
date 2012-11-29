@@ -133,7 +133,10 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(AddressOf node) {
-        throw new RuntimeException("Implement this");
+        program.debugComment("Taking address of variable.");
+		currentFunction.getAddress(program, "$t0" , node.symbol());
+		program.appendInstruction("add $t0, $fp, $t0");
+		program.pushInt("$t0");
     }
 
     @Override
@@ -146,7 +149,8 @@ public class CodeGen implements ast.CommandVisitor {
 		case FALSE:
 			  intVal = 0;
         }
-		program.appendInstruction("addi $t0, $0, " + intVal);
+		//program.appendInstruction("addi $t0, $0, " + intVal);
+		program.appendInstruction("li $t0, " + intVal);
 		program.pushInt("$t0");
     }
 
@@ -160,7 +164,8 @@ public class CodeGen implements ast.CommandVisitor {
     @Override
     public void visit(LiteralInt node) {
     	int value = node.value();
-		program.appendInstruction("addi $t0, $0, " + value);
+		//program.appendInstruction("addi $t0, $0, " + value);
+		program.appendInstruction("li $t0, " + value);
 		program.pushInt("$t0");
     }
 
@@ -243,7 +248,17 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(Dereference node) {
-        throw new RuntimeException("Implement this");
+        program.debugComment("Dereferencing address.");
+        node.expression().accept(this);
+        program.popInt("$t0"); // Contains address to type ,/
+        Type type = typeChecker.getType(node); // TODO type can be array 3 of array 2 of floatboat
+        if (type.equivalent(new FloatType())) {
+			program.appendInstruction("lwc1 $f0, 0($t0)");
+			program.pushFloat("$f0");
+        } else if (type.equivalent(new IntType()) || type.equivalent(new BoolType())) {
+			program.appendInstruction("lw $t1, 0($t0)");
+			program.pushInt("$t1");
+        }
     }
 
     @Override
@@ -253,7 +268,20 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(Assignment node) {
-        throw new RuntimeException("Implement this");
+    	program.debugComment("Assignment beginns.");
+    	node.destination().accept(this);
+    	program.popInt("$t0");
+    	node.source().accept(this);
+    	Type type = typeChecker.getType(node);
+        if (type instanceof ArrayType) {
+        	// TODO 
+        } else if (type.equivalent(new FloatType())) { 
+        	program.popFloat("$f0");
+        	program.appendInstruction("swc1 $f0, 0($t0)");
+        } else {
+        	program.popInt("$t1");
+        	program.appendInstruction("sw $t1, 0($t0)");
+        }
     }
 
     @Override

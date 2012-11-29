@@ -75,4 +75,9 @@ public class ArrayType extends Type {
 		//return (base instanceof ArrayType) ? base.baseType(symbol) : base;
 		return base.baseType(symbol);
 	}
+
+	@Override
+	public int numBytes() {
+		return extent * base.numBytes(); 
+	}
 }

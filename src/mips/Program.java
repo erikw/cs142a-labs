@@ -49,6 +49,7 @@ public class Program {
      * @param pos The position in the code segment.
      * @param instr The instruction to replace with.
      */
+    // TODO when do we have to replace an instruction?
     public void replaceInstruction(int pos, String instr) {
         codeSegment.set(pos, instr);
     }
@@ -98,7 +99,8 @@ public class Program {
      * @param Register to pop value to.
      */
     public void popInt(String reg) {
-    	throw new RuntimeException("Implement popping int from stack to register");
+    	appendInstruction("lw " + reg + ", 0($sp)");
+    	appendInstruction("addiu $sp, $sp, 4");
     }
 
     /**
