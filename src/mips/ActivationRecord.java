@@ -173,12 +173,14 @@ class GlobalFrame extends ActivationRecord {
 
     @Override
     public void add(Program prog, ast.VariableDeclaration var) {
-		prog.appendData(mangleDataname(var.symbol().name()) + ": .space " + var.symbol().type().numBytes());
+		Symbol symbol = var.symbol();
+		prog.appendData(mangleDataname(symbol.name()) + ": .space " + symbol.type().numBytes());
     }    
 
     @Override
     public void add(Program prog, ast.ArrayDeclaration array) {
-        throw new RuntimeException("implement adding array to global data space");
+    	Symbol symbol = array.symbol();
+        prog.appendData(mangleDataname(symbol.name()) +  ": .space " + symbol.type().numBytes());
     }
 
     @Override

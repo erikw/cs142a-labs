@@ -1,0 +1,6 @@
+// test global variable with mips instruction name
+array a : int[4][3][2];
+array b : int[4][3][2];
+func main() : void {
+  let a[1] = b[1];
+}

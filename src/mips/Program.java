@@ -294,7 +294,7 @@ public class Program {
 	 */
     public void debugComment(String comment) {
 		if (CodeGen.DEBUG) {
-			appendInstruction("# " + comment);
+			appendInstruction("\t\t\t\t# " + comment);
 		}
     }
 }

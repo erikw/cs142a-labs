@@ -135,7 +135,6 @@ public class CodeGen implements ast.CommandVisitor {
     public void visit(AddressOf node) {
         program.debugComment("Taking address of variable.");
 		currentFunction.getAddress(program, "$t0" , node.symbol());
-		program.appendInstruction("add $t0, $fp, $t0");
 		program.pushInt("$t0");
     }
 
@@ -263,14 +262,30 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(Index node) {
-        throw new RuntimeException("Implement this");
+        program.debugComment("Taking index of expression.");
+        node.base().accept(this);
+        program.debugComment("Popping base address. ");
+        program.popInt("$t0"); 
+        node.amount().accept(this);
+        program.debugComment("Popping amount. ");
+        program.popInt("$t1");
+
+        program.debugComment("Calculate base + offset");
+        Type type = typeChecker.getType(node);
+		program.appendInstruction("li $t2, " + type.numBytes());
+		program.appendInstruction("mul $t1, $t1, $t2");
+		program.appendInstruction("add $t0, $t0, $t1");
+		program.pushInt("$t0");
+
     }
 
     @Override
     public void visit(Assignment node) {
     	program.debugComment("Assignment beginns.");
+    	program.debugComment("Handle destination.");
     	node.destination().accept(this);
     	program.popInt("$t0");
+    	program.debugComment("Handle source.");
     	node.source().accept(this);
     	Type type = typeChecker.getType(node);
         if (type instanceof ArrayType) {
