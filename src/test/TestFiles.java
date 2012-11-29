@@ -325,7 +325,7 @@ public class TestFiles {
 			try {
 				if (spimErrStr.available() != 0) {
 					String errString = slurpStream(spimErrStr, 0);
-					errBuilder.append("Spim gave this on stderr" + errString);
+					errBuilder.append("Spim gave this on stderr: " + errString);
 				}
 			} catch (IOException ioe) {
 				fail(ioe.getMessage());
@@ -348,7 +348,7 @@ public class TestFiles {
 		for (int i = 0; scanner.hasNextLine() && (i < skipLines); ++i) {
 			scanner.nextLine();
 		}
-		return scanner.useDelimiter("\\Z").next();
+		return scanner.hasNext() ? scanner.useDelimiter("\\Z").next() : "";
 	}
 
 	/**

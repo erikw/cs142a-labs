@@ -88,7 +88,9 @@ public class Program {
      * @param reg The register to push value from.
      */
     public void pushFloat(String reg) {
-    	throw new RuntimeException("Implement pushing float register value to stack");
+        debugComment("Pushing float register to stack.");
+        appendInstruction("subu $sp, $sp, 4");
+        appendInstruction("swc1 " + reg + ", 0($sp)");
     }
 
     /**

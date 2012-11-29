@@ -152,7 +152,9 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(LiteralFloat node) {
-        throw new RuntimeException("Implement this");
+    	Float value = node.value();
+		program.appendInstruction("li.s $f0, " + value);
+		program.pushFloat("$f0");
     }
 
     @Override
