@@ -148,7 +148,7 @@ public class CodeGen implements ast.CommandVisitor {
 		case FALSE:
 			  intVal = 0;
         }
-		//program.appendInstruction("addi $t0, $0, " + intVal);
+        program.debugComment("Literalbool == " + intVal);
 		program.appendInstruction("li $t0, " + intVal);
 		program.pushInt("$t0");
     }
@@ -156,6 +156,7 @@ public class CodeGen implements ast.CommandVisitor {
     @Override
     public void visit(LiteralFloat node) {
     	Float value = node.value();
+        program.debugComment("LiteralFloat == " + value);
 		program.appendInstruction("li.s $f0, " + value);
 		program.pushFloat("$f0");
     }
@@ -163,7 +164,7 @@ public class CodeGen implements ast.CommandVisitor {
     @Override
     public void visit(LiteralInt node) {
     	int value = node.value();
-		//program.appendInstruction("addi $t0, $0, " + value);
+        program.debugComment("LiteralInt == " + value);
 		program.appendInstruction("li $t0, " + value);
 		program.pushInt("$t0");
     }
@@ -264,18 +265,18 @@ public class CodeGen implements ast.CommandVisitor {
     public void visit(Index node) {
         program.debugComment("Taking index of expression.");
         node.base().accept(this);
-        program.debugComment("Popping base address. ");
-        program.popInt("$t0"); 
         node.amount().accept(this);
         program.debugComment("Popping amount. ");
-        program.popInt("$t1");
+        program.popInt("$t0");
+        program.debugComment("Popping base address.");
+        program.popInt("$t1"); 
 
         program.debugComment("Calculate base + offset");
         Type type = typeChecker.getType(node);
 		program.appendInstruction("li $t2, " + type.numBytes());
-		program.appendInstruction("mul $t1, $t1, $t2");
-		program.appendInstruction("add $t0, $t0, $t1");
-		program.pushInt("$t0");
+		program.appendInstruction("mul $t0, $t0, $t2");
+		program.appendInstruction("add $t1, $t1, $t0");
+		program.pushInt("$t1");
 
     }
 
@@ -284,7 +285,6 @@ public class CodeGen implements ast.CommandVisitor {
     	program.debugComment("Assignment beginns.");
     	program.debugComment("Handle destination.");
     	node.destination().accept(this);
-    	program.popInt("$t0");
     	program.debugComment("Handle source.");
     	node.source().accept(this);
     	Type type = typeChecker.getType(node);
@@ -293,9 +293,13 @@ public class CodeGen implements ast.CommandVisitor {
         } else if (type.equivalent(new FloatType())) { 
         	program.popFloat("$f0");
         	program.appendInstruction("swc1 $f0, 0($t0)");
-        } else {
-        	program.popInt("$t1");
-        	program.appendInstruction("sw $t1, 0($t0)");
+        } else { // Int
+    		program.debugComment("Popping off value in asignmnet.");
+    		program.popInt("$t0"); 
+    		program.debugComment("Popping off destination address in assigmnet.");
+        	program.popInt("$t1"); // dest addr
+    		program.debugComment("Final assignment.");
+        	program.appendInstruction("sw $t0, 0($t1)");
         }
     }
 
