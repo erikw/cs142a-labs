@@ -110,7 +110,8 @@ public class Program {
      */
     public void popFloat(String reg) {
         debugComment("Popping float to reg " + reg);
-    	throw new RuntimeException("Implement popping floating point from stack to register");
+    	appendInstruction("lwc1 " + reg + "0($sp)");
+    	appendInstruction("addiu $sp, $sp, 4");
     }
 
     /**

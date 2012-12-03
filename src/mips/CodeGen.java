@@ -374,7 +374,15 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(Return node) {
-        throw new RuntimeException("Implement this");
+    	program.debugComment("Begin return func value.");
+    	program.debugComment("done -> Begin return func value.");
+    	node.argument().accept(this);
+		Type type = typeChecker.getType((Command) node.argument());
+        if (type.equivalent(new FloatType())) {
+			program.popFloat("$v0");
+        } else if (type.equivalent(new IntType()) || type.equivalent(new BoolType())) {
+			program.popInt("$v0");
+        } 
     }
 
     @Override
