@@ -131,6 +131,14 @@ public class CodeGen implements ast.CommandVisitor {
     public void visit(StatementList node) {
         for (Statement stmt : node) {
         	stmt.accept(this);
+        	if (stmt instanceof Call) {
+        		Call callNode = (Call) stmt;
+				Type retType = typeChecker.getType(callNode);
+				if (!retType.equivalent(new VoidType())) {
+					program.debugComment("Cleaning up unused function return value on stack.");
+					program.appendInstruction("addi $sp, $sp, 4");
+				}
+        	}
         }
     }
 
@@ -201,7 +209,7 @@ public class CodeGen implements ast.CommandVisitor {
 
 
 
-		Type retType  = ((FuncType) node.function().type()).returnType();
+		Type retType = typeChecker.getType(node);
 		if (!retType.equivalent(new VoidType())) {
 			program.debugComment("Storing return value.");
 			if (retType.equivalent(new FloatType())) {
