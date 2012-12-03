@@ -338,11 +338,15 @@ public class CodeGen implements ast.CommandVisitor {
         }
         program.appendInstruction("jal " + funcName);
 
+		FuncType func = (FuncType) node.function().type();
+ 		if (!func.returnType().equivalent(new VoidType())) { // TODO avoid save value if noone uses it?
+        	program.debugComment("Pop-push'n return value.");
+			program.appendInstruction("subu $sp, $sp, 4");
+			program.appendInstruction("sw $v0, 0($sp)");
+ 		}
+
         program.debugComment("Caller Teardown.");
-        //if (argFrameSize > 0) {
-            //program.debugComment("Cleaning up used function args.");
-             //program.appendInstruction("addi $sp, $sp, " + argFrameSize);
-        //}
+        // TODO cleanup stack values from expressions like unused function calls (and used?).
         if (args.size() > 0) {
         	program.debugComment("Cleaning up used func args.");
         	int argSize = 0;
@@ -353,12 +357,6 @@ public class CodeGen implements ast.CommandVisitor {
 			 program.appendInstruction("addi $sp, $sp, " + argSize);
         }
 
-		FuncType func = (FuncType) node.function().type();
- 		if (!func.returnType().equivalent(new VoidType())) {
-        	program.debugComment("Pop-push'n return value.");
-			program.appendInstruction("subu $sp, $sp, 4");
-			program.appendInstruction("sw $v0, 0($sp)");
- 		}
     }
 
     @Override
