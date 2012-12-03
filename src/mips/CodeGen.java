@@ -226,12 +226,49 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(Addition node) {
-        throw new RuntimeException("Implement this");
+        program.debugComment("Addition beginns.");
+        program.debugComment("Visit left hand side.");
+        node.leftSide().accept(this);
+        program.debugComment("Visit right hand side.");
+        node.rightSide().accept(this);
+        Type type = typeChecker.getType(node);
+        if (type.equivalent(new FloatType())) {
+        	program.popFloat("$f1");
+        	program.popFloat("$f0");
+        	program.appendInstruction("add.s $f0, $f0, $f1");
+        	program.debugComment("Store addition result.");
+        	program.pushFloat("$f0");
+        } else if (type.equivalent(new IntType()) || type.equivalent(new BoolType())) {
+        	program.popInt("$t1");
+        	program.popInt("$t0");
+        	program.appendInstruction("add $t0, $t0, $t1");
+        	program.debugComment("Store addition result.");
+        	program.pushInt("$t0");
+        }
     }
 
     @Override
     public void visit(Subtraction node) {
-        throw new RuntimeException("Implement this");
+        program.debugComment("Substract beginns.");
+        program.debugComment("Visit left hand side.");
+        node.leftSide().accept(this);
+        program.debugComment("Visit right hand side.");
+        node.rightSide().accept(this);
+
+        Type type = typeChecker.getType(node);
+        if (type.equivalent(new FloatType())) {
+        	program.popFloat("$f1");
+        	program.popFloat("$f0");
+        	program.appendInstruction("sub.s $f0, $f0, $f1");
+        	program.debugComment("Store substraction result.");
+        	program.pushFloat("$f0");
+        } else if (type.equivalent(new IntType()) || type.equivalent(new BoolType())) {
+        	program.popInt("$t1");
+        	program.popInt("$t0");
+        	program.appendInstruction("sub $t0, $t0, $t1");
+        	program.debugComment("Store substraction result.");
+        	program.pushInt("$t0");
+        }
     }
 
     @Override

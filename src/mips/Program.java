@@ -110,7 +110,7 @@ public class Program {
      */
     public void popFloat(String reg) {
         debugComment("Popping float to reg " + reg);
-    	appendInstruction("lwc1 " + reg + "0($sp)");
+    	appendInstruction("lwc1 " + reg + ", 0($sp)");
     	appendInstruction("addiu $sp, $sp, 4");
     }
 
