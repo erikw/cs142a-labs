@@ -79,7 +79,7 @@ public class Program {
      * @param reg The register to push value from.
      */
     public void pushInt(String reg) {
-        debugComment("Pushing int register to stack.");
+        debugComment("Pushing int register (" + reg + ")to stack.");
         appendInstruction("subu $sp, $sp, 4");
         appendInstruction("sw " + reg + ", 0($sp)");
     }
@@ -89,7 +89,7 @@ public class Program {
      * @param reg The register to push value from.
      */
     public void pushFloat(String reg) {
-        debugComment("Pushing float register to stack.");
+        debugComment("Pushing float register (" + reg + ") to stack.");
         appendInstruction("subu $sp, $sp, 4");
         appendInstruction("swc1 " + reg + ", 0($sp)");
     }
@@ -99,6 +99,7 @@ public class Program {
      * @param Register to pop value to.
      */
     public void popInt(String reg) {
+        debugComment("Popping int to reg " + reg);
     	appendInstruction("lw " + reg + ", 0($sp)");
     	appendInstruction("addiu $sp, $sp, 4");
     }
@@ -108,6 +109,7 @@ public class Program {
      * @param Register to pop value to.
      */
     public void popFloat(String reg) {
+        debugComment("Popping float to reg " + reg);
     	throw new RuntimeException("Implement popping floating point from stack to register");
     }
 
@@ -123,8 +125,8 @@ public class Program {
      */
     public void insertPrologue(int pos, int frameSize, boolean isMain) {
     	ArrayList<String> prologue = new ArrayList<String>();
+    	prologue.add("# Function (Callee) Prologue.");
     	if (!isMain) {
-    		prologue.add("# Function (Callee) Prologue.");
     		prologue.add("# Bookkeeping.");
     		prologue.add("subu $sp, $sp, 8");
     		prologue.add("sw $fp, 0($sp)");
@@ -132,7 +134,7 @@ public class Program {
     		prologue.add("addi $fp, $sp, 8");
     	}
     	if (frameSize > 0 ) {
-    		debugComment("Reserve space for function local vars.");
+    		prologue.add("# Reserve space for function local vars.");
     		prologue.add("subu $sp, $sp, " + frameSize);
     	}
     	codeSegment.addAll(pos, prologue);

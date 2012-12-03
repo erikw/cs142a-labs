@@ -24,6 +24,10 @@ public class ExpressionList extends Command implements Iterable<Expression> {
 		return list.size();
 	}
 
+	public List<Expression> list() {
+		return list;
+	}
+
 	public Iterator<Expression> iterator() {
 		return list.iterator();
 	}

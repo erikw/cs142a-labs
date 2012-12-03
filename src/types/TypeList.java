@@ -88,4 +88,13 @@ public class TypeList extends Type implements Iterable<Type> {
     public Iterator<Type> iterator() {
         return list.iterator();
     }
+
+    @Override
+	public int numBytes() {
+        int size = 0;
+        for (Type type : list) {
+			size += type.numBytes();
+        }
+        return size;
+	}
 }

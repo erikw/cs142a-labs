@@ -31,4 +31,9 @@ public class VoidType extends Type {
     public Type deref() {
         return this;
     }
+
+    @Override
+	public int numBytes() {
+        return 0;
+	}
 }

@@ -1,5 +1,8 @@
 package mips;
 
+import java.util.ArrayList;
+import java.util.ListIterator;
+
 import java.util.regex.Pattern;
 
 import ast.*;
@@ -133,7 +136,7 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(AddressOf node) {
-        program.debugComment("Taking address of variable.");
+        program.debugComment("Taking address of variable " + node.symbol().name() + ".");
 		currentFunction.getAddress(program, "$t0" , node.symbol());
 		program.pushInt("$t0");
     }
@@ -189,6 +192,8 @@ public class CodeGen implements ast.CommandVisitor {
 			funcName = namespaceFunc(node.function().name());
 		}
 		int startPos = program.appendInstruction(funcName + ":");
+		program.debugComment("Register argument symbols.");
+        currentFunction.add(program, node);
 		program.debugComment("Function body begins here.");
 		node.body().accept(this);
 		program.insertPrologue((startPos + 1), currentFunction.stackSize(), isMain);
@@ -248,10 +253,11 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(Dereference node) {
-        program.debugComment("Dereferencing address.");
+        program.debugComment("Dereferencing address. Now getting address.");
         node.expression().accept(this);
         program.popInt("$t0"); // Contains address to type ,/
         Type type = typeChecker.getType(node); // TODO type can be array 3 of array 2 of floatboat
+        program.debugComment("Load value at the found address.");
         if (type.equivalent(new FloatType())) {
 			program.appendInstruction("lwc1 $f0, 0($t0)");
 			program.pushFloat("$f0");
@@ -307,15 +313,22 @@ public class CodeGen implements ast.CommandVisitor {
     public void visit(Call node) {
         program.debugComment("Caller Setup");
         ExpressionList args = node.arguments();
-        int argFrameSize = 0;
-        if (args.size() > 0) {
-        	program.debugComment("Evaluate function arguments.");
-        	int frameSizeBefore = currentFunction.stackSize();
-        	for (Expression expr : args) {
-				expr.accept(this);
+        //if (args.size() > 0) {
+            //program.debugComment("Evaluate function arguments.");
+            //for (Expression expr : args) {
+				//expr.accept(this);
+            //}
+            //// TODO how register how much was allocated so we can cleanup?
+        //}
+		if (args.size() > 0) {
+			program.debugComment("Evaluate function arguments.");
+        	ArrayList<Expression> revList = new ArrayList<Expression>(args.list());
+        	ListIterator<Expression> revItr = revList.listIterator(revList.size());
+        	while (revItr.hasPrevious()) {
+				revItr.previous().accept(this);
         	}
-        	argFrameSize = currentFunction.stackSize() - frameSizeBefore;
-        }
+			program.debugComment("done -> Evaluate function arguments.");
+    }
 
         String funcName =  node.function().name();
         if (!funcName.matches("print(Bool|Float|Int|ln)|read(Float|Int)")) {
@@ -326,9 +339,18 @@ public class CodeGen implements ast.CommandVisitor {
         program.appendInstruction("jal " + funcName);
 
         program.debugComment("Caller Teardown.");
-        if (argFrameSize > 0) {
-        	program.debugComment("Cleaning up used function args.");
- 			program.appendInstruction("addi $sp, $sp, " + argFrameSize);
+        //if (argFrameSize > 0) {
+            //program.debugComment("Cleaning up used function args.");
+             //program.appendInstruction("addi $sp, $sp, " + argFrameSize);
+        //}
+        if (args.size() > 0) {
+        	program.debugComment("Cleaning up used func args.");
+        	int argSize = 0;
+        	for (Expression expr : args) {
+				Type type = typeChecker.getType((Command) expr);
+        		argSize += type.numBytes();
+        	}
+			 program.appendInstruction("addi $sp, $sp, " + argSize);
         }
 
 		FuncType func = (FuncType) node.function().type();

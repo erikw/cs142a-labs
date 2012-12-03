@@ -63,4 +63,9 @@ public class FuncType extends Type {
 			return ret;
         }
    	}
+
+    @Override
+	public int numBytes() {
+        return ret.numBytes();
+	}
 }

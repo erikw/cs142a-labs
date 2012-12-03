@@ -93,4 +93,9 @@ public class FloatType extends Type {
 	public Type baseType(Symbol symbol) {
 		return this;
 	}
+
+	@Override
+	public int numBytes() {
+		return 4; 
+	}
 }

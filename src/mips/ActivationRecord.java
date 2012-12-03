@@ -3,6 +3,8 @@ package mips;
 import java.util.Map;
 import java.util.HashMap;
 
+import ast.FunctionDefinition;
+
 import crux.Symbol;
 import types.*;
 
@@ -134,6 +136,24 @@ public class ActivationRecord {
 	 */
     public void add(Program prog, ast.ArrayDeclaration array) {
         throw new RuntimeException("implement adding array to local function space");
+    }
+
+	/**
+	 * Add a variable declaration to a program.
+	 * @param prog The program to use.
+	 * @param var The variable declaration to add.
+	 */
+    public void add(Program prog, FunctionDefinition funcDef) {
+		if (funcDef.arguments().size() > 0) {
+			prog.debugComment("Registering function argument symbols.");
+			int fpOffset = 0;
+			for (Symbol symbol : funcDef.arguments()) {
+				Type type = symbol.type();
+				locals.put(symbol, fpOffset);
+				fpOffset += type.numBytes();
+			}
+			prog.debugComment("done with -> Registering function argument symbols.");
+		}
     }
 
 	/**
