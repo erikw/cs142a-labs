@@ -194,19 +194,24 @@ public class CodeGen implements ast.CommandVisitor {
 		int startPos = program.appendInstruction(funcName + ":");
 		program.debugComment("Register argument symbols.");
         currentFunction.add(program, node);
+
 		program.debugComment("Function body begins here.");
 		node.body().accept(this);
 		program.insertPrologue((startPos + 1), currentFunction.stackSize(), isMain);
 
-		// TODO Callee Epilogue
-		program.appendEpilogue(currentFunction.stackSize(), isMain);
 
 
 		Type retType  = ((FuncType) node.function().type()).returnType();
 		if (!retType.equivalent(new VoidType())) {
-			program.debugComment("Saving return value.");
-			program.appendInstruction("lw $v0, 0($sp)");
+			program.debugComment("Storing return value.");
+			if (retType.equivalent(new FloatType())) {
+				program.popFloat("$v0");
+			} else if (retType.equivalent(new IntType()) || retType.equivalent(new BoolType())) {
+				program.popInt("$v0");
+			}
 		}
+
+		program.appendEpilogue(currentFunction.stackSize(), isMain);
 
     	currentFunction = currentFunction.parent();
     }
@@ -312,14 +317,7 @@ public class CodeGen implements ast.CommandVisitor {
     @Override
     public void visit(Call node) {
         program.debugComment("Caller Setup");
-        ExpressionList args = node.arguments();
-        //if (args.size() > 0) {
-            //program.debugComment("Evaluate function arguments.");
-            //for (Expression expr : args) {
-				//expr.accept(this);
-            //}
-            //// TODO how register how much was allocated so we can cleanup?
-        //}
+        ExpressionList args = node.arguments(); // TODO instread args.accept(this)??????
 		if (args.size() > 0) {
 			program.debugComment("Evaluate function arguments.");
         	ArrayList<Expression> revList = new ArrayList<Expression>(args.list());
@@ -328,7 +326,7 @@ public class CodeGen implements ast.CommandVisitor {
 				revItr.previous().accept(this);
         	}
 			program.debugComment("done -> Evaluate function arguments.");
-    }
+    	}
 
         String funcName =  node.function().name();
         if (!funcName.matches("print(Bool|Float|Int|ln)|read(Float|Int)")) {
@@ -340,7 +338,7 @@ public class CodeGen implements ast.CommandVisitor {
 
 		FuncType func = (FuncType) node.function().type();
  		if (!func.returnType().equivalent(new VoidType())) { // TODO avoid save value if noone uses it?
-        	program.debugComment("Pop-push'n return value.");
+        	program.debugComment("Saving function return value at $v0 on the stack.");
 			program.appendInstruction("subu $sp, $sp, 4");
 			program.appendInstruction("sw $v0, 0($sp)");
  		}
@@ -354,9 +352,8 @@ public class CodeGen implements ast.CommandVisitor {
 				Type type = typeChecker.getType((Command) expr);
         		argSize += type.numBytes();
         	}
-			 program.appendInstruction("addi $sp, $sp, " + argSize);
+			program.appendInstruction("addi $sp, $sp, " + argSize);
         }
-
     }
 
     @Override
@@ -375,12 +372,12 @@ public class CodeGen implements ast.CommandVisitor {
     	program.debugComment("Begin return func value.");
     	program.debugComment("done -> Begin return func value.");
     	node.argument().accept(this);
-		Type type = typeChecker.getType((Command) node.argument());
-        if (type.equivalent(new FloatType())) {
-			program.popFloat("$v0");
-        } else if (type.equivalent(new IntType()) || type.equivalent(new BoolType())) {
-			program.popInt("$v0");
-        } 
+		//Type type = typeChecker.getType((Command) node.argument());
+        //if (type.equivalent(new FloatType())) {
+			//program.popFloat("$v0");
+        //} else if (type.equivalent(new IntType()) || type.equivalent(new BoolType())) {
+			//program.popInt("$v0");
+        //} 
     }
 
     @Override
