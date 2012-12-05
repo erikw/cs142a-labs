@@ -125,7 +125,7 @@ public class ActivationRecord {
     	Symbol symbol = var.symbol();
     	int varSize = symbol.type().numBytes();
 		stackSize += varSize;
-		locals.put(symbol, -varSize);
+		locals.put(symbol, -stackSize);
 		//prog.appendInstruction("subu $sp, $sp, " + varSize);
     }
 

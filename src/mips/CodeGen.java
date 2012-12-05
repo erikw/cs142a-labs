@@ -239,16 +239,17 @@ public class CodeGen implements ast.CommandVisitor {
         if (type.equivalent(new FloatType())) {
         	program.popFloat("$f2");
         	program.popFloat("$f0");
-        	program.appendInstruction("add.s $f0, $f0, $f2");
+        	program.appendInstruction("add.s $f4, $f0, $f2");
         	program.debugComment("Store addition result.");
-        	program.pushFloat("$f0");
+        	program.pushFloat("$f4");
         } else if (type.equivalent(new IntType()) || type.equivalent(new BoolType())) {
         	program.popInt("$t1");
         	program.popInt("$t0");
-        	program.appendInstruction("add $t0, $t0, $t1");
+        	program.appendInstruction("add $t2, $t0, $t1");
         	program.debugComment("Store addition result.");
-        	program.pushInt("$t0");
+        	program.pushInt("$t2");
         }
+        program.debugComment("done -> Addition beginns.");
     }
 
     @Override
@@ -263,21 +264,41 @@ public class CodeGen implements ast.CommandVisitor {
         if (type.equivalent(new FloatType())) {
         	program.popFloat("$f2");
         	program.popFloat("$f0");
-        	program.appendInstruction("sub.s $f0, $f0, $f2");
+        	program.appendInstruction("sub.s $f4, $f0, $f2");
         	program.debugComment("Store substraction result.");
-        	program.pushFloat("$f0");
+        	program.pushFloat("$f4");
         } else if (type.equivalent(new IntType()) || type.equivalent(new BoolType())) {
         	program.popInt("$t1");
         	program.popInt("$t0");
-        	program.appendInstruction("sub $t0, $t0, $t1");
+        	program.appendInstruction("sub $t3, $t0, $t1");
         	program.debugComment("Store substraction result.");
-        	program.pushInt("$t0");
+        	program.pushInt("$t3");
         }
+        program.debugComment("done -> Substract beginns.");
     }
 
     @Override
     public void visit(Multiplication node) {
-        throw new RuntimeException("Implement this");
+        program.debugComment("Multiplication beginns.");
+        program.debugComment("Visit left hand side.");
+        node.leftSide().accept(this);
+        program.debugComment("Visit right hand side.");
+        node.rightSide().accept(this);
+        Type type = typeChecker.getType(node);
+        if (type.equivalent(new FloatType())) {
+        	program.popFloat("$f2");
+        	program.popFloat("$f0");
+        	program.appendInstruction("mul.s $f4, $f0, $f2");
+        	program.debugComment("Store mult result.");
+        	program.pushFloat("$f4");
+        } else if (type.equivalent(new IntType()) || type.equivalent(new BoolType())) {
+        	program.popInt("$t1");
+        	program.popInt("$t0");
+        	program.appendInstruction("mul $t3, $t0, $t1");
+        	program.debugComment("Store mult result.");
+        	program.pushInt("$t3");
+        }
+        program.debugComment("done -> Multiplication beginns.");
     }
 
     @Override
@@ -433,6 +454,8 @@ public class CodeGen implements ast.CommandVisitor {
         } else if (type.equivalent(new IntType()) || type.equivalent(new BoolType())) {
 			program.appendInstruction("lw $t1, 0($t0)");
 			program.pushInt("$t1");
+        } else {
+        	throw new RuntimeException("Bad type in deref?.");
         }
     }
 
@@ -446,12 +469,12 @@ public class CodeGen implements ast.CommandVisitor {
         program.debugComment("Popping base address.");
         program.popInt("$t1"); 
 
-        program.debugComment("Calculate base + offset");
         Type type = typeChecker.getType(node);
+        program.debugComment("Calculate base + offset");
 		program.appendInstruction("li $t2, " + type.numBytes());
-		program.appendInstruction("mul $t0, $t0, $t2");
-		program.appendInstruction("add $t1, $t1, $t0");
-		program.pushInt("$t1");
+		program.appendInstruction("mul $t3, $t0, $t2");
+		program.appendInstruction("add $t4, $t1, $t3");
+		program.pushInt("$t4");
 
     }
 
@@ -465,6 +488,7 @@ public class CodeGen implements ast.CommandVisitor {
     	Type type = typeChecker.getType(node);
         if (type instanceof ArrayType) {
         	// TODO 
+        	throw new RuntimeException("Implement this?????????????/");
         } else if (type.equivalent(new FloatType())) { 
         	program.popFloat("$f0");
         	program.appendInstruction("swc1 $f0, 0($t0)");

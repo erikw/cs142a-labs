@@ -49,7 +49,6 @@ public class Program {
      * @param pos The position in the code segment.
      * @param instr The instruction to replace with.
      */
-    // TODO when do we have to replace an instruction?
     public void replaceInstruction(int pos, String instr) {
         codeSegment.set(pos, instr);
     }
