@@ -199,14 +199,14 @@ public class CodeGen implements ast.CommandVisitor {
     public void visit(FunctionDefinition node) {
 		String funcName = node.symbol().name();
 		boolean isMain = funcName.equals("main");
-        currentFunction = new ActivationRecord(node, currentFunction);
 		program.debugComment("Function definition  starts here.");
 		if (!isMain) {
 			funcName = namespaceFunc(node.function().name());
 		}
 		int startPos = program.appendInstruction(funcName + ":");
 		program.debugComment("Register argument symbols.");
-        currentFunction.add(program, node);
+        currentFunction = new ActivationRecord(node, currentFunction);
+		program.debugComment("done -> Register argument symbols.");
 
 		program.debugComment("Function body begins here.");
 		node.body().accept(this);

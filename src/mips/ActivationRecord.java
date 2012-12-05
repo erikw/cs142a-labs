@@ -83,12 +83,12 @@ public class ActivationRecord {
 
         // Map this function's parameters.
         this.arguments = new HashMap<Symbol, Integer>();
-        int offset = 0;
-        for (int i = (fd.arguments().size() - 1); i >= 0; --i) {
-            Symbol arg = fd.arguments().get(i);
-            arguments.put(arg, offset);
-            offset += arg.type().numBytes();
-        }
+		int fpOffset = 0;
+		for (Symbol symbol : fd.arguments()) {
+			Type type = symbol.type();
+			locals.put(symbol, fpOffset);
+			fpOffset += type.numBytes();
+		}
     }
 
 	/**
@@ -121,12 +121,11 @@ public class ActivationRecord {
 	 * @param var The variable declaration to add.
 	 */
     public void add(Program prog, ast.VariableDeclaration var) {
-		throw new RuntimeException("implement adding variable to local function space");
-	   	// TODO are we suppose to put the relatieve offset from SP/FP in the map?
-	   //stackSize += type.sizeof();
-	   //StringBuilder instr = new StringBuilder();
-	   //instr.append("subu $sp, $sp, " + type.sizeof())
-	   //prog.appendInstruction(instr.toString()); // TODO replace previous subu with subu stacksize?
+    	Symbol symbol = var.symbol();
+    	int varSize = symbol.type().numBytes();
+		stackSize += varSize;
+		locals.put(symbol, -varSize);
+		prog.appendInstruction("subu $sp, $sp, " + varSize);
     }
 
 	/**
@@ -139,24 +138,6 @@ public class ActivationRecord {
     }
 
 	/**
-	 * Add a variable declaration to a program.
-	 * @param prog The program to use.
-	 * @param var The variable declaration to add.
-	 */
-    public void add(Program prog, FunctionDefinition funcDef) {
-		if (funcDef.arguments().size() > 0) {
-			prog.debugComment("Registering function argument symbols.");
-			int fpOffset = 0;
-			for (Symbol symbol : funcDef.arguments()) {
-				Type type = symbol.type();
-				locals.put(symbol, fpOffset);
-				fpOffset += type.numBytes();
-			}
-			prog.debugComment("done with -> Registering function argument symbols.");
-		}
-    }
-
-	/**
 	 * Get the address of a local or paramter symbol. // TODO what if symbol is in global space, shold we not ask parent?
 	 * @param prog The program to get from.
 	 * @param reg The register where the address is to be stored.
@@ -165,8 +146,14 @@ public class ActivationRecord {
     public void getAddress(Program prog, String reg, Symbol sym) {
     	if (locals.containsKey(sym)) {
     		int offset = locals.get(sym);
+        	prog.debugComment("Calculating address to var from framepointer to symbol " + sym.name());
+        	prog.appendInstruction("addi " + reg + ", $fp, " + offset);
+    	} else if (arguments.containsKey(sym)) {
+        	prog.debugComment("Calculating address to funcargumnet from framepointer to symbol " + sym.name());
+    		int offset = arguments.get(sym);
         	prog.appendInstruction("addi " + reg + ", $fp, " + offset);
     	} else if (parent != null) {
+        	prog.debugComment("Consulting parent scope for address to symbol" + sym.name());
 			parent.getAddress(prog, reg, sym);
     	} else {
         	throw new RuntimeException("This error should not be possible here, can not find symbol you're looking for.");
