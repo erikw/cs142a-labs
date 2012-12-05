@@ -552,8 +552,26 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(WhileLoop node) {
-        program.debugComment("Pop-push return value.");
-        throw new RuntimeException("Implement this");
+        program.debugComment("While loop beginns here.");
+		String condLabel = program.newLabel();
+    	program.debugComment("condLabel = " + condLabel);
+		String joinLabel = program.newLabel();
+    	program.debugComment("joinLabel = " + joinLabel);
+
+    	program.debugComment("Evaluate while-condition.");
+    	program.appendInstruction(condLabel + ":");
+        node.condition().accept(this);
+    	program.debugComment("done -> Evaluate while-condition.");
+    	program.debugComment("Pop off condition.");
+    	program.popInt("$t7");
+    	program.appendInstruction("beqz $t7, " + joinLabel);
+
+    	program.debugComment("While body  beginns.");
+    	node.body().accept(this);
+    	program.appendInstruction("b " + condLabel);
+    	program.debugComment("done -> While body  beginns.");
+    	program.appendInstruction(joinLabel + ":");
+        program.debugComment("done -> While loop beginns here.");
     }
 
     @Override
