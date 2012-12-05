@@ -82,6 +82,7 @@ public class ActivationRecord {
         this.locals = new HashMap<Symbol, Integer>();
 
         // Map this function's parameters.
+        // NOTE original code added args in the reverse order.
         this.arguments = new HashMap<Symbol, Integer>();
 		int fpOffset = 0;
 		for (Symbol symbol : fd.arguments()) {
@@ -125,7 +126,7 @@ public class ActivationRecord {
     	int varSize = symbol.type().numBytes();
 		stackSize += varSize;
 		locals.put(symbol, -varSize);
-		prog.appendInstruction("subu $sp, $sp, " + varSize);
+		//prog.appendInstruction("subu $sp, $sp, " + varSize);
     }
 
 	/**

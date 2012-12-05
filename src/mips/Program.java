@@ -60,7 +60,6 @@ public class Program {
      * @param pos The position in the code segment.
      * @param instr The instruction to insert.
      */
-    // TODO when do we need to insert at a position?
     public void insertInstruction(int pos, String instr) {
      	codeSegment.add(pos, instr);
     }
@@ -69,7 +68,6 @@ public class Program {
      * Append item to data segment.
      * @param data Item to append.
      */
-    // TODO who uses?
     public void appendData(String data) {
     	dataSegment.add(data);
     }
@@ -127,15 +125,17 @@ public class Program {
     public void insertPrologue(int pos, int frameSize, boolean isMain) {
     	ArrayList<String> prologue = new ArrayList<String>();
     	prologue.add("# Function (Callee) Prologue.");
-    	if (!isMain) {
-    		prologue.add("# Bookkeeping.");
+    	prologue.add("# Bookkeeping.");
+    	if (isMain) {
+    		prologue.add("addi $fp, $sp, 0");
+    	} else {
     		prologue.add("subu $sp, $sp, 8");
     		prologue.add("sw $fp, 0($sp)");
     		prologue.add("sw $ra, 4($sp)");
     		prologue.add("addi $fp, $sp, 8");
     	}
     	if (frameSize > 0 ) {
-    		prologue.add("# Reserve space for function local vars.");
+    		prologue.add("# Reserve space (" +  frameSize + "b) for function local vars.");
     		prologue.add("subu $sp, $sp, " + frameSize);
     	}
     	codeSegment.addAll(pos, prologue);

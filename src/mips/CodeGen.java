@@ -15,7 +15,6 @@ public class CodeGen implements ast.CommandVisitor {
 
 	/* Set this to true to also emitt debugging comments describint the
 	 * assemly code generated. */
-	// TODO set to false before hand in.
 	public static final boolean DEBUG = true;
 
     /* Collected error messages. */
@@ -203,15 +202,15 @@ public class CodeGen implements ast.CommandVisitor {
 		if (!isMain) {
 			funcName = namespaceFunc(node.function().name());
 		}
-		int startPos = program.appendInstruction(funcName + ":");
 		program.debugComment("Register argument symbols.");
         currentFunction = new ActivationRecord(node, currentFunction);
 		program.debugComment("done -> Register argument symbols.");
 
+		int startPos = program.appendInstruction(funcName + ":");
+
 		program.debugComment("Function body begins here.");
 		node.body().accept(this);
 		program.insertPrologue((startPos + 1), currentFunction.stackSize(), isMain);
-
 
 
 		Type retType = typeChecker.getType(node);
@@ -502,7 +501,6 @@ public class CodeGen implements ast.CommandVisitor {
         program.appendInstruction("jal " + funcName);
 
         program.debugComment("Caller Teardown.");
-        // TODO cleanup stack values from expressions like unused function calls (and used?).
         if (args.size() > 0) {
         	program.debugComment("Cleaning up used func args.");
         	int argSize = 0;
@@ -514,7 +512,7 @@ public class CodeGen implements ast.CommandVisitor {
         }
 
 		FuncType func = (FuncType) node.function().type();
- 		if (!func.returnType().equivalent(new VoidType())) { // TODO avoid save value if noone uses it?
+ 		if (!func.returnType().equivalent(new VoidType())) {
         	program.debugComment("Saving function return value at $v0 on the stack.");
 			program.appendInstruction("subu $sp, $sp, 4");
 			program.appendInstruction("sw $v0, 0($sp)");
