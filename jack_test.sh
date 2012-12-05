@@ -5,13 +5,14 @@
 # Author: Jack Cheng
 
 for FILE in tests/lab6/public/*.crx
-do 
+do
 	echo "Testing $FILE..."
-	java -cp bin: crux.Compiler $FILE > temp.asm
-	spim -file temp.asm < ${FILE%crx}in | sed '1,5 d' > temp.out
+	java -cp bin: crux.Compiler $FILE
+	spim -file ${FILE%crx}asm < ${FILE%crx}in | sed '1,5 d' > temp.out
+	sed -i -e '$a\' temp.out
 	sed -e '$a\' ${FILE%crx}out > temp2.out
 	diff temp.out temp2.out --strip-trailing-cr
-	if [ "$?" -ne "0" ]; then 
+	if [ "$?" -ne "0" ]; then
 		break
 	fi
 done
