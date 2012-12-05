@@ -238,9 +238,9 @@ public class CodeGen implements ast.CommandVisitor {
         node.rightSide().accept(this);
         Type type = typeChecker.getType(node);
         if (type.equivalent(new FloatType())) {
-        	program.popFloat("$f1");
+        	program.popFloat("$f2");
         	program.popFloat("$f0");
-        	program.appendInstruction("add.s $f0, $f0, $f1");
+        	program.appendInstruction("add.s $f0, $f0, $f2");
         	program.debugComment("Store addition result.");
         	program.pushFloat("$f0");
         } else if (type.equivalent(new IntType()) || type.equivalent(new BoolType())) {
@@ -262,9 +262,9 @@ public class CodeGen implements ast.CommandVisitor {
 
         Type type = typeChecker.getType(node);
         if (type.equivalent(new FloatType())) {
-        	program.popFloat("$f1");
+        	program.popFloat("$f2");
         	program.popFloat("$f0");
-        	program.appendInstruction("sub.s $f0, $f0, $f1");
+        	program.appendInstruction("sub.s $f0, $f0, $f2");
         	program.debugComment("Store substraction result.");
         	program.pushFloat("$f0");
         } else if (type.equivalent(new IntType()) || type.equivalent(new BoolType())) {
@@ -311,10 +311,41 @@ public class CodeGen implements ast.CommandVisitor {
         Type type = typeChecker.getType((Command) node.leftSide());
         if (type.equivalent(new FloatType())) {
         	program.debugComment("Popping off RHS value");
-			program.popFloat("$f1");
+			program.popFloat("$f2");
         	program.debugComment("Popping off LHS value");
 			program.popFloat("$f0");
-        	throw new RuntimeException("Implement this");
+			switch (node.operation()) {
+				case LT:
+        			program.debugComment("$f0 < $f2");
+					program.appendInstruction("c.lt.s $f0, $f2");
+					pushFloatCond();
+					break;
+				case GT:
+        			program.debugComment("$f0 > $f2");
+					program.appendInstruction("c.gt.s $f0, $f2");
+					pushFloatCond();
+					break;
+				case LE: 
+        			program.debugComment("$f0 <= $f2");
+					program.appendInstruction("c.le.s $f0, $f2");
+					pushFloatCond();
+					break;
+				case GE:
+        			program.debugComment("$f0 >= $f2");
+					program.appendInstruction("c.ge.s $f0, $f2");
+					pushFloatCond();
+					break;
+				case EQ:
+        			program.debugComment("$f0 == $f2");
+					program.appendInstruction("c.eq.s $f0, $f2");
+					pushFloatCond();
+					break;
+				case NE:
+        			program.debugComment("$f0 != $f2");
+					program.appendInstruction("c.ne.s $f0, $f2");
+					pushFloatCond();
+					break;
+			}
         } else if (type.equivalent(new IntType()) || type.equivalent(new BoolType())) {
         	program.debugComment("Popping off RHS value");
 			program.popInt("$t1");
@@ -323,37 +354,58 @@ public class CodeGen implements ast.CommandVisitor {
 			switch (node.operation()) {
 				case LT:
         			program.debugComment("$t0 < $t1");
-					program.appendInstruction("slt $t3, $t0, $t1");
+					program.appendInstruction("slt $t2, $t0, $t1");
 					break;
 				case GT:
         			program.debugComment("$t0 > $t1");
-					//program.appendInstruction("slt $t3, $t1, $t0");
+					//program.appendInstruction("slt $t2, $t1, $t0");
 					// Why not use synthetic instruction if we can? Clearer to read.
-					program.appendInstruction("sgt $t3, $t0, $t1");
+					program.appendInstruction("sgt $t2, $t0, $t1");
 					break;
 				case LE: 
         			program.debugComment("$t0 <= $t1");
-					program.appendInstruction("sle $t3, $t0, $t1");
+					program.appendInstruction("sle $t2, $t0, $t1");
 					break;
 				case GE:
         			program.debugComment("$t0 >= $t1");
-					program.appendInstruction("sge $t3, $t0, $t1");
+					program.appendInstruction("sge $t2, $t0, $t1");
 					break;
 				case EQ:
         			program.debugComment("$t0 == $t1");
-					program.appendInstruction("seq $t3, $t0, $t1");
+					program.appendInstruction("seq $t2, $t0, $t1");
 					break;
 				case NE:
         			program.debugComment("$t0 != $t1");
-					program.appendInstruction("sne $t3, $t0, $t1");
+					program.appendInstruction("sne $t2, $t0, $t1");
 					break;
 			}
+        	program.debugComment("Pushing comparsion outcome.");
+			program.pushInt("$t2");
         }
-        program.debugComment("Pushing comparsion outcome.");
-		program.pushInt("$t3");
-
         program.debugComment("done -> Comparsion beginns here.");
     }
+
+    /**
+     * Push the value of the floating condition register to the stack.
+     */
+	private void pushFloatCond() {
+		program.debugComment("Determin float cond value.");
+		String elseLabel = program.newLabel();
+    	program.debugComment("elseLabel = " + elseLabel);
+		String joinLabel = program.newLabel();
+    	program.debugComment("joinLabel = " + joinLabel);
+
+		program.appendInstruction("bc1f " + elseLabel);
+		program.debugComment("Float cond was true.");
+		program.appendInstruction("li $t0, 1");
+		program.appendInstruction("b " + joinLabel);
+		program.appendInstruction(elseLabel + ":");
+		program.debugComment("Float cond was false.");
+		program.appendInstruction("li $t0, 0");
+		program.appendInstruction(joinLabel + ":");
+
+		program.pushInt("$t0");
+	}
 
     @Override
     public void visit(Dereference node) {
