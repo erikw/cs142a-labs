@@ -288,7 +288,21 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(LogicalAnd node) {
-        throw new RuntimeException("Implement this");
+        program.debugComment("LogicalAnd beginns here.");
+        program.debugComment("Visiting LHS");
+		node.leftSide().accept(this);
+        program.debugComment("Visiting RHS");
+		node.rightSide().accept(this);
+        program.debugComment("Popping off RHS value.");
+        program.popInt("$t1");
+        program.debugComment("Popping off LHS value.");
+        program.popInt("$t0");
+        program.appendInstruction("and $t2, $t0, $t1");
+        program.debugComment("Pushing and result.");
+        program.popInt("$t0");
+        program.pushInt("$t2");
+
+        program.debugComment("done -> LogicalAnd beginns here.");
     }
 
     @Override
