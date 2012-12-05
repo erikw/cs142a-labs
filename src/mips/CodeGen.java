@@ -136,7 +136,12 @@ public class CodeGen implements ast.CommandVisitor {
 				Type retType = typeChecker.getType(callNode);
 				if (!retType.equivalent(new VoidType())) {
 					program.debugComment("Cleaning up unused function return value on stack.");
-					program.appendInstruction("addi $sp, $sp, 4");
+					if (retType.equivalent(new FloatType())) {
+						program.popFloat("$t0");
+					} else if (retType.equivalent(new IntType()) || retType.equals(new BoolType())) {
+						program.popInt("$t0");
+					}
+					//program.appendInstruction("addi $sp, $sp, 4");
 				}
         	}
         }
@@ -298,7 +303,56 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(Comparison node) {
-        throw new RuntimeException("Implement this");
+        program.debugComment("Comparsion beginns here.");
+        program.debugComment("Evaluate LHS.");
+		node.leftSide().accept(this);
+        program.debugComment("Evaluate RHS.");
+		node.rightSide().accept(this);
+        Type type = typeChecker.getType((Command) node.leftSide());
+        if (type.equivalent(new FloatType())) {
+        	program.debugComment("Popping off RHS value");
+			program.popFloat("$f1");
+        	program.debugComment("Popping off LHS value");
+			program.popFloat("$f0");
+        	throw new RuntimeException("Implement this");
+        } else if (type.equivalent(new IntType()) || type.equivalent(new BoolType())) {
+        	program.debugComment("Popping off RHS value");
+			program.popInt("$t1");
+        	program.debugComment("Popping off LHS value");
+			program.popInt("$t0");
+			switch (node.operation()) {
+				case LT:
+        			program.debugComment("$t0 < $t1");
+					program.appendInstruction("slt $t3, $t0, $t1");
+					break;
+				case GT:
+        			program.debugComment("$t0 > $t1");
+					//program.appendInstruction("slt $t3, $t1, $t0");
+					// Why not use synthetic instruction if we can? Clearer to read.
+					program.appendInstruction("sgt $t3, $t0, $t1");
+					break;
+				case LE: 
+        			program.debugComment("$t0 <= $t1");
+					program.appendInstruction("sle $t3, $t0, $t1");
+					break;
+				case GE:
+        			program.debugComment("$t0 >= $t1");
+					program.appendInstruction("sge $t3, $t0, $t1");
+					break;
+				case EQ:
+        			program.debugComment("$t0 == $t1");
+					program.appendInstruction("seq $t3, $t0, $t1");
+					break;
+				case NE:
+        			program.debugComment("$t0 != $t1");
+					program.appendInstruction("sne $t3, $t0, $t1");
+					break;
+			}
+        }
+        program.debugComment("Pushing comparsion outcome.");
+		program.pushInt("$t3");
+
+        program.debugComment("done -> Comparsion beginns here.");
     }
 
     @Override
@@ -362,7 +416,7 @@ public class CodeGen implements ast.CommandVisitor {
     @Override
     public void visit(Call node) {
         program.debugComment("Caller Setup");
-        ExpressionList args = node.arguments(); // TODO instread args.accept(this)??????
+        ExpressionList args = node.arguments(); // TODO instead args.accept(this)??????
 		if (args.size() > 0) {
 			program.debugComment("Evaluate function arguments.");
         	ArrayList<Expression> revList = new ArrayList<Expression>(args.list());
@@ -381,13 +435,6 @@ public class CodeGen implements ast.CommandVisitor {
         }
         program.appendInstruction("jal " + funcName);
 
-		FuncType func = (FuncType) node.function().type();
- 		if (!func.returnType().equivalent(new VoidType())) { // TODO avoid save value if noone uses it?
-        	program.debugComment("Saving function return value at $v0 on the stack.");
-			program.appendInstruction("subu $sp, $sp, 4");
-			program.appendInstruction("sw $v0, 0($sp)");
- 		}
-
         program.debugComment("Caller Teardown.");
         // TODO cleanup stack values from expressions like unused function calls (and used?).
         if (args.size() > 0) {
@@ -399,11 +446,42 @@ public class CodeGen implements ast.CommandVisitor {
         	}
 			program.appendInstruction("addi $sp, $sp, " + argSize);
         }
+
+		FuncType func = (FuncType) node.function().type();
+ 		if (!func.returnType().equivalent(new VoidType())) { // TODO avoid save value if noone uses it?
+        	program.debugComment("Saving function return value at $v0 on the stack.");
+			program.appendInstruction("subu $sp, $sp, 4");
+			program.appendInstruction("sw $v0, 0($sp)");
+ 		}
+
     }
 
     @Override
     public void visit(IfElseBranch node) {
-        throw new RuntimeException("Implement this");
+    	program.debugComment("IfElseBranch beginns here");
+		String elseLabel = program.newLabel();
+    	program.debugComment("elseLabel = " + elseLabel);
+		String joinLabel = program.newLabel();
+    	program.debugComment("joinLabel = " + joinLabel);
+
+    	program.debugComment("Evaluate if-condition.");
+        node.condition().accept(this);
+    	program.debugComment("done -> Evaluate if expression.");
+    	program.debugComment("Pop off condition.");
+    	program.popInt("$t7");
+    	program.appendInstruction("beqz $t7, " + elseLabel);
+
+    	program.debugComment("Then branch beginns.");
+		node.thenBlock().accept(this);
+		program.appendInstruction("b " + joinLabel);
+    	program.debugComment("done -> Then branch beginns.");
+    	program.debugComment("Else branch beginns.");
+    	program.appendInstruction(elseLabel + ":");
+		node.elseBlock().accept(this);
+    	program.debugComment("done -> Else branch beginns.");
+
+    	program.appendInstruction(joinLabel + ":");
+    	program.debugComment("done -> IfElseBranch beginns here");
     }
 
     @Override

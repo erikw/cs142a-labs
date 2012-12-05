@@ -79,7 +79,7 @@ public class Program {
      * @param reg The register to push value from.
      */
     public void pushInt(String reg) {
-        debugComment("Pushing int register (" + reg + ")to stack.");
+        debugComment("Pushing int register (" + reg + ") to stack.");
         appendInstruction("subu $sp, $sp, 4");
         appendInstruction("sw " + reg + ", 0($sp)");
     }
