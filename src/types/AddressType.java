@@ -45,7 +45,7 @@ public class AddressType extends Type {
         if (!source.equivalent(base)) {
         	return super.assign(source);
         } else {
-        	return new VoidType();
+        	return base.assign(source);
         }
     }
 

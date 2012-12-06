@@ -402,7 +402,7 @@ public class CodeGen implements ast.CommandVisitor {
 					program.appendInstruction("c.gt.s $f0, $f2");
 					pushFloatCond();
 					break;
-				case LE: 
+				case LE:
         			program.debugComment("$f0 <= $f2");
 					program.appendInstruction("c.le.s $f0, $f2");
 					pushFloatCond();
@@ -439,7 +439,7 @@ public class CodeGen implements ast.CommandVisitor {
 					// Why not use synthetic instruction if we can? Clearer to read.
 					program.appendInstruction("sgt $t2, $t0, $t1");
 					break;
-				case LE: 
+				case LE:
         			program.debugComment("$t0 <= $t1");
 					program.appendInstruction("sle $t2, $t0, $t1");
 					break;
@@ -498,7 +498,7 @@ public class CodeGen implements ast.CommandVisitor {
 			program.appendInstruction("lw $t1, 0($t0)");
 			program.pushInt("$t1");
         } else {
-        	throw new RuntimeException("Bad type in deref?.");
+        	throw new CodeGenException("Bad type in deref?.");
         }
     }
 
@@ -510,7 +510,7 @@ public class CodeGen implements ast.CommandVisitor {
         program.debugComment("Popping amount. ");
         program.popInt("$t0");
         program.debugComment("Popping base address.");
-        program.popInt("$t1"); 
+        program.popInt("$t1");
 
         Type type = typeChecker.getType(node);
         program.debugComment("Calculate base + offset");
@@ -529,19 +529,26 @@ public class CodeGen implements ast.CommandVisitor {
     	node.source().accept(this);
     	Type type = typeChecker.getType(node);
         if (type instanceof ArrayType) {
-        	// TODO 
+        	// TODO
         	throw new RuntimeException("Implement this?????????????/");
-        } else if (type.equivalent(new FloatType())) { 
-        	program.popFloat("$f0");
-        	program.appendInstruction("swc1 $f0, 0($t0)");
-        } else { // Int
+        } else if (type.equivalent(new FloatType())) {
     		program.debugComment("Popping off value in asignmnet.");
-    		program.popInt("$t0"); 
+        	program.popFloat("$f0");
+    		program.debugComment("Popping off destination address in assigmnet.");
+    		program.popInt("$t0");
+    		program.debugComment("Final assignment.");
+        	program.appendInstruction("swc1 $f0, 0($t0)");
+        } else if (isIntCompatType(type)){
+    		program.debugComment("Popping off value in asignmnet.");
+    		program.popInt("$t0");
     		program.debugComment("Popping off destination address in assigmnet.");
         	program.popInt("$t1"); // dest addr
     		program.debugComment("Final assignment.");
         	program.appendInstruction("sw $t0, 0($t1)");
+        } else {
+        	throw new RuntimeException("type=" + type + " in node=" + node);
         }
+    	program.debugComment("done -> Assignment beginns.");
     }
 
     @Override

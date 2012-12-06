@@ -80,7 +80,7 @@ public class FloatType extends Type {
 		if (!equivalent(source)) {
 			return super.assign(source);
 		} else {
-			return new VoidType();
+			return this;
 		}
 	}
 

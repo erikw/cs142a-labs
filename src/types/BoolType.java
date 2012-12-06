@@ -57,7 +57,7 @@ public class BoolType extends Type {
 		if (!equivalent(source)) {
 			return super.assign(source);
 		} else {
-			return new VoidType();
+			return this;
 		}
 	}
 

@@ -309,7 +309,7 @@ public class TestFiles {
 		}
 
 		String actual = slurpStream(spimInStr, 5);
-		actual += "\n"; // TODO why do we need this?
+		actual += "\n";
 		actual = actual.replaceAll("\\r", ""); // So tests can be run under Windoze.
 
 		if (!expected.equals(actual)) {
