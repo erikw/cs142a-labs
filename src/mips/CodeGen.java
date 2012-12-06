@@ -26,6 +26,9 @@ public class CodeGen implements ast.CommandVisitor {
     /* The program we're building. */
     private Program program;
 
+    /* The end point of a function, jump here when all is done. */
+    private String funcRetLabel;
+
     /* The current activation record. */
     private ActivationRecord currentFunction;
 
@@ -199,6 +202,8 @@ public class CodeGen implements ast.CommandVisitor {
 		String funcName = node.symbol().name();
 		boolean isMain = funcName.equals("main");
 		program.debugComment("Function definition  starts here.");
+		funcRetLabel = program.newLabel();
+		program.debugComment("Join label for function is " + funcRetLabel);
 		if (!isMain) {
 			funcName = namespaceFunc(node.function().name());
 		}
@@ -213,6 +218,7 @@ public class CodeGen implements ast.CommandVisitor {
 		program.insertPrologue((startPos + 1), currentFunction.stackSize(), isMain);
 
 
+		program.appendInstruction(funcRetLabel + ":");
 		Type retType = typeChecker.getType(node);
 		if (!retType.equivalent(new VoidType())) {
 			program.debugComment("Storing return value.");
@@ -599,14 +605,10 @@ public class CodeGen implements ast.CommandVisitor {
     @Override
     public void visit(Return node) {
     	program.debugComment("Begin return func value.");
-    	program.debugComment("done -> Begin return func value.");
     	node.argument().accept(this);
-		//Type type = typeChecker.getType((Command) node.argument());
-        //if (type.equivalent(new FloatType())) {
-			//program.popFloat("$v0");
-        //} else if (type.equivalent(new IntType()) || type.equivalent(new BoolType())) {
-			//program.popInt("$v0");
-        //} 
+    	program.debugComment("done -> Begin return func value.");
+    	program.debugComment("Jumping to end of function.");
+    	program.appendInstruction("b " + funcRetLabel);
     }
 
     @Override

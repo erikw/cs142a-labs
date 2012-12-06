@@ -16,4 +16,4 @@ do
 		break
 	fi
 done
-rm temp.asm temp.out temp2.out
+rm temp.out temp2.out
