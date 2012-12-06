@@ -3,8 +3,6 @@ package mips;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
-import java.util.regex.Pattern;
-
 import ast.*;
 import types.*;
 
@@ -12,10 +10,6 @@ import types.*;
  * A visitor that generated MIPS assembly code.
  */
 public class CodeGen implements ast.CommandVisitor {
-
-	/* Set this to true to also emitt debugging comments describint the
-	 * assemly code generated. */
-	public static final boolean DEBUG = true;
 
     /* Collected error messages. */
     private StringBuilder errorBuffer = new StringBuilder();
@@ -43,7 +37,7 @@ public class CodeGen implements ast.CommandVisitor {
 
     /**
      * Query for errors.
-     * @return Indication of the precense of errors.
+     * @return Indication of error precense.
      */
     public boolean hasError() {
         return errorBuffer.length() != 0;
@@ -102,18 +96,10 @@ public class CodeGen implements ast.CommandVisitor {
 	 * @param name The input name.
 	 * @return A mangled version of input.
 	 */
-    private String newFunLabel(String name) {
-        return "cruxfunc." + name;
-    }
-
-	/**
-	 * Generate a unique name in the crux namespace for functions to not conflict with MIPS built ins.
-	 * @param name The input name.
-	 * @return A mangled version of input.
-	 */
     private String namespaceFunc(String name) {
         return "cruxfunc." + name;
     }
+
 
 	// Visitor methods ===================================
 
@@ -143,10 +129,18 @@ public class CodeGen implements ast.CommandVisitor {
 					} else if (retType.equivalent(new IntType()) || retType.equals(new BoolType())) {
 						program.popInt("$t0");
 					}
-					//program.appendInstruction("addi $sp, $sp, 4");
 				}
         	}
         }
+    }
+
+	/**
+	 * Short hand for testing if the given type is of MIPS int compatible type.
+	 * @param type The type to test.
+	 * @return true if int compatible.
+	 */
+    private boolean isIntCompatType(Type type) {
+    	return type.equivalent(new IntType()) || type.equals(new BoolType());
     }
 
     @Override
@@ -160,11 +154,11 @@ public class CodeGen implements ast.CommandVisitor {
     public void visit(LiteralBool node) {
         int intVal = -1;
         switch (node.value()) {
-		case TRUE:
-			  intVal = 1;
-			  break;
-		case FALSE:
-			  intVal = 0;
+			case TRUE:
+			  	intVal = 1;
+			  	break;
+			case FALSE:
+			  	intVal = 0;
         }
         program.debugComment("Literalbool == " + intVal);
 		program.appendInstruction("li $t0, " + intVal);
@@ -215,7 +209,7 @@ public class CodeGen implements ast.CommandVisitor {
 
 		program.debugComment("Function body begins here.");
 		node.body().accept(this);
-		program.insertPrologue((startPos + 1), currentFunction.stackSize(), isMain);
+		program.insertPrologue((startPos + 1), currentFunction.stackSize());
 
 
 		program.appendInstruction(funcRetLabel + ":");

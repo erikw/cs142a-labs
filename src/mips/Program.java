@@ -8,6 +8,7 @@ import java.util.Vector;
  * Models a generated MIPS program.
  */
 public class Program {
+
 	/* The code segment. */
     private Vector<String> codeSegment;
 
@@ -16,6 +17,10 @@ public class Program {
 
     /* Number of lables used. */
     private int labelCounter;
+
+	/* Set this to true to also emitt debugging comments describint the
+	 * assemly code generated. */
+	private final boolean DEBUG = true;
 
     /**
      * Construct a new program.
@@ -119,21 +124,15 @@ public class Program {
      * have to insert the prologue after we have that information.
      * @param pos The position to insert prologue at.
      * @param frameSize The size of the local variables in the function body.
-     * @param isMain If this is a prologue for the main function.
      */
-    public void insertPrologue(int pos, int frameSize, boolean isMain) {
+    public void insertPrologue(int pos, int frameSize) {
     	ArrayList<String> prologue = new ArrayList<String>();
-    	prologue.add("# Function (Callee) Prologue.");
-    	prologue.add("# Bookkeeping.");
-        // After all, treating main differntly caused problems when calc local var addresses etc. better to be consistent for simplicity. TODO remove ismain parater
-        //if (isMain) {
-            //prologue.add("addi $fp, $sp, 0");
-        //} else { 
-    		prologue.add("subu $sp, $sp, 8");
-    		prologue.add("sw $fp, 0($sp)");
-    		prologue.add("sw $ra, 4($sp)");
-    		prologue.add("addi $fp, $sp, 8");
-        //}
+    	prologue.add("\t\t\t\t# Function (Callee) Prologue.");
+    	prologue.add("\t\t\t\t# Bookkeeping.");
+    	prologue.add("subu $sp, $sp, 8");
+    	prologue.add("sw $fp, 0($sp)");
+    	prologue.add("sw $ra, 4($sp)");
+    	prologue.add("addi $fp, $sp, 8");
     	if (frameSize > 0 ) {
     		prologue.add("# Reserve space (" +  frameSize + "b) for function local vars.");
     		prologue.add("subu $sp, $sp, " + frameSize);
@@ -296,7 +295,7 @@ public class Program {
 	 * @param comment The comment to append.
 	 */
     public void debugComment(String comment) {
-		if (CodeGen.DEBUG) {
+		if (DEBUG) {
 			appendInstruction("\t\t\t\t# " + comment);
 		}
     }

@@ -3,8 +3,6 @@ package mips;
 import java.util.Map;
 import java.util.HashMap;
 
-import ast.FunctionDefinition;
-
 import crux.Symbol;
 import types.*;
 
@@ -12,8 +10,9 @@ import types.*;
  * Models an activation record.
  */
 public class ActivationRecord {
+
     /* Size of the book keeping variables on the very top of the stack frame. */
-    private static int fixedFrameSize = 2*4;
+    private static final int fixedFrameSize = 2*4;
 
     /* The function defintion for the function using this activation record. */
     private ast.FunctionDefinition func;
@@ -24,7 +23,7 @@ public class ActivationRecord {
     /* Size of the local variables segment in the stack.*/
     private int stackSize;
 
-    /* Maps a local symbol to its offset (negative) from the frame pointer.  */
+    /* Maps a local symbol to its offset (negative and stored so) from the frame pointer.  */
     private Map<Symbol, Integer> locals;
 
     /* Maps an argument symbol to its offset (positive) from the frame pointer. */
@@ -37,27 +36,6 @@ public class ActivationRecord {
     public static ActivationRecord newGlobalFrame() {
         return new GlobalFrame();
     }
-
-    /**
-     * Get the number of bytes for a given type.
-     * @param type The type to check. Must be IntType, FloatType or ArrayType.
-     * @return The size in bytes.
-     * @throws RuntimeException if the type constraints does not hold.
-     */
-    //protected static int numBytes(Type type) {
-        //if (type instanceof IntType) {
-            //return 4;
-        //} else if (type instanceof FloatType) {
-            //return 4;
-        //} else if (type instanceof ArrayType) {
-            //ArrayType aType = (ArrayType)type;
-            //return aType.extent() * numBytes(aType.base());
-         //} else if (type instanceof BoolType) {
-             //return 4;
-        //} else {
-            //throw new RuntimeException("No size known for " + type);
-        //}
-    //}
 
     /**
      * Construct a new activation record with default values on members.
@@ -126,7 +104,6 @@ public class ActivationRecord {
     	int varSize = symbol.type().numBytes();
 		stackSize += varSize;
 		locals.put(symbol, -stackSize);
-		//prog.appendInstruction("subu $sp, $sp, " + varSize);
     }
 
 	/**
@@ -140,7 +117,7 @@ public class ActivationRecord {
     }
 
 	/**
-	 * Get the address of a local or paramter symbol. // TODO what if symbol is in global space, shold we not ask parent?
+	 * Get the address of a local or paramter symbol.
 	 * @param prog The program to get from.
 	 * @param reg The register where the address is to be stored.
 	 * @param sym the symbol to get address of.
@@ -149,7 +126,7 @@ public class ActivationRecord {
     	if (locals.containsKey(sym)) {
     		int offset = locals.get(sym);
         	prog.debugComment("Calculating address to var from framepointer to symbol " + sym.name());
-        	prog.appendInstruction("addi " + reg + ", $fp, " + (offset - 8));
+        	prog.appendInstruction("addi " + reg + ", $fp, " + (offset - fixedFrameSize));
     	} else if (arguments.containsKey(sym)) {
         	prog.debugComment("Calculating address to funcargumnet from framepointer to symbol " + sym.name());
     		int offset = arguments.get(sym);
@@ -167,9 +144,6 @@ public class ActivationRecord {
  * A frame that is in the global space.
  */
 class GlobalFrame extends ActivationRecord {
-
-    //public GlobalFrame() {
-    //}
 
 	/**
 	 * Generate a unique name in the crux namespace for data to not conflict with MIPS built ins.
