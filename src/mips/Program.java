@@ -2,18 +2,16 @@ package mips;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Vector;
 
 /**
  * Models a generated MIPS program.
  */
 public class Program {
-
 	/* The code segment. */
-    private Vector<String> codeSegment;
+    private ArrayList<String> codeSegment;
 
     /* The data segment. */
-    private Vector<String> dataSegment;
+    private ArrayList<String> dataSegment;
 
     /* Number of lables used. */
     private int labelCounter;
@@ -27,8 +25,8 @@ public class Program {
      */
     public Program() {
         labelCounter = -1;
-        codeSegment = new Vector<String>();
-        dataSegment = new Vector<String>();
+        codeSegment = new ArrayList<String>();
+        dataSegment = new ArrayList<String>();
     }
 
     /**

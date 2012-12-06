@@ -10,7 +10,6 @@ import types.*;
  * A visitor that generated MIPS assembly code.
  */
 public class CodeGen implements ast.CommandVisitor {
-
     /* Collected error messages. */
     private StringBuilder errorBuffer = new StringBuilder();
 
@@ -100,12 +99,22 @@ public class CodeGen implements ast.CommandVisitor {
         return "cruxfunc." + name;
     }
 
+	/**
+	 * Short hand for testing if the given type is of MIPS int compatible type.
+	 * @param type The type to test.
+	 * @return true if int compatible.
+	 */
+    private boolean isIntCompatType(Type type) {
+    	return type.equivalent(new IntType()) || type.equivalent(new BoolType());
+    }
 
 	// Visitor methods ===================================
 
     @Override
     public void visit(ExpressionList node) {
-        throw new RuntimeException("Implement this");
+        for (Expression expr : node) {
+        	expr.accept(this);
+        }
     }
 
     @Override
@@ -126,21 +135,12 @@ public class CodeGen implements ast.CommandVisitor {
 					program.debugComment("Cleaning up unused function return value on stack.");
 					if (retType.equivalent(new FloatType())) {
 						program.popFloat("$t0");
-					} else if (retType.equivalent(new IntType()) || retType.equals(new BoolType())) {
+					} else if (isIntCompatType(retType)) {
 						program.popInt("$t0");
 					}
 				}
         	}
         }
-    }
-
-	/**
-	 * Short hand for testing if the given type is of MIPS int compatible type.
-	 * @param type The type to test.
-	 * @return true if int compatible.
-	 */
-    private boolean isIntCompatType(Type type) {
-    	return type.equivalent(new IntType()) || type.equals(new BoolType());
     }
 
     @Override
@@ -209,8 +209,8 @@ public class CodeGen implements ast.CommandVisitor {
 
 		program.debugComment("Function body begins here.");
 		node.body().accept(this);
+		program.debugComment("done -> Function body begins here.");
 		program.insertPrologue((startPos + 1), currentFunction.stackSize());
-
 
 		program.appendInstruction(funcRetLabel + ":");
 		Type retType = typeChecker.getType(node);
@@ -218,13 +218,12 @@ public class CodeGen implements ast.CommandVisitor {
 			program.debugComment("Storing return value.");
 			if (retType.equivalent(new FloatType())) {
 				program.popFloat("$v0");
-			} else if (retType.equivalent(new IntType()) || retType.equivalent(new BoolType())) {
+			} else if (isIntCompatType(retType)) {
 				program.popInt("$v0");
 			}
 		}
 
 		program.appendEpilogue(currentFunction.stackSize(), isMain);
-
     	currentFunction = currentFunction.parent();
     }
 
@@ -242,7 +241,7 @@ public class CodeGen implements ast.CommandVisitor {
         	program.appendInstruction("add.s $f4, $f0, $f2");
         	program.debugComment("Store addition result.");
         	program.pushFloat("$f4");
-        } else if (type.equivalent(new IntType()) || type.equivalent(new BoolType())) {
+        } else if (isIntCompatType(type)) {
         	program.popInt("$t1");
         	program.popInt("$t0");
         	program.appendInstruction("add $t2, $t0, $t1");
@@ -267,7 +266,7 @@ public class CodeGen implements ast.CommandVisitor {
         	program.appendInstruction("sub.s $f4, $f0, $f2");
         	program.debugComment("Store substraction result.");
         	program.pushFloat("$f4");
-        } else if (type.equivalent(new IntType()) || type.equivalent(new BoolType())) {
+        } else if (isIntCompatType(type)) {
         	program.popInt("$t1");
         	program.popInt("$t0");
         	program.appendInstruction("sub $t3, $t0, $t1");
@@ -291,7 +290,7 @@ public class CodeGen implements ast.CommandVisitor {
         	program.appendInstruction("mul.s $f4, $f0, $f2");
         	program.debugComment("Store mult result.");
         	program.pushFloat("$f4");
-        } else if (type.equivalent(new IntType()) || type.equivalent(new BoolType())) {
+        } else if (isIntCompatType(type)) {
         	program.popInt("$t1");
         	program.popInt("$t0");
         	program.appendInstruction("mul $t3, $t0, $t1");
@@ -303,6 +302,7 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(Division node) {
+        // TODO 
         throw new RuntimeException("Implement this");
     }
 
@@ -327,11 +327,13 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(LogicalOr node) {
+    	// TODO 
         throw new RuntimeException("Implement this");
     }
 
     @Override
     public void visit(LogicalNot node) {
+    	// TODO 
         throw new RuntimeException("Implement this");
     }
 
@@ -380,7 +382,7 @@ public class CodeGen implements ast.CommandVisitor {
 					pushFloatCond();
 					break;
 			}
-        } else if (type.equivalent(new IntType()) || type.equivalent(new BoolType())) {
+        } else if (isIntCompatType(type)) {
         	program.debugComment("Popping off RHS value");
 			program.popInt("$t1");
         	program.debugComment("Popping off LHS value");
@@ -446,12 +448,12 @@ public class CodeGen implements ast.CommandVisitor {
         program.debugComment("Dereferencing address. Now getting address.");
         node.expression().accept(this);
         program.popInt("$t0"); // Contains address to type ,/
-        Type type = typeChecker.getType(node); // TODO type can be array 3 of array 2 of floatboat
+        Type type = typeChecker.getType(node);
         program.debugComment("Load value at the found address.");
         if (type.equivalent(new FloatType())) {
 			program.appendInstruction("lwc1 $f0, 0($t0)");
 			program.pushFloat("$f0");
-        } else if (type.equivalent(new IntType()) || type.equivalent(new BoolType())) {
+        } else if (isIntCompatType(type)) {
 			program.appendInstruction("lw $t1, 0($t0)");
 			program.pushInt("$t1");
         } else {
@@ -475,7 +477,6 @@ public class CodeGen implements ast.CommandVisitor {
 		program.appendInstruction("mul $t3, $t0, $t2");
 		program.appendInstruction("add $t4, $t1, $t3");
 		program.pushInt("$t4");
-
     }
 
     @Override
@@ -505,16 +506,9 @@ public class CodeGen implements ast.CommandVisitor {
     @Override
     public void visit(Call node) {
         program.debugComment("Caller Setup");
-        ExpressionList args = node.arguments(); // TODO instead args.accept(this)??????
-		if (args.size() > 0) {
-			program.debugComment("Evaluate function arguments.");
-        	ArrayList<Expression> revList = new ArrayList<Expression>(args.list());
-        	ListIterator<Expression> revItr = revList.listIterator(revList.size());
-        	while (revItr.hasPrevious()) {
-				revItr.previous().accept(this);
-        	}
-			program.debugComment("done -> Evaluate function arguments.");
-    	}
+        program.debugComment("Begin evaluate function arguments.");
+		node.arguments().accept(this);
+        program.debugComment("done -> Begin evaluate function arguments.");
 
         String funcName =  node.function().name();
         if (!funcName.matches("print(Bool|Float|Int|ln)|read(Float|Int)")) {
@@ -525,10 +519,10 @@ public class CodeGen implements ast.CommandVisitor {
         program.appendInstruction("jal " + funcName);
 
         program.debugComment("Caller Teardown.");
-        if (args.size() > 0) {
+        if (node.arguments().size() > 0) {
         	program.debugComment("Cleaning up used func args.");
         	int argSize = 0;
-        	for (Expression expr : args) {
+        	for (Expression expr : node.arguments()) {
 				Type type = typeChecker.getType((Command) expr);
         		argSize += type.numBytes();
         	}
@@ -611,5 +605,4 @@ public class CodeGen implements ast.CommandVisitor {
         errorBuffer.append(message);
         throw new CodeGenException(message);
     }
-
 }
