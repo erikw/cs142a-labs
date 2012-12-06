@@ -360,8 +360,22 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(LogicalNot node) {
-    	// TODO 
-        throw new RuntimeException("Implement this");
+        program.debugComment("LogicalNot beginns here.");
+        program.debugComment("Visiting expression");
+        String falseLabl = program.newLabel();
+        String pushLabel = program.newLabel();
+		node.expression().accept(this);
+        program.debugComment("Popping off expr value.");
+        program.popInt("$t0");
+        program.appendInstruction("beqz $t0, " + falseLabl);
+        program.appendInstruction("li $t1, 0");
+        program.appendInstruction("b " + pushLabel);
+        program.appendInstruction(falseLabl + ":");
+        program.appendInstruction("li $t1, 1");
+        program.appendInstruction(pushLabel + ":");
+        program.debugComment("Pushing and result.");
+        program.pushInt("$t1");
+        program.debugComment("done -> LogicalNot beginns here.");
     }
 
     @Override

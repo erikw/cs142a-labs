@@ -1,0 +1,25 @@
+// not
+
+func main() : void {
+  	if (not false) {
+  	  	::printInt(101);
+  	} else {
+  		::printInt(10);
+  	}
+  	::println();
+  	if (not true) {
+  	  	::printInt(101);
+  	} else {
+  		::printInt(10);
+  	}
+  	::println();
+  	var a : bool;
+  	let a = true;
+  	if (not a) {
+  	  	::printInt(101);
+  	} else { if (a) {
+  		::printInt(10);
+  		}
+  	}
+  	::println();
+}

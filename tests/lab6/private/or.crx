@@ -1,10 +1,10 @@
-// div
+// or
 
 func main() : void {
   	if (false or true) {
   	  	::printInt(101);
   	} else {
-  		::printInt(010);
+  		::printInt(10);
   	}
   	::println();
   	var a : bool;
@@ -14,7 +14,7 @@ func main() : void {
   	if (a or b) {
   	  	::printInt(101);
   	} else {
-  		::printInt(010);
+  		::printInt(10);
   	}
   	::println();
   	let a = false;
@@ -22,7 +22,7 @@ func main() : void {
   	if (a or b) {
   	  	::printInt(101);
   	} else {
-  		::printInt(010);
+  		::printInt(10);
   	}
   	::println();
   	let a = true;
@@ -30,7 +30,7 @@ func main() : void {
   	if (a or b) {
   	  	::printInt(101);
   	} else {
-  		::printInt(010);
+  		::printInt(10);
   	}
   	::println();
   	let a = false;
