@@ -288,13 +288,13 @@ public class CodeGen implements ast.CommandVisitor {
         	program.popFloat("$f2");
         	program.popFloat("$f0");
         	program.appendInstruction("mul.s $f4, $f0, $f2");
-        	program.debugComment("Store mult result.");
+        	program.debugComment("Store mul result.");
         	program.pushFloat("$f4");
         } else if (isIntCompatType(type)) {
         	program.popInt("$t1");
         	program.popInt("$t0");
         	program.appendInstruction("mul $t3, $t0, $t1");
-        	program.debugComment("Store mult result.");
+        	program.debugComment("Store mul result.");
         	program.pushInt("$t3");
         }
         program.debugComment("done -> Multiplication beginns.");
@@ -302,8 +302,26 @@ public class CodeGen implements ast.CommandVisitor {
 
     @Override
     public void visit(Division node) {
-        // TODO 
-        throw new RuntimeException("Implement this");
+        program.debugComment("Divison beginns.");
+        program.debugComment("Visit left hand side.");
+        node.leftSide().accept(this);
+        program.debugComment("Visit right hand side.");
+        node.rightSide().accept(this);
+        Type type = typeChecker.getType(node);
+        if (type.equivalent(new FloatType())) {
+        	program.popFloat("$f2");
+        	program.popFloat("$f0");
+        	program.appendInstruction("div.s $f4, $f0, $f2");
+        	program.debugComment("Store div result.");
+        	program.pushFloat("$f4");
+        } else if (isIntCompatType(type)) {
+        	program.popInt("$t1");
+        	program.popInt("$t0");
+        	program.appendInstruction("div $t3, $t0, $t1");
+        	program.debugComment("Store div result.");
+        	program.pushInt("$t3");
+        }
+        program.debugComment("done -> Divison beginns.");
     }
 
     @Override

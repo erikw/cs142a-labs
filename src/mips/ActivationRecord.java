@@ -106,14 +106,8 @@ public void add(Program prog, ast.VariableDeclaration var) {
 	locals.put(symbol, -stackSize);
 }
 
-/**
- * Add an array declaration to a program.
- * @param prog The program to use.
- * @param array The array declaration to add.
- */
 public void add(Program prog, ast.ArrayDeclaration array) {
-    // TODO
-    throw new RuntimeException("implement adding array to local function space");
+    throw new RuntimeException("Not possible, array can only be declared in global scope. Parser should have detected this.");
 }
 
 /**

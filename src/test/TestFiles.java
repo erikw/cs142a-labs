@@ -161,11 +161,11 @@ public class TestFiles {
 		testMIPSFilesIn("lab6/public");
 	}
 
-	//@Test // TODO enable laster
-	//public void testLab6Private() {
-		//compiler.setLab(crux.Compiler.Lab.LAB6);
-		//testMIPSFilesIn("lab6/private");
-	//}
+	@Test
+	public void testLab6Private() {
+		compiler.setLab(crux.Compiler.Lab.LAB6);
+		testMIPSFilesIn("lab6/private");
+	}
 
 	// =========== Helper functions.
 
