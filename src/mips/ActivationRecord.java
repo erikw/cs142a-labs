@@ -87,7 +87,7 @@ public class ActivationRecord {
 		int fpOffset = 0;
 		for (Symbol symbol : fd.arguments()) {
 			Type type = symbol.type();
-			locals.put(symbol, fpOffset);
+			arguments.put(symbol, fpOffset);
 			fpOffset += type.numBytes();
 		}
     }
@@ -135,6 +135,7 @@ public class ActivationRecord {
 	 * @param array The array declaration to add.
 	 */
     public void add(Program prog, ast.ArrayDeclaration array) {
+    	// TODO
         throw new RuntimeException("implement adding array to local function space");
     }
 
@@ -148,7 +149,7 @@ public class ActivationRecord {
     	if (locals.containsKey(sym)) {
     		int offset = locals.get(sym);
         	prog.debugComment("Calculating address to var from framepointer to symbol " + sym.name());
-        	prog.appendInstruction("addi " + reg + ", $fp, " + offset);
+        	prog.appendInstruction("addi " + reg + ", $fp, " + (offset - 8));
     	} else if (arguments.containsKey(sym)) {
         	prog.debugComment("Calculating address to funcargumnet from framepointer to symbol " + sym.name());
     		int offset = arguments.get(sym);

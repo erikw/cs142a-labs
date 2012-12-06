@@ -125,14 +125,15 @@ public class Program {
     	ArrayList<String> prologue = new ArrayList<String>();
     	prologue.add("# Function (Callee) Prologue.");
     	prologue.add("# Bookkeeping.");
-    	if (isMain) {
-    		prologue.add("addi $fp, $sp, 0");
-    	} else {
+        // After all, treating main differntly caused problems when calc local var addresses etc. better to be consistent for simplicity. TODO remove ismain parater
+        //if (isMain) {
+            //prologue.add("addi $fp, $sp, 0");
+        //} else { 
     		prologue.add("subu $sp, $sp, 8");
     		prologue.add("sw $fp, 0($sp)");
     		prologue.add("sw $ra, 4($sp)");
     		prologue.add("addi $fp, $sp, 8");
-    	}
+        //}
     	if (frameSize > 0 ) {
     		prologue.add("# Reserve space (" +  frameSize + "b) for function local vars.");
     		prologue.add("subu $sp, $sp, " + frameSize);
