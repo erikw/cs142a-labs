@@ -1,0 +1,4 @@
+Error type-checking file.
+TypeError(3,3)[IfElseBranch requires bool condition not int.]
+TypeError(11,3)[WhileLoop requires bool condition not int.]
+

@@ -1,0 +1,17 @@
+// function with large parameter list
+
+func foo(a:int, b:bool, c:float, d:int, e:bool, f:float) : float {
+  if (b and e) {
+    return c;
+  } else {
+    let a = d;
+  }
+  return c + f / 3.14;
+}
+
+func main() : void {
+  ::printFloat(::foo(7,true,2.71, 8,false,7.89));
+  ::printFloat(::foo(7,true,2, 8,false,7.89));
+  ::printFloat(::foo(7,true,2.72, 8,0,7.89));
+  ::printFloat(::foo(1,2,3, 4,5,6));
+}

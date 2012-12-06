@@ -1,0 +1,9 @@
+Error type-checking file.
+TypeError(4,3)[Cannot call func(TypeList(int)):void using TypeList().]
+TypeError(5,3)[Cannot call func(TypeList(float)):void using TypeList().]
+TypeError(6,3)[Cannot call func(TypeList(bool)):void using TypeList().]
+TypeError(9,11)[Cannot call func(TypeList()):int using TypeList(int).]
+TypeError(9,3)[Cannot assign ErrorType(Cannot call func(TypeList()):int using TypeList(int).) to Address(float).]
+TypeError(12,11)[Cannot call func(TypeList()):float using TypeList(float).]
+TypeError(12,3)[Cannot assign ErrorType(Cannot call func(TypeList()):float using TypeList(float).) to Address(int).]
+

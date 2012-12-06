@@ -1,0 +1,6 @@
+Error type-checking file.
+TypeError(21,1)[Not all paths in function t2_broken have a return.]
+TypeError(31,1)[Not all paths in function t22_broken have a return.]
+TypeError(41,1)[Not all paths in function t3_broken have a return.]
+TypeError(70,1)[Not all paths in function t5_broken have a return.]
+

@@ -1,0 +1,121 @@
+//test all paths return
+var b1:bool;
+var b2:bool;
+var b3:bool;
+
+func t_valid(a:int) : int {
+  if (true) {
+    while (b3) {
+          return a;
+    }
+    if (b3) {
+      return a;
+    } else {
+      return a;
+    }
+  } else {
+    return a;
+  }
+}
+
+func t2_broken(a:int) : int {
+  while (b2) {
+    if (b2) {
+      return a;
+    } else {
+      return a;
+    }
+  }
+}
+
+func t22_broken(a:int) : int {
+  if (b2) {
+    while(b3) {
+      return a;
+    }
+  } else {
+    return a;
+  }
+}
+
+func t3_broken(a:int) : int {
+  if (true) {
+    while (b3) {
+          return a;
+    }
+    if (b3) {
+      if (b2) {
+        return a;
+      }
+    } else {
+      return a;
+    }
+  } else {
+    return a;
+    let a = 3;
+  }
+}
+
+func t4(a:int) : int {
+  while (b2) {
+    if (b2) {
+      return a;
+    } else {
+      let a = 4;
+    }
+  }
+  return a;
+}
+
+func t5_broken(a:int) : int {
+  if (true) {
+    if (b3) {
+      if (b2) {
+        if (b1) {
+          while (b1) {
+            return a;
+          }
+        } else {
+          return a;
+        }
+      } else {
+        return a;
+      }
+    } else {
+      return a;
+    }
+  } else {
+    return a;
+    let a = 3;
+  }
+
+}
+
+func t6_works(a:int) : int {
+  if (true)
+  {
+    return a;
+  }
+
+  if (b1) {
+    return a;
+  } else {
+    return a;
+  }
+}
+
+func t7_works(a:int) : int {
+  if (b1) {
+    return a;
+  } else {
+     if (b2) {
+       return a;
+     } else {
+       return a;
+     }
+  }
+}
+
+func main() : void {
+  ::printInt(8);
+}

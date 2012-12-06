@@ -1,0 +1,13 @@
+// test all the pre-defined functions
+
+func main() : void {
+  ::printInt();
+  ::printFloat();
+  ::printBool();
+
+  var x : float;
+  let x = ::readInt(7);
+
+  var y : int;
+  let y = ::readFloat(7.8);
+}

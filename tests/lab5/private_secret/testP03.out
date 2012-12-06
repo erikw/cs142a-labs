@@ -1,0 +1,8 @@
+Error type-checking file.
+TypeError(14,16)[Cannot call func(TypeList(int, bool, float, int, bool, float)):float using TypeList(int, bool, int, int, bool, float).]
+TypeError(14,3)[Cannot call func(TypeList(float)):void using TypeList(ErrorType(Cannot call func(TypeList(int, bool, float, int, bool, float)):float using TypeList(int, bool, int, int, bool, float).)).]
+TypeError(15,16)[Cannot call func(TypeList(int, bool, float, int, bool, float)):float using TypeList(int, bool, float, int, int, float).]
+TypeError(15,3)[Cannot call func(TypeList(float)):void using TypeList(ErrorType(Cannot call func(TypeList(int, bool, float, int, bool, float)):float using TypeList(int, bool, float, int, int, float).)).]
+TypeError(16,16)[Cannot call func(TypeList(int, bool, float, int, bool, float)):float using TypeList(int, int, int, int, int, int).]
+TypeError(16,3)[Cannot call func(TypeList(float)):void using TypeList(ErrorType(Cannot call func(TypeList(int, bool, float, int, bool, float)):float using TypeList(int, int, int, int, int, int).)).]
+
