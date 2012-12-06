@@ -1,8 +1,5 @@
 package mips;
 
-import java.util.ArrayList;
-import java.util.ListIterator;
-
 import ast.*;
 import types.*;
 

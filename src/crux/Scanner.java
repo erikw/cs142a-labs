@@ -2,12 +2,7 @@ package crux;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Collection;
 import java.util.Iterator;
-
-import javax.naming.OperationNotSupportedException;
-
-//import java.io.IOException;
 
 /**
  * A scanner that reads crux source text and produces as stream of tokens.
@@ -18,9 +13,6 @@ public class Scanner implements Iterable<Token> {
 
     /* Represents Beginning of File. */
     private static final short BOF = -2;
-
-    /* Means that no character is unread. */
-    private static final short NO_UNREAD_CHAR = -2;
 
     /* Author details. */
     public static String studentName = "Erik Westrup";

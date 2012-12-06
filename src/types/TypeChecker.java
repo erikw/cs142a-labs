@@ -1,6 +1,5 @@
 package types;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -325,10 +324,8 @@ public class TypeChecker implements CommandVisitor {
         }
 
 		needsReturn = true;
-		int prevNbrRets = nbrFoundReturns;
 		visit(node.thenBlock());
 		boolean thenNeedsReturn = needsReturn ;
-		prevNbrRets = nbrFoundReturns;
 		needsReturn = true;
 		visit(node.elseBlock());
 		boolean elseNeedsReturn = needsReturn ;
