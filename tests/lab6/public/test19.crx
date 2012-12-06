@@ -1,0 +1,39 @@
+// test 2D array
+
+array x:int[3][5];
+  
+func main() : void {
+  var canary_begin:int;
+  var canary_end:int;
+  var outer:int;
+  var inner:int;
+  let canary_begin = 0;
+  let canary_end = 0;
+
+  let outer = 4;
+  let inner = 2;
+  while (outer >= 0) {
+    while (inner >= 0) {
+        let x[inner][outer] = inner * 1000 + outer * 100 + 99;
+      let inner = inner - 1;
+    }
+    let inner = 2;
+    let outer = outer - 1;
+  }
+
+  let inner = 0;
+  let outer = 0;
+  while (outer < 5) {
+    while (inner < 3) { 
+       ::printInt(x[inner][outer]);
+       let inner = inner + 1;
+     }
+     ::println();
+     let inner = 0;
+     let outer = outer + 1;
+  }
+  ::printInt(canary_begin);
+  ::printInt(canary_end);
+}
+	
+

@@ -53,6 +53,14 @@ public class TypeList extends Type implements Iterable<Type> {
         return sb.toString();
     }
 
+	/**
+	 * Get the length of this list.
+	 * @return The length.
+	 */
+    public int size() {
+    	return list.size();
+    }
+
     @Override
     public boolean equivalent(Type that) {
         if (that == null) {
@@ -80,4 +88,13 @@ public class TypeList extends Type implements Iterable<Type> {
     public Iterator<Type> iterator() {
         return list.iterator();
     }
+
+    @Override
+	public int numBytes() {
+        int size = 0;
+        for (Type type : list) {
+			size += type.numBytes();
+        }
+        return size;
+	}
 }

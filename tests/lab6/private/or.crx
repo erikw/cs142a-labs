@@ -1,0 +1,45 @@
+// or
+
+func main() : void {
+  	if (false or true) {
+  	  	::printInt(101);
+  	} else {
+  		::printInt(10);
+  	}
+  	::println();
+  	var a : bool;
+  	var b : bool;
+  	let a = true;
+  	let b = true;
+  	if (a or b) {
+  	  	::printInt(101);
+  	} else {
+  		::printInt(10);
+  	}
+  	::println();
+  	let a = false;
+  	let b = true;
+  	if (a or b) {
+  	  	::printInt(101);
+  	} else {
+  		::printInt(10);
+  	}
+  	::println();
+  	let a = true;
+  	let b = false;
+  	if (a or b) {
+  	  	::printInt(101);
+  	} else {
+  		::printInt(10);
+  	}
+  	::println();
+  	let a = false;
+  	let b = false;
+  	if (a or b) {
+  	  	::printInt(101);
+  	} else {
+  		::printInt(10);
+  	}
+  	::println();
+}
+

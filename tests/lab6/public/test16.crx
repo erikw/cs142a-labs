@@ -1,0 +1,14 @@
+// test while loop
+
+var a:int;
+
+func main() : void {
+  let a = 9;
+  while (a > 0) {
+    ::printInt(a);
+    ::println();
+    let a = a-1;
+  }
+  ::printInt(0-5);
+  ::printInt(a);
+}

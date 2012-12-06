@@ -1,0 +1,4 @@
+// test printFloat
+func main() : void {
+  ::printFloat(0.5);
+}

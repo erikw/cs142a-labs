@@ -1,0 +1,22 @@
+// div
+
+func main() : void {
+  var a : int;
+  var b : int;
+  let a = 5;
+  let b = 2;
+  ::printInt(a/b);
+  ::println();
+  ::printInt(b/a);
+  ::println();
+
+  var c : float;
+  var d : float;
+  let c = 5.5;
+  let d = 1.5;
+  ::printFloat(c/d);
+  ::println();
+  ::printFloat(d/c);
+  ::println();
+}
+

@@ -57,7 +57,7 @@ public class BoolType extends Type {
 		if (!equivalent(source)) {
 			return super.assign(source);
 		} else {
-			return new VoidType();
+			return this;
 		}
 	}
 
@@ -69,5 +69,10 @@ public class BoolType extends Type {
 	@Override
 	public Type baseType(Symbol symbol) {
 		return this;
+	}
+
+	@Override
+	public int numBytes() {
+		return 4; 
 	}
 }    

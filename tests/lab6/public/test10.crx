@@ -1,0 +1,8 @@
+// test if-else: true condition, missing else branch
+
+func main() : void {
+  if (true) {
+    ::printInt(1);
+  }
+  ::printInt(0-1);
+}

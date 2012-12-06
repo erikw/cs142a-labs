@@ -56,6 +56,9 @@
 		<echo message="File: ${jarName}" />
 	</target>
 
+	<target name="cc" depends="clean,compile" description="Short hand for clean and compile.">
+	</target>
+
 	<target name="distribute" depends="compile,doc" description="Make a releaseable JAR.">
 
 		<property name="jarName" value="${path.release}/${project.name}.jar" />

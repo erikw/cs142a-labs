@@ -1,0 +1,10 @@
+// test recursion
+
+func fib(a:int) : int {
+  if (a <= 0) { return 1; }
+  return ::fib(a-1) + ::fib(a-2);
+}
+
+func main() : void {
+  ::printInt(::fib(5));
+}

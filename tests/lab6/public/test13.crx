@@ -1,0 +1,13 @@
+// test int comparison
+
+func blt(a:int, b:int) : bool {
+  return a < b;
+}
+
+func main() : void {
+  ::printBool(::blt(1,2));
+  ::println();
+  ::printBool(::blt(2,1));
+  ::println();
+  ::printBool(::blt(1,1));
+}

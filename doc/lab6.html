@@ -1,0 +1,610 @@
+<html>
+  <head>
+    <title>CS 142A: Interpreters and Compilers</title>
+    <link href="../../style.css" rel="StyleSheet" type="text/css" \>
+    <script type="text/javascript" src="../../code/jQuery.js"></script>
+
+  </head>
+
+  <body><div id="container">
+    <div id="header">
+      <p><a href="index.html">CS 142A: Interpreters and Compilers</a></p>
+    </div>
+
+    <div id="leftnav">
+      <!-- should provide a noscript hard link to a navigation page -->
+      <script type="text/javascript" src="../../code/menu.js"></script>
+      <script type="text/javascript">document.write(generateMenu(document.URL));</script>
+    </div>
+
+    <div id="content">
+    
+    <h1>Lab #6: <i>Code Generation</i></h1>
+    <p><b>Due date and time:</b> <i>Saturday, December 8, 11:59pm</i></span><br>
+    This project transforms our semantically checked AST into MIPS assembly code.
+    Out of all the projects in the course, you will likely find this one the trickiest and most difficult.
+    We are not handing out a solution to the previous lab.
+    To avoid delays, please make sure to see the TA or myself to get it working without error as soon as possible.
+    </p>
+
+    <h1>Introduction</h1>
+    <p>Now that we have a semantically verified tree representation of crux source code, we can translate that representation to assembly code.
+    Because we're targeting MIPS assembly, we will need a simulator for the MIPs architecture.
+    Fortunately, James Larus, has written <a href="http://spimsimulator.sourceforge.net/">SPIM</a>, for his compiler class at University of Wisconsin, Madison.
+
+    <h2>Obtaining Spim</h2>
+    <p>You may visit the <a href="">Sourceforge download site</a>, or use one of the links below.
+    <table>
+      <tr><th>OS</th><th>Download</th></tr>
+      <tr>
+        <td>Mac</td>
+        <td><a href="spim/QtSpim_9.0.3_mac.dmg">QtSpim_9.0.3_mac.dmg</a></td>
+      </tr>
+      <tr>
+        <td>Windows</td>
+        <td><a href="spim/QtSpim_9.1.7_Windows.zip">QtSpim_9.1.7_Windows.zip</a><br>
+            <a href="spim/PCSpim_9.1.4.zip">PCSpim_9.1.4.zip</a></td>
+      </tr>
+      <tr>
+        <td>Linux</td>
+        <td><a href="spim/qtspim_9.1.6_linux32.deb">qtspim_9.1.6_linux32.deb</a><br>
+          <a href="spim/qtspim_9.1.6_linux64.deb">qtspim_9.1.6_linux64.deb</a><br>
+          For those using Ubuntu, a command line version of spim is available using the command "apt-get install spim".</td>
+      </tr>
+    </table>
+    </p>
+
+    <h2>Working with Assembly</h2>
+    <p>For many of you, this project will be your first time working with assembly code.
+    Think of it as another, more primitive, computer language.
+    Assembly code is only a small abstraction away from actual machine code.
+    Instead of strange binary codes, each machine level operation is described via an easier remembered mnemonic opcode.
+    The processor itself has no concept of higher-level language conveniences, such as loop bodies, code blocks, type safety, variable scope, classes and objects, etc.
+    This lab focuses on lowering crux's higher-level features into assembly.
+    For example, we will model variables as storage on the stack which must first be loaded into a register before performing any operation.
+    If the variable's value is updated, as in the case of an assignment, the value must be stored back to the stack, in order for the update to persist.
+    </p>
+
+    <h2>Documentation</h2>
+    <p>You are encouraged to find MIPS/SPIM documentation online.
+    I'm providing some resources here, which I found useful during implementation.
+    <ul>
+      <li><a href="spim/spim.pdf">Introduction ot SPIM Programming</a></il>
+      <li><a href="spim/MIPS%20Tutorial.pdf">MIPS Assembly Language Programming</a></li>
+      <li><a href="http://www.utdallas.edu/~cantrell/ee2310/spim.inst.txt">Reference List of MIPS Instructions</a></li>
+    </ul>
+    </p>
+ 
+    <h1>Code Generation</h1>
+    <p>In this project we will write another visitor on the AST.
+    The mips.CodeGen visitor traverses a crux AST and generates MIPS assembly code.
+    Although the AST contains all of the information needed for compilation, the visitor is limited in its traversal.
+    For example, when the CodeGen visitor visits a FunctionDefinition node, it does not immediately know about the variables declared within the function body.
+    </p>
+    <p>In addition to local variables, Crux offers other language features, such as loops and conditional branching, that we shall have to translate into assembly code.
+    Some of these features tend to be more work than others, but we can always abstract some of the complexity by writing helper classes and methods.
+    For example, we can delay reservation of storage for function local variables until after the function body has been traversed.
+    </p>
+
+    <h1>Functions and Stack Frames</h1>
+    <p>Each time a function is called, the machine must perform some bookkeeping that allows it to return to the correct place when the function is finished.
+    We can model the functions on a stack data structure, because when F calls G, G must complete before F can resume where it left off.
+    At runtime, the <a href="http://en.wikipedia.org/wiki/Call_stack">call stack</a> contains an Activation Record for each active function.
+    A function's activation record stores bookkeeping information such as the return address and caller frame pointer and contains additional space for local variables.
+    In our code, we take care to ensure two invariants that make programming (and debugging) easier:
+    <ol>
+      <li>The frame pointer register, <code>$fp</code>, always holds the position of the activation record for the currently executing function (i.e., the one last placed on the stack).</li>
+      <li>The stack pointer register, <code>$sp</code>, always holds the position of the last value placed on the stack. Often, this will be a temporary from a subbranch of a long expression.</li>
+    </ol>
+    </p>
+
+    <p>When one function calls another, we have to ensure that special registers such as the frame pointer, <code>$fp</code>, are remembered and restored appropriately.
+    The passing of arguments and returning of values must also be handled with some care.
+    The most important aspect is that the caller and callee must <em>agree on a calling convention</em> that clearly delegates the bookkeeping responsibilities.
+    This agreement between functions is more important than the details of the convention itself.
+    Although calling conventions vary by architecture, they all have strong similarities to each other.
+    In this project, the calling convention passes all arguments via the stack.
+    We make this simplification to avoid writing code that would handle real-world complexities like "callee saved" and "caller saved" registers.
+    </p>
+
+    <p>
+    A function call breaks down into four discrete steps:
+    <ol>
+      <li>caller sets up the callsite,</li>
+      <li>callee remembers where it should go after finishing and sets up space for itself,</li>
+      <li>callee finishes and tears itself down,</li>
+      <li>caller retrieve any return value and tears down the callsite.</li>
+    </ol>
+    </p>
+
+    <h2>Caller Setup</h2>
+    <table>
+    <tr><td style="border: 0px">
+    <p>The caller has evaluated all the arguments that will be passed to the callee, and pushed them on the stack.
+    The stack pointer, <code>$sp</code>, references the last argument pushed.
+    The frame pointer, <code>$fp</code>, references the currently executing frame (somewhere much higher on the stack).
+    In MIPS the stack grows down.
+    So each time a value code pushes a value on the stack it subtracts from <code>$sp</code> the size (in bytes) of that value.
+    </p>
+    <!-- <p>Although we won't be dealing with this issue in our project, some calling conventions have what are known as "caller saved registers".
+    The convention allows the callee to use these registers during its execution, so there is no guarantee that they hold their original values after the call has finished.
+    In addition to placing arguments on the stack, the caller would also store onto the stack any of the caller saved registers.
+    </p> -->
+
+    <p>Finally, after evaluating the arguments, and placing them on the stack, the caller makes a call to the function "func".
+    The <code>jal</code> opcode automatically changes the return address register, <code>$ra</code> to hold the instruction immediately following itself.
+    When "func" has finished, that's exactly where the current function will pick up again.
+    </p>
+    <dl>
+      <dd><code>//eval and push args</code></dd>
+      <dd><code>jal func</code></dd>
+    </dl>
+    </td>
+    <td><pre>
+                     &larr;$fp
+
+
+     |             |
+     | computation |
+     +-------------+
+     |             |
+     |             |
+     |             |
+     |             |
+     |   args      |
+$sp&rarr; +-------------+
+    </pre>
+    </td></tr>
+    </table>
+   
+    <h2>Callee Prologue</h2>
+    <table>
+    <tr><td style="border: 0px">
+        <p>Every function (including the main function) begins with some entry code, known as the prologue, that executes as soon as the function takes over execution.
+        The callee first allocates some space for bookkeeping values.
+        </p>
+        <dl>
+          <dd><code>subu $sp, $sp, 8</code></dd>
+        </dl>
+        <p>Next, the callee saves the caller's frame pointer and return address.
+        </p>
+        <dl>
+          <dd><code>sw   $fp, 0($sp)</code></dd>
+          <dd><code>sw   $ra, 4($sp)</code></dd>
+        </dl>
+        <p>Then it updates the frame pointer to reference its own activation record.
+        </p>
+        <dl>
+          <dd><code>addi $fp, $sp, 8</code></dd>
+        </dl>
+        <p>Finally it reserves enough space on the stack to store all the variables and arrays local to this function.
+        For the sake of using real numbers in our example, let's assume "func" has one int and an array of three floats.
+        On MIPS, ints are 4 bytes, and each float (single precision) is 4 bytes.
+        That means we must reserve 1*4 + 3*4 = 16 bytes.
+        </p>
+        <dl>
+          <dd><code>subu $sp, $sp, 16</code></dd>
+        </dl>
+    </td>
+    <td><pre>
+     |             |
+     |  args       |
+     +-------------+ &larr;$fp
+     |  ret addr   |
+     +-------------+
+     |  prev fp    |
+     +-------------+
+     |   var int   |
+     |  float [0]  |
+     |  float [1]  |
+     |  float [2]  |
+$sp&rarr; +-------------+
+    </pre>
+    </td></tr>
+    </table>
+
+    <h2>Callee Execution</h2>
+    <table><tr><td style="border: 0px">
+    <p>Note that, during execution the frame pointer provides the anchor from which addresses for arguments and local variables can be computed.
+    </p>
+    <p>
+    For example, <code>0($fp)</code> holds the last argument, <code>-4($fp)</code> holds the second-to-last argument, <code>-8($fp)</code> holds the third-to-last argument, etc.
+    If "func" had 5 arguments, the first one would be at <code>-16($fp)</code>
+    </p>
+    <p>Similarly, but in the other direction, we can address the local variables.
+    However, we have to skip past the return address and previous frame pointer.
+    The one local int is at <code>-12($fp)</code>, and the base address of the array of three floats is found at <code>-16($fp)</code>.
+    </p>
+    <p>This project implements computations with a stack machine model of execution.
+    So, the callee will place temporary values that result from partial evaluation of expressions onto the stack.
+    These temporary values do not persist between expressions, and can be accessed via the stack pointer, <code>$sp</code>.
+    </p></td>
+    <td><pre>
+     |             |
+     |  args       |
+     +-------------+ &larr;$fp
+     |  ret addr   |
+     +-------------+
+     |  prev fp    |
+     +-------------+
+     |             |
+     | local vars  |
+     |             |
+     +-------------+
+     | temp space  |
+     |    for      |
+     | computation |
+     |             |
+$sp&rarr; +-------------+
+    </pre>
+    </td></tr>
+    </table>
+
+    <h2>Callee Epilogue</h2>
+    <table>
+    <tr><td style="border: 0px">
+        <p>After "func" has completed its execution, it has tear down its activation record.
+        It does this by undoing the work of the prologue, in precisely reverse order, starting with popping off the stack the space reserved for locals. (Remember 16 bytes is only for this example, the actual amount will vary by function.)
+        </p>
+        <dl>
+          <dd><code>addu $sp, $sp, 16</code></dd>
+        </dl>
+        <p>Next, the return address and caller's frame pointer are restored.
+        </p>
+        <dl>
+          <dd><code>lw   $ra, 4($sp)</code></dd>
+          <dd><code>lw   $fp, 0($sp)</code></dd>
+        </dl>
+        <p>The space for this bookkeeping is popped from the stack.
+        <dl>
+          <dd><code>addu $sp, $sp, 8</code></dd>
+        </dl>
+        <p>Finally, control is transfered back to the caller using a jump return.
+        </p>
+        <dl>
+          <dd><code>jr   $ra</code</dd>
+        </dl>
+     </td>
+    <td><pre>
+                     &larr;$fp
+
+
+     |             |
+     | computation |
+     +-------------+
+     |             |
+     |             |
+     |             |
+     |             |
+     |    args     |
+$sp&rarr; +-------------+ <span style="color:Silver">
+     |  ret addr   |
+     +-------------+
+     |  prev fp    |
+     +-------------+
+     |             |
+     | local vars  |
+     |             |
+     +-------------+</span>
+    </pre>
+    </td></tr>
+    </table>
+   
+ 
+    <h2>Caller Teardown</h2>
+    <table>
+    <tr><td style="border: 0px">
+        <p>The caller now picks up execution where it left off.
+        The arguments provided to the caller are no longer needed, and can be popped off the stack.
+        Assuming that "func" had five arguments, we'd pop 5*4 = 20 bytes off the stack.
+        </p>
+        <dl>
+          <dd><code>subu $sp, $sp, 20</code></dd>
+        </dl>
+        <p>If the function called happens to have a return value it will be found in register <code>$v0</code>.
+        Following the stack machine execution semantics, now is the time to push the return value on the stack.
+        Conceptually, the 5 arguments are now replaced by the 1 result value.
+        Functions with void return type have no value to return, and so would skip this step and not push anything onto the stack.
+        </p>
+        <dl>
+          <dd><code>subu $sp, $sp, 4</code></dd>
+          <dd><code>sw   $v0, 0($sp)</code></dd>
+        </dl>
+      </td>
+      <td><pre>
+                     &larr;$fp
+
+
+     |             |
+     | computation |
+     +-------------+
+     | return val  |
+$sp&rarr; +-------------+<span style="color:Silver">
+     |             |
+     |             |
+     |             |
+     |             |
+     |    args     |
+     +-------------+</span>
+    </pre>
+    </td></tr>
+    </table>
+
+    <h2>Returning a Value</h2>
+    <p>Each function has only one epilogue.
+    When a function has a return statement, it first evaluates the expression.
+    It then pops the result off the stack and into the return register, <code>$v0</code>.
+    Control can safely jump directly to the function epilogue.
+    Neither the epilogue nor caller teardown of function arguments affect the value in register <code>$v0</code>.
+    By choosing register, <code>$v0</code>, the return value is safely preserved until the caller is ready to push it to the stack.
+    </p>
+
+    <h1>Accessing Global and Local Symbols</h1>
+    <p>Just as we did in <a href="../lab3/">Lab 3: Symbol Table</a>, we will again have to model variable use.
+    This time around, it's not to find errors, for those have already been discovered by our semantic checks in earlier labs, but to retrieve and store values at runtime.
+    For that, we need access to each symbol's address.
+    </p>
+
+    <h2>Symbols in Function Scope</h2>
+    <p>A helper ActivationRecord class assists the CodeGen visitor in tracking the location of variables and arrays.
+    Each time the visitor encounters an array or variable declaration it notifies the current ActivationRecord object, which records an offset (from the frame pointer) where the symbol will be stored at runtime.
+    Later, when the crux program uses a variable, the CodeGen visitor retrieves the base address of that symbol from the current ActivationRecord.
+    Because we create only one ActivationRecord per FunctionDeclaration, all variables declared within that function are 'lifted' to function-level scope.
+    </p>
+ 
+    <h2>Symbols in Global Scope</h2>
+    <p>The MIPS architecture provides a global data store, which can reside outside of individual functions.
+    Global data persists between function calls, and does not require an active stack frame for storage.
+    Another class, GlobalRecord, extends the ActivationRecord class, to specialize on the storage and retrieval of global variables.
+    The CodeGen visitor begins its traversal of the crux program AST with a GlobalRecord object.
+    This object adds any variable or array declarations to the data segment section of the assembly code.
+    It also returns to the visitor "load address" opcodes for any global data retrieved.
+    </p>
+
+    <h2>Transitioning from Global to Function Scope</h2>
+    <p>Each time the CodeGen visitor encounters a FunctionDefinition, it can create a new ActivationRecord object to model that function's scope.
+    ActivationRecord's are linked via parent field, that allows symbol lookup to chain upwards.
+    If a symbol isn't found in the inner-most scope, a parent ActivationRecord supplies the address.
+    Once the CodGen visitor has finished assembling the function body, it can pop the current ActivationRecord and restore the previous one.
+    </p>
+
+    <h1>Evaluating Expressions on a Stack Machine</h1>
+    <p>The assembly code that we generate in this project is far from optimal.
+    Despite the fact that MIPS has plenty of general purpose registers, we will be implementing a <a href="http://en.wikipedia.org/wiki/Stack_machine">Stack Machine</a>.
+    Our emitted assembly code will unnecessarily shuffle values back and forth between registers and stack, resulting in slow MIPS programs.
+    However, the stack machine design is much easier to implement and debug and this course values correctness of results over performance.
+    The goal is not to try and compute results now, during compilation, but to generate code that will compute the results when the mips assembly is executed.
+    </p>
+
+    <h2>The General Approach</h2>
+    <table><tr>
+      <td style="border: 0px">
+        <p>Prior to calculating a result, the code generator must first evaluate the arguments to each operation.
+        The generated assembly will place all temporary results are on the stack.
+        For an example, let's see what code is generated by the expression "<code>3*a</code>", which has an AST shown on the right.
+        </p>
+        <p>The <code>Add</code> node must first determine its inputs, beginning with the leftSide expression.
+        The leftSide, a <code>Mul</code> node, must also also first determine its leftSide.
+        The leftSide of the <code>Mul</code> node is an <code>IntLiteral</code> which generates the conceptual instruction:
+        </p>
+        <dd><dd><code>push the number 3</code></dd></dl>
+        <p>Having finished with the leftSide of the <code>Mul</code> node, the CodeGen visitor proceeds down the rightSide, where it reaches a <code>Dereference</code> node.
+        This node also first determines its argument, the <code>ReadSymbol</code> node, which generates the conceptual instruction:
+        </p>
+        <dl><dd><code>push the address of the symbol "a"</code></dd></dl>
+        <p>The visitor picks up where it left off: evaluating the <code>Dereference</code> node, which generates the conceptual instructions:
+        </p>
+        <dl>
+          <dd><code>pop argument (address of symbol "a")</code></dd>
+          <dd><code>load the value at that address</code></dd>
+          <dd><code>push the value</code></code></dd>
+        </dl>
+        <p>Now the CodeGen visitor has finished processing both sides of the <code>Mul</code>, and it can create code for the multiplication.
+        <dl>
+          <dd><code>pop the rightSide (value of variable "a")</code></dd>
+          <dd><code>pop the leftSide  (the number 3)</code></dd>
+          <dd><code>compute the multiplication</code></dd>
+          <dd><code>push the result</code>
+        </dl>
+        <p>With the leftSide of the <code>Add</code> node finished, the visitor proceeds to evaluate the rightSide, which contains another <code>IntLiteral</code> node.
+        </p>
+        <dl><dd><code>push the number 2</code></dd></dl>
+        <p>Finally, both sides of the <code>Add</code> node have been visited and the CodeGen visitor can emit assembly that computes the addition.
+        </p>
+        <dl>
+          <dd><code>pop the rightSide (the number 2)</code></dd>
+          <dd><code>pop the leftSide  (the result of mul)</code></dd>
+          <dd><code>compute the addition</code></dd>
+          <dd><code>push the result</code></dd>
+        </dl>
+      </td>
+      <td>
+        <pre>
+                Add
+               /   \
+             /       IntLiteral
+          Mul            2
+        /     \
+      /     Dereference
+    /            |
+IntLiteral   ReadSymbol
+    3            a
+        </pre>
+      </td>
+    </tr></table>
+
+    <h2>Floating Point Comparison</h2>
+    <p>MIPS provides 6 comparison operators for integers (<code>slt</code>, <code>sle</code>, <code>seq</code>, <code>sne</code>, <code>sge</code>, <code>sgt</code>) but only 3 for floating point numbers (<code>c.eq.s</code>, <code>c.le.s</code>, <code>c.lt.s</code>).
+    Even more inconvenient the floating point comparison operators put the result into a float-flag.
+    In our stack machine semantics, we need to push the result of the comparison onto the stack.
+    But the float-flag cannot be dumped into a register.
+    To access the result of the comparison we use one of the floating point branch instructions (<code>bc1f</code>, <code>bc1t</code>) in a hand-coded tiny if-else clause that pushes either 1 (true) or 0 (false) to the stack.
+    <em>I think hand-coding this if-else clause is rather inelegant, feel free to suggest a better approach.</em>
+    </p>
+
+    <h2>Short-circuit Logical Operations</h2>
+    <p>Most languages employ <a href="http://en.wikipedia.org/wiki/Short-circuit_evaluation">short-circuit evaluation</a> of the logical operators (and, or).
+    For example, if the left (first) argument of a logical AND evaluates false, then the AND can immediately return false, allowing the machine to save time by skipping the evaluation of the right (second) argument.
+    Crux, being a very simple language, evaluates all of the arguments to the logical operation.
+    It does not support short-circuit evaluation of logical operations.
+    We make this language design decision because it simplifies code generation.
+
+    <h2>Statements do not Grow the Stack</h2>
+    <p>As exhibited in the stack machine example, evaluating an expression leaves the result of that expression on the stack.
+    Each operator, can expect its arguments to be waiting on the stack, ready to pop off for computation.
+    Expressions grow the stack as necessary for their subcomputations, and then push their own results on the top of the stack, where it can be popped of by a parent expression.
+    </p>
+    <p>In contrast, statements do not modify the stack size.
+    A statement may contain an expression, which does modify the stack size during its execution.
+    However, when the statement has finished evaluation of that expression, the stack is at the same size as when the statement began.
+    We must enforce this constraint, otherwise the function epilogue will not execute as expected.
+    For example, if a statement accidentally leaves a value pushed on the stack, then the stack pointer not be where the function epilogue expects.
+    Remember, the stack pointer arithmetic in the epilogue is dependant only on the size of the local variables, and assumes that the stack pointer is exactly that amount away from the bookkeeping data in the stack frame.
+    </p>
+    
+    <h1>Control Flow</h1>
+    <p>In addition to calling functions, we must also model the IfElseBranch and WhileLoop.
+    Both of these language features involve jumping over a block of code.
+    Depending on its condition, an IfElseBranch skips either the then-block or the else-block.
+    When its condition evaluates false, a WhileLoop skips past the loop-body.
+    </p>
+
+    <h2>Labels</h2>
+    <p>MIPS assembly allows the code generator to emit labels that mark jump targets.
+    Together with an instruction to jump to any specified label, the assembly allows a great convenience: We don't have to calculate the number of bytes between the jump instruction and its target.
+    Using a convenience function to generate unique labels, we avoid mixing up jump targets.
+    A label can be emitted just before each block of code critical to control flow, including loop condition blocks, join blocks, and function prologues.
+
+    <!--
+    <table>
+      <tr><th>IfElseBranch</th><th>WhileLoop</th></tr>
+      <tr>
+        <td><pre>
+       condition   
+       jump ---------\
+       then block    |
+  /----jump          |
+  |    else block  &lt;-/
+  |    else block  
+  \-&gt;  join block
+        </pre></td>
+        <td><pre>
+
+        </pre></td>
+      </tr>
+    </table>
+    -->
+
+    <h2>Name Mangling</h2>
+    <p>The SPIM assembler does not allow us to use MIPS instruction names as labels.
+    For example, we cannot use the label "<code>bne:</code>" as a jump target.
+    Because we use labels for function names, we must be careful that the label for a function name does not collide with a MIPS instruction.
+    That is, if the crux source code contains a "<code>func bne() : ....</code>", we could not use "<code>bne</code>" as the label for that function in the MIPS assembly.
+    We avoid name collision by automatically translating all crux function names to a form that will not result in any confusion.
+    It's fine to use a simple mechanism for this process, such as prefixing "func." or "crux." to all function labels.
+    Be sure to establish a mangling convention that avoids collisions between crux globals, crux functions, code jump labels, and mips assembly commands.
+    One caveat however, MIPS expects that the main function is labeled "main".
+    </p>
+
+    <h1>What do I need to Implement?</h1>
+    <ul>
+      <li>Implement the methods in the mips.CodeGen visitor class.</li>
+      <li>Fill out any incomplete methods in the mips.Program helper class.</li>
+    </ul>
+
+    <p>For convenience, you may get a start on this lab by using a pre-made <a href="Lab6_CodeGen.zip">Lab6_CodeGen.zip</a> project, which contains the <code>mips</code> package.
+    As before, you are both allowed and encouraged to make your program easier to read and maintain by implementing helper functions with good names.
+    </p>
+
+    <h2>Changes from Lab 5: Types</h2>
+    <ul>
+      <li>Update the Compiler driver to produce MIPS assembly output.</li>
+    </ul>
+ 
+    <h1>Testing</h1>
+    <p>Test cases are available in this <a href="tests.zip">tests.zip</a> file.
+    The provided tests are not meant to be exhaustive.
+    You are strongly encouraged to construct your own.
+    (If chrome gives you a warning that "tests.zip is not commonly downloaded and could be dangerous" it means that Google hasn't performed an automated a virus scan.
+    This warning can be safely ignored, as the tests.zip file contains only text files.)
+    </p>
+
+    <h1>Deliverables</h1>
+    <p>A zip file, named Crux.zip, containing the following files (in the <code>crux</code> package):
+    <ul>
+      <li>The <code>crux</code> package: NonTerminal, Parser, Scanner, Compiler, Token, Symbol and SymbolTable.</li>
+      <li>The <code>ast</code> package: A class for each Command, a CommandVisitor interface, and a PrettyPrinter.</li>
+      <li>The <code>types</code> package: A class for each Type, and a TypeChecker implementing the CommandVisitor interface.</li>
+      <li>The <code>mips</code> package: The CodeGen visitor class, and any helper classes.
+    </ul>
+    </p>
+
+    <p>Please use the <a href="../../tester/index.php">AutoTester</a> to make sure that your work meets our requirements.
+    We reserve the right to assign 0 points to any submissions which cannot be automatically unzipped and tested.
+    Additionally, we reserve the right to assign 0 points to any submission which 'games' the automated testing by using a lookup which produces only outputs that correspond to the test cases we happen to use.
+    You are bound to all of the rules on the <a href="../../submittingprojects.html">Submitting Labs</a> page.
+    Be sure to submit the version of the project that you want graded, as we won't regrade if you submit the wrong version by accident.
+    </p>
+         
+    </div>
+    <div id="footer"></div>
+
+  </div></body>
+</html>
+
+<!--
+ Change to previous (which?)
+  - enforce signature of main()
+ Change name of LiteralBoolean -> LiteralBool
+                LiteralInteger -> LiteralInt
+ Change Lab3 to pre-load the symbols
+             and verify that main() exists
+ Change Lab5 to apply types to the preloaded symbols
+             and verify that main() has appropriate type
+  - preload:
+    printInt
+    printFloat
+    readInt
+    readFloat
+    println
+
+ - build convenience functions in code gen framework
+   - a call method for each built-in
+ 
+ x variable lookup
+   x lifted to function scope
+   x track/distinguish params, locals, globals
+     automatically get the offset from fp
+
+ - functions
+   x preamble and teardown
+   x allocation (to include the locals, but not params)
+   x return values always left in $v0
+
+   - stack alignment issues
+     x calling void functions should not put their return on the stack
+     - Statements of non-void type should not leave their results on the stack
+       (ex: calling a non-void function, but doing nothing with the argument)
+       => invariant: each statement leaves the stack where it was
+
+ - logic
+   - the floating point comparisons are a bitch
+     only 3 of the logics are available, and the flag is implicit
+     so have to implement a tiny if-else-branch to write out the bool result to the stack
+   - neither of and, or have short-cut evaluation semantics
+
+ - force that a function with signature exists:
+   main() : void
+
+   - Symbol Lab has to change: force the lifting of variables to function scope
+     this makes codegen easier (locating stack vars is a pain otherwise)
+     ... but with the statement invariant, it shouldn't be that bad....
+     ... could have a stack of those ActivationRecords ...
+     ... NO, don't be tempted
+  
+     http://www.utdallas.edu/~cantrell/ee2310/spim.inst.txt
+
+<span = "todo">Create a test for function-level scope variable lifting</span>
+
+
+-->

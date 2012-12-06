@@ -1,0 +1,27 @@
+// test array of floats
+
+var canary_begin:int;
+array a : float[3];
+var canary_end:int;
+  
+
+func main() : void {
+  var counter : int;
+  
+  let canary_begin = 0;
+  let canary_end = 0;
+  
+  let a[0] = 1.11;
+  let a[1] = 2.22;
+  let a[2] = 3.33;
+
+  ::printInt(canary_begin);
+  ::println();
+  let counter = 0;
+  while (counter < 3) {
+    ::printFloat(a[counter]);
+    ::println();
+    let counter = counter + 1;
+  }
+  ::printInt(canary_end);
+}

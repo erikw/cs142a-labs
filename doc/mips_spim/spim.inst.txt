@@ -1,0 +1,180 @@
+                        MIPS INSTRUCTIONS, REGISTERS AND SYSTEM CALLS
+                             1. INTEGER and GENERAL INSTRUCTIONS
+
+  Call      Arg 1     Arg 2     Arg3                  Description
+
+* abs       rd        rs                  put the absolute value of rs into rd
+  add       rd        rs        rt        rd = rs + rt (with overflow)
+  addu      rd        rs        rt        rd = rs + rt (without overflow)
+  addi      rt        rs        imm       rt = rs + imm (with overflow)
+  addiu     rt        rs        imm       rt = rs + imm (without overflow)
+  and       rd        rs        rt        put rs AND rt into rd
+* b         label                         branch to label
+  beq       rs        rt        label     branch to label if (rs==rt)
+* beqz      rs        label               branch to label if (rs==0)
+* bge       rs        rt        label     branch to label if (rs>=rt)
+  bgez      rs        label               branch to label if (rs>=0)
+  bgt       rs        rt        label     branch to label if (rs>rt)
+  bgtz      rs        label               branch to label if (rs>0)
+  ble       rs        rt        label     branch to label if (rs<=rt)
+  blez      rs        label               branch to label if (rs<=0)
+* blt       rs        rt        label     branch to label if (rs<rt)
+  bltz      rs        label               branch to label if (rs<0)
+  bne       rs        rt        label     branch to label if (rs!=rt)
+* bnez      rs        label               branch to label if (rs!=0)
+  div       rd        rs        rt        rd = rs DIV rt
+  j         label                         jump to label
+  jal       label                         jump to label and save next instruction in rd
+  jalr     [rd]       rs                  jump to instruction at (rs), save next in rd
+  jr        rs                            jump to instruction at (rs)
+* la        rd        label               load address of word at label into rd
+  lb        rt        address             load byte at address into rt, sign xtnd
+  lbu       rt        address             load byte at address into rt 
+* li        rd        number              load number into rd
+  lui       rt        number              upper halfword of rt = 16-bit number
+  lw        rd        address             load the word at address into rd
+  lw        rd        offset(base)        load word at addr offset+base into rd
+* move      rd        rs                  move rs to rd
+* mul       rd        rs        rt        rd = rs * rt
+* neg       rd        rs                  rd = - rs
+  nop                                     do nothing
+  nor       rd        rs        rt        rd = rs NOR rt
+* not       rd        rs                  rs = bitwise logical negation of rd
+  or        rd        rs        rt        rd = rs OR rt
+  ori       rt        rs        imm       rt = rs OR imm
+* rem       rd        rs        rt        rd = rs MOD rt
+* rol(ror)  rd        rs        rt        rd = rs rotated left(right) by rt
+  sb        rt        address             store byte in rt to address
+* seq       rd        rs        rt        if (rs==rt) rd=1;else rd=0
+* sge       rd        rs        rt        if (rs>=rt) rd=1;else rd=0
+* sgt       rd        rs        rt        if (rs>rt) rd=1;else rd=0
+* sle       rd        rs        rt        if (rs<=rt) rd=1;else rd=0
+  sll       rd        rt        sa        rd = rt shifted left by distance sa
+  slt       rd        rs        rt        if (rs<rt) rd=1;else rd=0
+* sne       rd        rs        rt        if (rs!=rt) rd=1;else rd=0
+  sra       rd        rt        sa        rd = rt shifted right by sa, sign-extended
+  srl       rd        rt        sa        rd = rt shifted right by sa, 0-extended
+  sub       rd        rs        rt        rd = rs - rt
+  sw        rt        address             store the word in rt to address
+  sw        rt        offset(base)        store word in rt to addr offset+base
+  syscall                                 do a system call depending on contents of $v0
+  xor       rd        rs        rt        rd = rs XOR rt
+
+* Indicates a pseudoinstruction (assembler generates more than one 
+  instruction to produce the same result) (a pseudoinstruction has no opcode)
+  ----------------------------------------------------------------------------
+
+                                2. FLOATING POINT INSTRUCTIONS
+                                       (single precision)
+
+  Call      Arg 1     Arg 2     Arg3                  Description
+
+  abs.s     fd        fs                  fd = absolute value of fs
+  add.s     fd        fs        ft        fd = fs + ft
+  bc1f      label                         branch to label if float-flag is FALSE
+  bc1t      label                         branch to label if float-flag is TRUE
+  c.eq.s    fs        ft                  if (fs==ft) then float-flag is TRUE, else its FALSE
+  c.le.s    fs        ft                  if (fs<=ft) then float-flag is TRUE,else its FALSE
+  c.lt.s    fs        ft                  if (fs<ft) then float-flag is TRUE, else its FALSE
+  cvt.s.w   fd        fs                  convert integer in fs to single-precision float in fd
+  cvt.w.s   fd        fs                  convert single-precisoin float in fs to integer in fd
+  div.s     fd        fs        ft        fd = fs / ft
+  l.s       fd        address             load the single at address into fd
+  li.s      fd        number              load the number fd
+  mov.s     fd        fs                  move single from fs to fd
+  mfc1      rd        rs                  move integer rs to float rd
+  mtc1      rs        rd                  move integer rs to float rd
+  mul.s     fd        fs        ft        fd = fs * ft
+  neg.s     fd        fs                  fd = - fs
+  s.s       fd        addresss            store fd at in memory at address
+  sub.s     fd        fs        ft        fd = fs - ft
+
+----------------------------------------------------------------------------
+
+                               3a. CPU REGISTERS
+
+        Name     Register             Function
+
+         $a0        4       used to pass the first of four arguments
+         $a1        5       used to pass the second of four arguments
+         $a2        6       used to pass the third of four arguments
+         $a3        7       used to pass the fourth of four arguments
+         $at        1       reserved for the operating system
+         $fp       30       frame pointer.
+         $gp       28       global memory pointer
+         $k0       26       reserved for the operating system
+         $k1       27       reserved for the operating system
+         $ra       31       return address
+         $s0       16       callee-saved registers
+         $s1       17       callee-saved registers
+         $s2       18       callee-saved registers
+         $s3       19       callee-saved registers
+         $s4       20       callee-saved registers
+         $s5       21       callee-saved registers
+         $s6       22       callee-saved registers
+         $s7       23       callee-saved registers
+         $sp       29       stack pointer to the first free location
+         $t0        8       used to hold temporary variables
+         $t1        9       used to hold temporary variables
+         $t2       10       used to hold temporary variables
+         $t3       11       used to hold temporary variables
+         $t4       12       used to hold temporary variables
+         $t5       13       used to hold temporary variables
+         $t6       14       used to hold temporary variables
+         $t7       15       used to hold temporary variables
+         $t8       24       used to hold temporary variables
+         $t9       25       used to hold temporary variables
+         $v0        2       used to pass values to and from functions
+         $v1        3       used to pass values to and from functions
+         
+                               3b. FPU (CP1) REGISTERS
+
+        Name     Register             Function
+
+         $f0     (float)    hold floating point type function results
+         $f2     (float)    hold floating poitn type function results
+         $f4     (float)    temporary register
+         $f6     (float)    temporary register
+         $f8     (float)    temporary register
+         $f10    (float)    temporary register
+         $f12    (float)    pass the first of two float arguments
+         $f14    (float)    pass the second of two float arguments
+         $f16    (float)    temporary register
+         $f18    (float)    temporary register
+         $f20    (float)    saved register
+         $f22    (float)    saved register
+         $f24    (float)    saved register
+         $f26    (float)    saved register
+         $f28    (float)    saved register
+         $f30    (float)    saved register
+         
+                               3c. CP0 REGISTERS
+
+                 Register             Function
+
+                    13      Cause
+                    14      EPC (Exception Program Counter)
+
+----------------------------------------------------------------------------
+
+                        4. SYSTEM CALL INFORMATION
+
+      Call Code    Event       Arguments                Result
+      (in $v0)
+
+        1        print int     $a0 = integer            $a0 is printed out
+        2        print float   $f12 = float             $f12 is printed out
+        4        print string  $a0 = pointer to string  string is printed out
+        5        read int                               $v0 holds integer read
+        6        read float                             $f0 holds float read
+        7        read double                            $f0 holds double read
+        8        read string   $a0 = buffer,a1 = length string is read from console
+        9        sbrk          $a0 = amount             address of additional memory in $v0
+       10        exit program
+       11        print byte    $a0 = byte               byte is printed out
+
+
+----------------------------------------------------------------------------
+
+Originally due to Eric Gauthier
+Modified and expanded by C. D. Cantrell

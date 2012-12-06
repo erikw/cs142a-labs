@@ -45,7 +45,7 @@ public class AddressType extends Type {
         if (!source.equivalent(base)) {
         	return super.assign(source);
         } else {
-        	return new VoidType();
+        	return base.assign(source);
         }
     }
 
@@ -102,4 +102,9 @@ public class AddressType extends Type {
     public Type compare(Type that) {
         return base.compare(that);
     }
+
+	@Override
+	public int numBytes() {
+		return base.numBytes(); 
+	}
 }

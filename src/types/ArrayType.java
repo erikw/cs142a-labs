@@ -10,7 +10,7 @@ public class ArrayType extends Type {
     /* Base of the array. */
     private Type base;
 
-    /* How far from the base this array reaches. */
+    /* How far from the base this array reaches i.e. the dimension of this array. */
     private int extent;
 
     /**
@@ -74,5 +74,10 @@ public class ArrayType extends Type {
 	public Type baseType(Symbol symbol) {
 		//return (base instanceof ArrayType) ? base.baseType(symbol) : base;
 		return base.baseType(symbol);
+	}
+
+	@Override
+	public int numBytes() {
+		return extent * base.numBytes(); 
 	}
 }
