@@ -103,7 +103,6 @@ public class AddressType extends Type {
         return base.compare(that);
     }
 
-    // TODO ugly hack to get visit(index node) in codGen to work --OR-- is this correct?
 	@Override
 	public int numBytes() {
 		return base.numBytes(); 

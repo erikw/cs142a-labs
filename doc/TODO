@@ -1,3 +1,1 @@
 * Clean up unused imports. :JavaImportClean
-* grep -nri "implement|todo" src/
-* cleanyup unused outcommented code

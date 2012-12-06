@@ -528,10 +528,7 @@ public class CodeGen implements ast.CommandVisitor {
     	program.debugComment("Handle source.");
     	node.source().accept(this);
     	Type type = typeChecker.getType(node);
-        if (type instanceof ArrayType) {
-        	// TODO
-        	throw new RuntimeException("Implement this?????????????/");
-        } else if (type.equivalent(new FloatType())) {
+        if (type.equivalent(new FloatType())) {
     		program.debugComment("Popping off value in asignmnet.");
         	program.popFloat("$f0");
     		program.debugComment("Popping off destination address in assigmnet.");
@@ -546,7 +543,7 @@ public class CodeGen implements ast.CommandVisitor {
     		program.debugComment("Final assignment.");
         	program.appendInstruction("sw $t0, 0($t1)");
         } else {
-        	throw new RuntimeException("type=" + type + " in node=" + node);
+        	throw new CodeGenException("Weird type \"" + type + "\" in assignment.");
         }
     	program.debugComment("done -> Assignment beginns.");
     }
