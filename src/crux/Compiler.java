@@ -180,7 +180,7 @@ public class Compiler {
         if (args.length == 1) {
         	sourceFile = args[0];
         } else if (args.length == 2) {
-			Matcher matcher  = Pattern.compile("-l\\s?([1-6])").matcher(args[0]);;
+			Matcher matcher = Pattern.compile("-l\\s?([1-6])").matcher(args[0]);;
 			if (matcher.matches()) {
 				String labNumStr = matcher.group(1);
 				int labNum = Integer.valueOf(labNumStr);

@@ -23,7 +23,7 @@ public abstract class AbstractSymbolTable {
 		}
 
     	/**
-    	 * The father of a children with a NULL parent is always the child it self; think Adam and Eva.
+    	 * The father of a child with a NULL parent is always the child it self; think Adam and Eva.
     	 */
     	protected AbstractSymbolTable whoIsMyFather(AbstractSymbolTable child) {
     		return child; // Vader, I'm your father.

@@ -28,7 +28,6 @@ public class Parser {
 	/* Buffer for error messages. */
 	private StringBuilder errorBuffer = new StringBuilder();
 
-
 	/* Scanner to fecth tokens from. */
 	private Scanner scanner;
 

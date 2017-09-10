@@ -153,7 +153,7 @@ public class Token {
 		return makeTokenFromKindWLexeme(lineNum, charPos, kind, "");
 	}
 
-	/**=
+	/**
 	 * Make an operator of kind.
 	 * @param lineNum The line number.
 	 * @param charPos The character positionl

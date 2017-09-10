@@ -1,5 +1,6 @@
+*.asm
+*.sw[op]
 bin/
 doc/gen
+release/
 tags
-*.sw[op]
-*.asm
